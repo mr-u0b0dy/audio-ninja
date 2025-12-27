@@ -12,6 +12,7 @@ pub mod hrtf;
 pub mod iamf;
 pub mod jitter;
 pub mod latency;
+pub mod loudness;
 pub mod mapping;
 pub mod network;
 pub mod pipeline;
