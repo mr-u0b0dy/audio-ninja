@@ -8,7 +8,9 @@ fn peak_linear(samples: &[f32]) -> f32 {
     samples.iter().map(|s| s.abs()).fold(0.0f32, f32::max)
 }
 
-fn db_to_linear(db: f32) -> f32 { 10f32.powf(db / 20.0) }
+fn db_to_linear(db: f32) -> f32 {
+    10f32.powf(db / 20.0)
+}
 
 #[test]
 fn test_renderer_normalizes_to_streaming_target() {
@@ -31,7 +33,11 @@ fn test_renderer_normalizes_to_streaming_target() {
     let lufs = meter.measure_integrated_loudness(&output);
 
     // Expect near -14 LUFS within reasonable tolerance
-    assert!((lufs - (-14.0)).abs() < 1.0, "normalized loudness {} LUFS not near -14", lufs);
+    assert!(
+        (lufs - (-14.0)).abs() < 1.0,
+        "normalized loudness {} LUFS not near -14",
+        lufs
+    );
 }
 
 #[test]
@@ -55,6 +61,14 @@ fn test_renderer_headroom_limits_peaks() {
     let after_peak = peak_linear(&output.channels[0]);
     let threshold = db_to_linear(-3.0);
 
-    assert!(after_peak <= threshold * 1.01, "peak {} exceeds -3dB threshold {}", after_peak, threshold);
-    assert!(after_peak <= before_peak, "peak should not increase after limiting");
+    assert!(
+        after_peak <= threshold * 1.01,
+        "peak {} exceeds -3dB threshold {}",
+        after_peak,
+        threshold
+    );
+    assert!(
+        after_peak <= before_peak,
+        "peak should not increase after limiting"
+    );
 }

@@ -16,11 +16,18 @@ fn test_drc_reduces_peaks_without_makeup_gain() {
     let mut samples = vec![0.0f32; frames];
     // Create some peaks
     for i in (100..frames).step_by(200) {
-        if i < frames { samples[i] = 0.9; }
-        if i + 1 < frames { samples[i + 1] = 0.7; }
+        if i < frames {
+            samples[i] = 0.9;
+        }
+        if i + 1 < frames {
+            samples[i + 1] = 0.7;
+        }
     }
 
-    let block = AudioBlock { sample_rate: sr, channels: vec![samples.clone()] };
+    let block = AudioBlock {
+        sample_rate: sr,
+        channels: vec![samples.clone()],
+    };
     let before_peak = peak_linear(&block.channels[0]);
 
     let mut drc = DynamicRangeControl::new(4.0, -20.0, 5.0, 80.0, sr);
@@ -29,5 +36,10 @@ fn test_drc_reduces_peaks_without_makeup_gain() {
     drc.process(&mut processed);
 
     let after_peak = peak_linear(&processed.channels[0]);
-    assert!(after_peak < before_peak * 0.96, "peak not sufficiently reduced: before {} after {}", before_peak, after_peak);
+    assert!(
+        after_peak < before_peak * 0.96,
+        "peak not sufficiently reduced: before {} after {}",
+        before_peak,
+        after_peak
+    );
 }

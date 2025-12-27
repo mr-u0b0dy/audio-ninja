@@ -4,6 +4,28 @@ use crate::loudness::{DynamicRangeControl, HeadroomManager, LoudnessNormalizer, 
 use crate::{AudioBlock, SpeakerLayout};
 use std::time::Duration;
 
+/// DRC compression presets for common use cases
+#[derive(Clone, Copy, Debug, PartialEq)]
+pub enum DRCPreset {
+    /// Speech: 3:1 ratio, -16dB threshold, 5ms attack, 80ms release
+    Speech,
+    /// Music: 4:1 ratio, -18dB threshold, 10ms attack, 100ms release
+    Music,
+    /// Cinema: 2:1 ratio, -14dB threshold, 20ms attack, 150ms release
+    Cinema,
+}
+
+impl DRCPreset {
+    /// Get DRC parameters for this preset: (ratio, threshold_db, attack_ms, release_ms)
+    pub fn params(&self) -> (f32, f32, f32, f32) {
+        match self {
+            DRCPreset::Speech => (3.0, -16.0, 5.0, 80.0),
+            DRCPreset::Music => (4.0, -18.0, 10.0, 100.0),
+            DRCPreset::Cinema => (2.0, -14.0, 20.0, 150.0),
+        }
+    }
+}
+
 /// Options for audio rendering
 #[derive(Clone, Debug, PartialEq)]
 pub struct RenderOptions {
@@ -100,6 +122,12 @@ impl ReferenceRenderer {
     /// Disable DRC
     pub fn disable_drc(&mut self) {
         self.drc = None;
+    }
+
+    /// Apply DRC preset (Speech, Music, Cinema)
+    pub fn apply_drc_preset(&mut self, preset: DRCPreset) {
+        let (ratio, threshold_db, attack_ms, release_ms) = preset.params();
+        self.enable_drc_with_params(ratio, threshold_db, attack_ms, release_ms);
     }
 
     /// Set headroom target
@@ -223,5 +251,50 @@ mod tests {
         let max_after = output.channels[0].iter().cloned().fold(0.0, f32::max);
 
         assert!(max_after <= max_before);
+    }
+
+    #[test]
+    fn test_drc_preset_speech_params() {
+        let (ratio, threshold_db, attack_ms, release_ms) = DRCPreset::Speech.params();
+        assert_eq!(ratio, 3.0);
+        assert_eq!(threshold_db, -16.0);
+        assert_eq!(attack_ms, 5.0);
+        assert_eq!(release_ms, 80.0);
+    }
+
+    #[test]
+    fn test_drc_preset_music_params() {
+        let (ratio, threshold_db, attack_ms, release_ms) = DRCPreset::Music.params();
+        assert_eq!(ratio, 4.0);
+        assert_eq!(threshold_db, -18.0);
+        assert_eq!(attack_ms, 10.0);
+        assert_eq!(release_ms, 100.0);
+    }
+
+    #[test]
+    fn test_drc_preset_cinema_params() {
+        let (ratio, threshold_db, attack_ms, release_ms) = DRCPreset::Cinema.params();
+        assert_eq!(ratio, 2.0);
+        assert_eq!(threshold_db, -14.0);
+        assert_eq!(attack_ms, 20.0);
+        assert_eq!(release_ms, 150.0);
+    }
+
+    #[test]
+    fn test_renderer_apply_drc_preset() {
+        let mut renderer = ReferenceRenderer::new(48000);
+        renderer.apply_drc_preset(DRCPreset::Speech);
+
+        let block = AudioBlock {
+            sample_rate: 48000,
+            channels: vec![vec![0.5; 480]],
+        };
+
+        let opts = RenderOptions::default();
+        let output = renderer.render(block, &opts);
+
+        assert_eq!(output.sample_rate, 48000);
+        // Output should have reduced peaks compared to input due to compression
+        assert!(output.channels[0].iter().all(|&s| s.abs() <= 0.5));
     }
 }

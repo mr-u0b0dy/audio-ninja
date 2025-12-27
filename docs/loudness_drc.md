@@ -115,19 +115,54 @@ Gain Reduction = threshold + (input - threshold) / ratio
 Makeup Gain = (threshold * (ratio - 1)) / ratio
 ```
 
+## DRC Presets
+
+For convenience, the `ReferenceRenderer` provides three pre-configured compression presets for common audio scenarios:
+
+### Preset Specifications
+
+| Preset | Use Case | Ratio | Threshold | Attack | Release |
+|--------|----------|-------|-----------|--------|---------|
+| **Speech** | Podcasts, audiobooks, voice recordings | 3:1 | -16 dB | 5 ms | 80 ms |
+| **Music** | Music streaming, mixed content | 4:1 | -18 dB | 10 ms | 100 ms |
+| **Cinema** | Film distribution, theatrical release | 2:1 | -14 dB | 20 ms | 150 ms |
+
+### Using Presets
+
+```rust
+use audio_ninja::render::{ReferenceRenderer, DRCPreset};
+
+let mut renderer = ReferenceRenderer::new(48000);
+
+// Apply Speech preset for podcast content
+renderer.apply_drc_preset(DRCPreset::Speech);
+
+// Or apply Music preset
+// renderer.apply_drc_preset(DRCPreset::Music);
+
+// Or apply Cinema preset
+// renderer.apply_drc_preset(DRCPreset::Cinema);
+```
+
+**Preset Characteristics:**
+
+- **Speech**: Fast attack (5ms) catches vocal transients; moderate release (80ms) preserves intelligibility. Ideal for podcasts and spoken word.
+- **Music**: Balanced attack (10ms) preserves note articulation; longer release (100ms) smooths compression. Suitable for mixed genres.
+- **Cinema**: Slow attack (20ms) allows natural dynamics; slow release (150ms) maintains spaciousness. For film distribution.
+
 ## Integration with ReferenceRenderer
 
 The render module integrates all components into a coherent signal processing pipeline:
 
 ```rust
-use audio_ninja::render::{ReferenceRenderer, RenderOptions};
+use audio_ninja::render::{ReferenceRenderer, RenderOptions, DRCPreset};
 use audio_ninja::loudness::LoudnessTarget;
 
-// Create renderer with loudness processing
+// Create renderer with loudness processing and DRC preset
 let mut renderer = ReferenceRenderer::new(48000);
 renderer.set_loudness_target(LoudnessTarget::StreamingMusic);
-renderer.enable_drc(4.0, -20.0); // 4:1 ratio, -20dB threshold
-renderer.set_headroom_db(-3.0);
+renderer.apply_drc_preset(DRCPreset::Music);  // Use Music preset
+renderer.set_headroom_db(3.0);
 
 // Render audio
 let options = RenderOptions::default();

@@ -11,7 +11,7 @@ use audio_ninja::{
     loudness::{
         DynamicRangeControl, HeadroomManager, LoudnessMeter, LoudnessNormalizer, LoudnessTarget,
     },
-    render::{ReferenceRenderer, RenderOptions},
+    render::{ReferenceRenderer, RenderOptions, DRCPreset},
     AudioBlock,
 };
 
@@ -101,15 +101,15 @@ fn main() -> anyhow::Result<()> {
     println!("6. Processing through complete ReferenceRenderer pipeline...");
     let mut renderer = ReferenceRenderer::new(SAMPLE_RATE);
     renderer.set_loudness_target(LoudnessTarget::StreamingMusic);
-    // Customize DRC for speech: 3:1 ratio, -16dB threshold, faster attack/release
-    renderer.enable_drc_with_params(3.0, -16.0, 5.0, 80.0);
-    renderer.set_headroom_db(-3.0);
+    // Apply Speech preset for faster compression and tighter control
+    renderer.apply_drc_preset(DRCPreset::Speech);
+    renderer.set_headroom_db(3.0);
     renderer.set_headroom_lookahead_ms(3.0);
 
     println!("   ✓ ReferenceRenderer configured with:");
     println!("     - Target loudness: Streaming Music (-14 LUFS)");
-    println!("     - DRC: 4:1 ratio, -18dB threshold");
-    println!("     - Headroom: -3dB protection (3ms lookahead)\n");
+    println!("     - DRC Preset: Speech (3:1 ratio, -16dB threshold, 5ms/80ms attack/release)");
+    println!("     - Headroom: 3dB protection (3ms lookahead)\n");
 
     // ========== Summary ==========
     println!("=== Processing Summary ===");
