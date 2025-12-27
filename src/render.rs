@@ -69,13 +69,24 @@ impl ReferenceRenderer {
         self.loudness_normalizer = None;
     }
 
-    /// Enable DRC compression
+    /// Enable DRC compression with default attack/release
     pub fn enable_drc(&mut self, ratio: f32, threshold_db: f32) {
+        self.enable_drc_with_params(ratio, threshold_db, 10.0, 100.0);
+    }
+
+    /// Enable DRC compression with custom attack/release in milliseconds
+    pub fn enable_drc_with_params(
+        &mut self,
+        ratio: f32,
+        threshold_db: f32,
+        attack_ms: f32,
+        release_ms: f32,
+    ) {
         self.drc = Some(DynamicRangeControl::new(
             ratio,
             threshold_db,
-            10.0,  // 10ms attack
-            100.0, // 100ms release
+            attack_ms,
+            release_ms,
             self.sample_rate,
         ));
 
@@ -166,6 +177,22 @@ mod tests {
     fn test_renderer_with_drc() {
         let mut renderer = ReferenceRenderer::new(48000);
         renderer.enable_drc(4.0, -20.0);
+
+        let block = AudioBlock {
+            sample_rate: 48000,
+            channels: vec![vec![0.5; 480]],
+        };
+
+        let opts = RenderOptions::default();
+        let output = renderer.render(block, &opts);
+
+        assert_eq!(output.sample_rate, 48000);
+    }
+
+    #[test]
+    fn test_renderer_with_drc_params() {
+        let mut renderer = ReferenceRenderer::new(48000);
+        renderer.enable_drc_with_params(3.0, -18.0, 5.0, 80.0);
 
         let block = AudioBlock {
             sample_rate: 48000,

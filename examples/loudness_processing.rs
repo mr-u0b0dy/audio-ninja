@@ -101,7 +101,8 @@ fn main() -> anyhow::Result<()> {
     println!("6. Processing through complete ReferenceRenderer pipeline...");
     let mut renderer = ReferenceRenderer::new(SAMPLE_RATE);
     renderer.set_loudness_target(LoudnessTarget::StreamingMusic);
-    renderer.enable_drc(4.0, -18.0);
+    // Customize DRC for speech: 3:1 ratio, -16dB threshold, faster attack/release
+    renderer.enable_drc_with_params(3.0, -16.0, 5.0, 80.0);
     renderer.set_headroom_db(-3.0);
     renderer.set_headroom_lookahead_ms(3.0);
 
