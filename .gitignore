@@ -1,0 +1,30 @@
+# Ignore build artifacts
+/target/
+Cargo.lock
+
+# IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+
+# Testing
+*.profraw
+*.profdata
+
+# Documentation
+/doc/
+
+# Backup files
+*.bak
+*.orig
+
+# Environment
+.env
+.env.local
+
+# Coverage
+cobertura.xml
+tarpaulin-report.html
