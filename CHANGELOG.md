@@ -8,7 +8,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
-- Initial open-source release
+- Loudness management module (`src/loudness.rs`) implementing ITU-R BS.1770-4 loudness measurement (LUFS), normalization, headroom management, and DRC.
+- Renderer integration: `ReferenceRenderer` supports loudness targets, DRC, and headroom protection (`src/render.rs`).
+- Documentation: `docs/loudness_drc.md` (guide) and example `examples/loudness_processing.rs`.
+- Tests: Integration tests for renderer loudness/headroom (`tests/loudness_render_tests.rs`) and DRC peak reduction (`tests/drc_tests.rs`).
+- CI: GitHub Actions workflow to run fmt, clippy, build, and tests (`.github/workflows/ci.yml`).
 - IAMF (Immersive Audio Model and Formats) parsing and rendering
 - 3D VBAP (Vector-Based Amplitude Panning) spatial renderer
   - Support for arbitrary speaker layouts with elevation
@@ -44,7 +48,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Apache 2.0 license with SPDX identifiers
 
 ### Changed
-- N/A (initial release)
+- README updated with Loudness/DRC section and example instructions.
+- CI clippy relaxed to not fail on warnings (until codebase warnings are addressed).
 
 ### Deprecated
 - N/A
