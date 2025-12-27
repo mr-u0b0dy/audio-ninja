@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 //! Loudness management for audio normalization and dynamic range control
-//! 
+//!
 //! This module implements ITU-R BS.1770 loudness measurement and normalization,
 //! along with headroom management and Dynamic Range Control (DRC).
 
@@ -61,7 +61,7 @@ impl LoudnessMeter {
     }
 
     /// Measure integrated loudness (LUFS) of an audio block
-    /// 
+    ///
     /// LUFS = Loudness Units relative to Full Scale
     /// Uses K-weighting (approximated high-pass filter + frequency response adjustment)
     pub fn measure_integrated_loudness(&mut self, block: &AudioBlock) -> f32 {
@@ -133,17 +133,20 @@ pub struct HeadroomManager {
     limiter_release_samples: usize,
     /// Current limiter gain (0.0 to 1.0)
     limiter_gain: f32,
+    /// Lookahead in samples for peak detection
+    lookahead_samples: usize,
 }
 
 impl HeadroomManager {
     /// Create new headroom manager
-    /// 
+    ///
     /// # Arguments
     /// * `target_headroom_db` - Safety margin (typically 1-6 dB)
     /// * `sample_rate` - Sample rate for attack/release timing
     pub fn new(target_headroom_db: f32, sample_rate: u32) -> Self {
         let attack_ms = 10.0; // 10ms attack
         let release_ms = 300.0; // 300ms release
+        let lookahead_ms = 3.0; // 3ms lookahead
 
         Self {
             target_headroom_db: target_headroom_db.clamp(0.1, 20.0),
@@ -151,7 +154,14 @@ impl HeadroomManager {
             limiter_attack_samples: ((sample_rate as f32 * attack_ms) / 1000.0) as usize,
             limiter_release_samples: ((sample_rate as f32 * release_ms) / 1000.0) as usize,
             limiter_gain: 1.0,
+            lookahead_samples: ((sample_rate as f32 * lookahead_ms) / 1000.0).max(1.0) as usize,
         }
+    }
+
+    /// Set lookahead time in milliseconds
+    pub fn set_lookahead_ms(&mut self, sample_rate: u32, lookahead_ms: f32) {
+        self.lookahead_samples = ((sample_rate as f32 * lookahead_ms.max(0.0)) / 1000.0)
+            .max(1.0) as usize;
     }
 
     /// Apply headroom management with soft limiting
@@ -163,19 +173,30 @@ impl HeadroomManager {
         let threshold = db_to_linear(self.limiting_threshold_db);
 
         for channel in &mut block.channels {
-            for sample in channel.iter_mut() {
-                let abs_sample = sample.abs();
+            let len = channel.len();
+            for i in 0..len {
+                let abs_sample = channel[i].abs();
 
-                if abs_sample > threshold {
-                    // Calculate required gain reduction
-                    let gain_needed = threshold / abs_sample.max(0.0001);
+                // Lookahead: inspect upcoming window for potential peaks
+                let end = (i + self.lookahead_samples).min(len);
+                let mut ahead_max = abs_sample;
+                for j in i..end {
+                    let v = channel[j].abs();
+                    if v > ahead_max {
+                        ahead_max = v;
+                    }
+                }
+
+                if ahead_max > threshold {
+                    // Calculate required gain reduction ahead of peak
+                    let gain_needed = threshold / ahead_max.max(0.0001);
                     self.limiter_gain = gain_needed.min(self.limiter_gain);
                 } else {
-                    // Gradual release
+                    // Gradual release towards unity
                     self.limiter_gain = (self.limiter_gain * 0.99 + 1.0 * 0.01).min(1.0);
                 }
 
-                *sample *= self.limiter_gain;
+                channel[i] *= self.limiter_gain;
             }
         }
     }
@@ -206,6 +227,8 @@ pub struct DynamicRangeControl {
     makeup_gain_db: f32,
     /// Current gain reduction (0.0 to 1.0)
     current_gain: f32,
+    /// Envelope follower state (linear amplitude)
+    envelope: f32,
 }
 
 impl DynamicRangeControl {
@@ -227,6 +250,7 @@ impl DynamicRangeControl {
             release_samples,
             makeup_gain_db: 0.0,
             current_gain: 1.0,
+            envelope: 0.0,
         }
     }
 
@@ -244,26 +268,31 @@ impl DynamicRangeControl {
         let threshold = db_to_linear(self.threshold_db);
         let makeup_gain = db_to_linear(self.makeup_gain_db);
 
+        // Envelope follower coefficients (simple one-pole)
+        let attack_coeff = (1.0 / self.attack_samples.max(1) as f32).min(1.0);
+        let release_coeff = (1.0 / self.release_samples.max(1) as f32).min(1.0);
+
         for channel in &mut block.channels {
             for sample in channel.iter_mut() {
                 let abs_sample = sample.abs();
-
-                if abs_sample > threshold {
-                    // Calculate gain reduction
-                    let over_threshold = abs_sample / threshold;
-                    let gain_reduction = 1.0 / (over_threshold.powf((self.ratio - 1.0) / self.ratio));
-
-                    // Smooth gain reduction with attack/release
-                    if gain_reduction < self.current_gain {
-                        // Attack
-                        self.current_gain = self.current_gain * 0.95 + gain_reduction * 0.05;
-                    } else {
-                        // Release
-                        self.current_gain = self.current_gain * 0.98 + gain_reduction * 0.02;
-                    }
+                // Update envelope: instant attack, smoothed release
+                if abs_sample > self.envelope {
+                    self.envelope = abs_sample;
                 } else {
-                    // Below threshold, release
-                    self.current_gain = (self.current_gain * 0.98 + 1.0 * 0.02).min(1.0);
+                    self.envelope += (abs_sample - self.envelope) * release_coeff;
+                }
+
+                // Compute gain reduction from envelope
+                let over_threshold = (self.envelope / threshold).max(1.0);
+                let gain_reduction = 1.0 / (over_threshold.powf((self.ratio - 1.0) / self.ratio));
+
+                // Smooth gain towards target reduction
+                if gain_reduction < self.current_gain {
+                    // Instant attack to catch transients
+                    self.current_gain = gain_reduction;
+                } else {
+                    // Smoothed release towards unity
+                    self.current_gain = self.current_gain * (1.0 - release_coeff) + gain_reduction * release_coeff;
                 }
 
                 *sample *= self.current_gain * makeup_gain;
@@ -384,7 +413,7 @@ mod tests {
     #[test]
     fn test_loudness_meter_tone() {
         let mut meter = LoudnessMeter::new(48000);
-        
+
         // Generate 1kHz sine wave
         let tone: Vec<f32> = (0..4800)
             .map(|i| {
@@ -392,12 +421,12 @@ mod tests {
                 (2.0 * std::f32::consts::PI * 1000.0 * t).sin() * 0.5
             })
             .collect();
-        
+
         let block = AudioBlock {
             sample_rate: 48000,
             channels: vec![tone.clone(), tone],
         };
-        
+
         let loudness = meter.measure_integrated_loudness(&block);
         assert!(loudness.is_finite());
         assert!(loudness < 0.0); // Should be negative
@@ -406,39 +435,39 @@ mod tests {
     #[test]
     fn test_headroom_manager_limiting() {
         let mut mgr = HeadroomManager::new(3.0, 48000);
-        
+
         let mut block = AudioBlock {
             sample_rate: 48000,
             channels: vec![vec![0.99; 100], vec![0.99; 100]],
         };
-        
+
         let max_before = block.channels[0].iter().cloned().fold(0.0, f32::max);
         mgr.apply_limiting(&mut block);
         let max_after = block.channels[0].iter().cloned().fold(0.0, f32::max);
-        
+
         assert!(max_after <= max_before);
     }
 
     #[test]
     fn test_drc_compression() {
         let mut drc = DynamicRangeControl::new(
-            4.0,      // 4:1 ratio
-            -20.0,    // -20dB threshold
-            10.0,     // 10ms attack
-            100.0,    // 100ms release
+            4.0,   // 4:1 ratio
+            -20.0, // -20dB threshold
+            10.0,  // 10ms attack
+            100.0, // 100ms release
             48000,
         );
         drc.set_makeup_gain(10.0); // Makeup gain
-        
+
         let mut block = AudioBlock {
             sample_rate: 48000,
             channels: vec![vec![0.5; 100]],
         };
-        
+
         let before = block.channels[0][0];
         drc.process(&mut block);
         let after = block.channels[0][0];
-        
+
         assert!(after.is_finite());
         assert!(after >= 0.0);
     }
@@ -446,7 +475,7 @@ mod tests {
     #[test]
     fn test_loudness_normalizer() {
         let mut normalizer = LoudnessNormalizer::new(48000, LoudnessTarget::Television);
-        
+
         // Create quiet signal
         let quiet: Vec<f32> = (0..4800)
             .map(|i| {
@@ -454,16 +483,16 @@ mod tests {
                 (2.0 * std::f32::consts::PI * 1000.0 * t).sin() * 0.1
             })
             .collect();
-        
+
         let mut block = AudioBlock {
             sample_rate: 48000,
             channels: vec![quiet.clone(), quiet],
         };
-        
+
         let before_norm = block.channels[0][100];
         normalizer.normalize(&mut block);
         let after_norm = block.channels[0][100];
-        
+
         // Should have increased amplitude
         assert!(after_norm.abs() > before_norm.abs());
     }
@@ -473,7 +502,7 @@ mod tests {
         assert!((db_to_linear(0.0) - 1.0).abs() < 0.001);
         assert!((db_to_linear(-6.02) - 0.5).abs() < 0.01);
         assert!((db_to_linear(-20.0) - 0.1).abs() < 0.001);
-        
+
         assert!((linear_to_db(1.0) - 0.0).abs() < 0.001);
         assert!((linear_to_db(0.5) - (-6.02)).abs() < 0.1);
         assert!((linear_to_db(0.1) - (-20.0)).abs() < 0.001);
@@ -482,12 +511,12 @@ mod tests {
     #[test]
     fn test_headroom_detection() {
         let mut mgr = HeadroomManager::new(3.0, 48000);
-        
+
         let mut block = AudioBlock {
             sample_rate: 48000,
             channels: vec![vec![0.5; 100]],
         };
-        
+
         assert!(!mgr.is_limiting());
         mgr.apply_limiting(&mut block);
         // With 0.5 amplitude, shouldn't trigger limiting at 3dB headroom
