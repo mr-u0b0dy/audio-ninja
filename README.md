@@ -61,21 +61,23 @@ cargo build --release
 cargo test
 ```
 
-All 151 tests should pass:
-- 17 unit tests
-- 20 BLE tests  
-- 16 calibration tests
-- 14 FEC tests
-- 25 HOA tests
-- 8 IAMF tests
-- 12 network tests
-- 13 transport tests
-- 26 VBAP tests
+All 196 tests should pass:
+- 30 HRTF tests
+- 20 IAMF tests
+- 16 transport/RTP tests
+- 14 network/UDP tests
+- 25 transport/sync/latency/jitter tests
+- 8 BLE tests
+- 12 calibration tests
+- 13 FEC tests
+- 32 VBAP tests
+- 32 HOA tests
 
 ## 📖 Documentation
 
 ### Modules
 
+- **[HRTF](docs/hrtf.md)**: Head-Related Transfer Function binaural rendering
 - **[VBAP](docs/vbap.md)**: 3D Vector-Based Amplitude Panning
 - **[HOA](docs/hoa.md)**: Higher-Order Ambisonics Decoder
 - **Calibration**: Room measurement and correction
@@ -85,6 +87,24 @@ All 151 tests should pass:
 - **Transport**: RTP, jitter buffer, clock sync
 
 ### Examples
+
+#### HRTF Binaural Rendering
+
+```rust
+use audio_ninja::hrtf::{HrtfDatabase, HrtfDataset, BinauralRenderer, HeadphoneProfile, HrtfPosition};
+
+let mut db = HrtfDatabase::new(HrtfDataset::Kemar, 48000);
+db.load_default_kemar()?;
+
+let renderer = BinauralRenderer::new(db, HeadphoneProfile::Flat);
+
+// Render mono audio from a 45° angle
+let mono_input = vec![0.5; 512];
+let position = HrtfPosition::new(45.0, 15.0, 1.5);
+let (left, right) = renderer.render(&mono_input, &position)?;
+
+// Now you have binaural stereo audio for headphone playback
+```
 
 #### VBAP Rendering
 
