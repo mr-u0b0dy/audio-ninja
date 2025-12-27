@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 - Loudness management module (`src/loudness.rs`) implementing ITU-R BS.1770-4 loudness measurement (LUFS), normalization, headroom management, and DRC.
 - Renderer integration: `ReferenceRenderer` supports loudness targets, DRC, and headroom protection (`src/render.rs`).
+- **DRC Presets**: `DRCPreset` enum with Speech, Music, and Cinema presets; `apply_drc_preset()` method for convenient preset selection.
 - Documentation: `docs/loudness_drc.md` (guide) and example `examples/loudness_processing.rs`.
 - Tests: Integration tests for renderer loudness/headroom (`tests/loudness_render_tests.rs`) and DRC peak reduction (`tests/drc_tests.rs`).
 - CI: GitHub Actions workflow to run fmt, clippy, build, and tests (`.github/workflows/ci.yml`).

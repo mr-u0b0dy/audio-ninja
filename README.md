@@ -7,8 +7,8 @@
 
 ### New: Loudness & DRC
 - ITU-R BS.1770 loudness measurement (LUFS) and normalization
-- Dynamic Range Control (DRC) with ratio/threshold and makeup gain
-- Headroom protection via soft limiting (configurable dB)
+- Dynamic Range Control (DRC) with Speech/Music/Cinema presets
+- Headroom protection via soft limiting (configurable dB, 3ms lookahead)
 - See the guide: [docs/loudness_drc.md](docs/loudness_drc.md)
 
 ## ✨ Features
@@ -66,17 +66,15 @@ cargo build --release
 cargo test
 ```
 
-All 196 tests should pass:
-- 30 HRTF tests
-- 20 IAMF tests
-- 16 transport/RTP tests
-- 14 network/UDP tests
-- 25 transport/sync/latency/jitter tests
-- 8 BLE tests
-- 12 calibration tests
-- 13 FEC tests
-- 32 VBAP tests
-- 32 HOA tests
+All 50 library tests should pass, covering:
+- HRTF binaural rendering
+- IAMF parsing and decoding
+- VBAP spatial panning
+- HOA ambisonics decoding
+- Loudness measurement and normalization (ITU-R BS.1770)
+- DRC presets and parameters
+- Network transport and RTP
+- Clock synchronization
 
 ## 📖 Documentation
 
