@@ -5,6 +5,12 @@
 
 **Audio Ninja** is an open-source wireless immersive audio platform with IAMF-first architecture, flexible speaker layouts, networked transport with sync, DSP processing, and room calibration.
 
+### New: Spatial Audio for Headphones
+- **Binaural Rendering**: HRTF-based spatial audio virtualization (Flat, ClosedBack, OpenBack, IEM profiles)
+- **Spatial Positioning**: Azimuth, elevation, and distance controls for virtual speaker placement
+- Multi-channel to stereo conversion automatically integrated with loudness/DRC pipeline
+- See the guide: [docs/binaural_rendering.md](docs/binaural_rendering.md)
+
 ### New: Loudness & DRC
 - ITU-R BS.1770 loudness measurement (LUFS) and normalization
 - Dynamic Range Control (DRC) with Speech/Music/Cinema presets
@@ -17,6 +23,7 @@
 - **IAMF (Immersive Audio Model and Formats)**: Parse, decode, and render object-based, channel-based, and scene-based audio
 - **3D VBAP**: Vector-Based Amplitude Panning for arbitrary speaker layouts with elevation support
 - **HOA Decoder**: Higher-Order Ambisonics (1st/2nd/3rd order) with Basic, Max-rE, and In-Phase modes
+- **Binaural Rendering**: HRTF-based virtualization for immersive headphone playback
 - **Flexible Layouts**: Support from 2.0 stereo through 9.1.6+ immersive configurations
 
 ### 🌐 Networked Audio
@@ -80,6 +87,8 @@ All 50 library tests should pass, covering:
 
 ### Modules
 
+- **[Binaural Rendering](docs/binaural_rendering.md)**: HRTF spatial audio for headphones
+- **[Loudness & DRC](docs/loudness_drc.md)**: ITU-R BS.1770 loudness and dynamic range control
 - **[HRTF](docs/hrtf.md)**: Head-Related Transfer Function binaural rendering
 - **[VBAP](docs/vbap.md)**: 3D Vector-Based Amplitude Panning
 - **[HOA](docs/hoa.md)**: Higher-Order Ambisonics Decoder
@@ -108,6 +117,20 @@ let (left, right) = renderer.render(&mono_input, &position)?;
 
 // Now you have binaural stereo audio for headphone playback
 ```
+
+#### Binaural Rendering for Headphones
+
+Run the binaural example:
+
+```bash
+cargo run --example binaural_rendering
+```
+
+This demonstrates:
+- Converting multi-channel surround to stereo binaural
+- Selecting headphone profiles (Flat, ClosedBack, OpenBack, IEM)
+- Spatial positioning (azimuth, elevation, distance)
+- Integration with loudness/DRC pipeline
 
 #### Loudness Normalization + DRC + Headroom
 

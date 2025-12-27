@@ -8,8 +8,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+- **Binaural Rendering**: HRTF-based spatial audio virtualization for headphone playback
+  - 4 headphone profiles: Flat, ClosedBack, OpenBack, IEM
+  - Spatial positioning: azimuth, elevation, distance controls
+  - Automatic multi-channel to stereo downmix
+  - Integration with loudness/DRC pipeline
+  - Documentation: `docs/binaural_rendering.md`; example: `examples/binaural_rendering.rs`
 - Loudness management module (`src/loudness.rs`) implementing ITU-R BS.1770-4 loudness measurement (LUFS), normalization, headroom management, and DRC.
-- Renderer integration: `ReferenceRenderer` supports loudness targets, DRC, and headroom protection (`src/render.rs`).
+- Renderer integration: `ReferenceRenderer` supports loudness targets, DRC, headroom protection, and binaural rendering (`src/render.rs`).
 - **DRC Presets**: `DRCPreset` enum with Speech, Music, and Cinema presets; `apply_drc_preset()` method for convenient preset selection.
 - Documentation: `docs/loudness_drc.md` (guide) and example `examples/loudness_processing.rs`.
 - Tests: Integration tests for renderer loudness/headroom (`tests/loudness_render_tests.rs`) and DRC peak reduction (`tests/drc_tests.rs`).
