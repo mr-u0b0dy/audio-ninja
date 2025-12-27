@@ -6,6 +6,12 @@
 
 **Audio Ninja** is an open-source wireless immersive audio platform with IAMF-first architecture, flexible speaker layouts, networked transport with sync, DSP processing, and room calibration.
 
+### New: Loudness & DRC
+- ITU-R BS.1770 loudness measurement (LUFS) and normalization
+- Dynamic Range Control (DRC) with ratio/threshold and makeup gain
+- Headroom protection via soft limiting (configurable dB)
+- See the guide: [docs/loudness_drc.md](docs/loudness_drc.md)
+
 ## ✨ Features
 
 ### 🎵 Spatial Audio Rendering
@@ -105,6 +111,22 @@ let (left, right) = renderer.render(&mono_input, &position)?;
 
 // Now you have binaural stereo audio for headphone playback
 ```
+
+#### Loudness Normalization + DRC + Headroom
+
+Run the end-to-end example:
+
+```bash
+cargo run --example loudness_processing
+```
+
+This demonstrates:
+- Measuring loudness (integrated/short-term/LRA)
+- Normalizing to streaming target (-14 LUFS)
+- Applying DRC (e.g., 4:1 ratio, -18 dB threshold)
+- Soft-limiting peaks to maintain headroom
+
+For details, read: [docs/loudness_drc.md](docs/loudness_drc.md)
 
 #### VBAP Rendering
 
