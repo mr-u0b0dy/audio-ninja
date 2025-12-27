@@ -1,8 +1,6 @@
 // SPDX-License-Identifier: Apache-2.0
 
-use crate::loudness::{
-    DynamicRangeControl, HeadroomManager, LoudnessNormalizer, LoudnessTarget,
-};
+use crate::loudness::{DynamicRangeControl, HeadroomManager, LoudnessNormalizer, LoudnessTarget};
 use crate::{AudioBlock, SpeakerLayout};
 use std::time::Duration;
 
@@ -63,8 +61,7 @@ impl ReferenceRenderer {
 
     /// Enable loudness normalization
     pub fn set_loudness_target(&mut self, target: LoudnessTarget) {
-        self.loudness_normalizer =
-            Some(LoudnessNormalizer::new(self.sample_rate, target));
+        self.loudness_normalizer = Some(LoudnessNormalizer::new(self.sample_rate, target));
     }
 
     /// Disable loudness normalization
@@ -97,6 +94,12 @@ impl ReferenceRenderer {
     /// Set headroom target
     pub fn set_headroom_db(&mut self, headroom_db: f32) {
         self.headroom_manager = HeadroomManager::new(headroom_db, self.sample_rate);
+    }
+
+    /// Set limiter lookahead time in milliseconds
+    pub fn set_headroom_lookahead_ms(&mut self, lookahead_ms: f32) {
+        self.headroom_manager
+            .set_lookahead_ms(self.sample_rate, lookahead_ms);
     }
 }
 
@@ -195,4 +198,3 @@ mod tests {
         assert!(max_after <= max_before);
     }
 }
-

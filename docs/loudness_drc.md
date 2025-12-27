@@ -290,3 +290,25 @@ This restores average level after compression.
 - [HRTF Binaural Rendering](./hrtf.md)
 - [Spatial Rendering API](./render.md)
 - [Transport Synchronization](./transport.md)
+
+## Advanced: Lookahead Limiting and Envelope Follower
+
+For more transparent peak control, the pipeline supports:
+
+- Lookahead limiting to react before peaks occur
+- Envelope follower in the DRC with instant attack and smoothed release
+
+Configure lookahead via the renderer:
+
+```rust
+use audio_ninja::render::ReferenceRenderer;
+use audio_ninja::loudness::LoudnessTarget;
+
+let mut renderer = ReferenceRenderer::new(48_000);
+renderer.set_loudness_target(LoudnessTarget::StreamingMusic);
+renderer.enable_drc(4.0, -18.0);
+renderer.set_headroom_db(-3.0);
+renderer.set_headroom_lookahead_ms(3.0); // 3ms lookahead for proactive limiting
+```
+
+This helps catch single-sample transients while maintaining natural release behavior.
