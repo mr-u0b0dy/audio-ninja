@@ -2,6 +2,8 @@
 
 [![License](https://img.shields.io/badge/license-Apache%202.0-blue.svg)](LICENSE)
 [![Rust](https://img.shields.io/badge/rust-1.70%2B-orange.svg)](https://www.rust-lang.org/)
+[![codecov](https://codecov.io/gh/mr-u0b0dy/audio-ninja/branch/main/graph/badge.svg)](https://codecov.io/gh/mr-u0b0dy/audio-ninja)
+[![CI](https://github.com/mr-u0b0dy/audio-ninja/workflows/CI/badge.svg)](https://github.com/mr-u0b0dy/audio-ninja/actions)
 
 **Audio Ninja** is an open-source wireless immersive audio platform with IAMF-first architecture, flexible speaker layouts, networked transport with sync, DSP processing, and room calibration.
 
@@ -130,6 +132,23 @@ cargo +nightly fuzz run --all
 
 # See crates/core/fuzz/README.md for detailed fuzzing guide
 ```
+
+### Code Coverage
+
+Generate and view code coverage reports:
+
+```bash
+# Generate HTML coverage report
+make coverage
+
+# Open coverage report in browser
+make coverage-open
+
+# Generate LCOV format (for CI/CD)
+make coverage-lcov
+```
+
+Coverage reports are automatically generated in CI and uploaded to [Codecov](https://codecov.io/gh/mr-u0b0dy/audio-ninja).
 
 See [crates/cli/README.md](crates/cli/README.md) for full CLI documentation.
 

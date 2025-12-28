@@ -16,6 +16,8 @@ help:
 	@echo "  make clippy       - Run clippy lints"
 	@echo "  make clippy-fix   - Auto-fix clippy warnings"
 	@echo "  make doc          - Build documentation"
+	@echo "  make coverage     - Generate code coverage report (HTML)"
+	@echo "  make coverage-open - Generate and open coverage report"
 	@echo ""
 	@echo "Running:"
 	@echo "  make run-daemon   - Run the daemon service"
@@ -82,6 +84,22 @@ doc:
 
 doc-check:
 	RUSTDOCFLAGS="-D warnings" cargo doc --workspace --no-deps
+
+# Coverage
+coverage:
+	@echo "Generating code coverage report..."
+	@command -v cargo-llvm-cov >/dev/null 2>&1 || { echo "Installing cargo-llvm-cov..."; cargo install cargo-llvm-cov; }
+	cargo llvm-cov --workspace --all-features --html
+	@echo "Coverage report generated in target/llvm-cov/html/index.html"
+
+coverage-lcov:
+	@command -v cargo-llvm-cov >/dev/null 2>&1 || { echo "Installing cargo-llvm-cov..."; cargo install cargo-llvm-cov; }
+	cargo llvm-cov --workspace --all-features --lcov --output-path lcov.info
+	@echo "Coverage report generated: lcov.info"
+
+coverage-open:
+	@command -v cargo-llvm-cov >/dev/null 2>&1 || { echo "Installing cargo-llvm-cov..."; cargo install cargo-llvm-cov; }
+	cargo llvm-cov --workspace --all-features --open
 
 # Running services
 run-daemon:
