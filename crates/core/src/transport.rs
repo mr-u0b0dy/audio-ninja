@@ -47,11 +47,7 @@ impl ClockTimestamp {
         let self_dur = self.to_duration();
         let other_dur = other.to_duration();
 
-        if self_dur > other_dur {
-            self_dur - other_dur
-        } else {
-            other_dur - self_dur
-        }
+        self_dur.abs_diff(other_dur)
     }
 }
 

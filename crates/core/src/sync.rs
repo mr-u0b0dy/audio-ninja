@@ -126,11 +126,7 @@ impl ClockSync for NtpClock {
         let local_dur = local.to_duration();
 
         // NTP uses gradual adjustment rather than hard offset
-        let diff = if ref_dur > local_dur {
-            ref_dur - local_dur
-        } else {
-            local_dur - ref_dur
-        };
+        let diff = ref_dur.abs_diff(local_dur);
 
         // Apply 10% of the difference each sync
         self.offset += diff / 10;
