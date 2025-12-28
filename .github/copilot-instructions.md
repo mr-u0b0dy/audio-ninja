@@ -217,8 +217,8 @@ Example GitHub Actions cache:
 11. **Design proper icons**: Replace placeholder blue circles with real branding
 
 ### Low Priority (Later)
-11. **Fuzz testing**: Add `cargo-fuzz` for IAMF/RTP parsers
-12. **Cross-platform**: Test on macOS, add Windows support
+11. ✅ **Fuzz testing**: Added `cargo-fuzz` for IAMF/RTP parsers
+12. ✅ **Cross-platform**: Test on macOS, add Windows support
 13. ✅ **Release automation**: GitHub Actions workflow for binary builds and releases
 14. **Real codec integration**: Replace FFmpeg stubs with actual Opus/AAC/FLAC decoding
 15. **IAMF decoder**: Integrate libiamf/AOM reference implementation

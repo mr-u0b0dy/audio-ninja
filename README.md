@@ -196,6 +196,12 @@ cargo run -p audio-ninja-gui --release
 
 ## 📖 Documentation
 
+### Guides
+
+- **[Cross-Platform Build Guide](docs/CROSS_PLATFORM.md)**: Linux, macOS, and Windows setup and build instructions
+- **[Release Process](docs/RELEASE.md)**: Versioning and automated release workflow
+- **[DevContainer Setup](.devcontainer/README.md)**: Containerized development environment
+
 ### Modules
 
 - **[Binaural Rendering](docs/binaural_rendering.md)**: HRTF spatial audio for headphones
