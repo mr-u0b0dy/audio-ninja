@@ -147,6 +147,25 @@ Example GitHub Actions cache:
 - Run `cd docs-site && npm run dev` to preview documentation locally
 - Deployment: Auto-deploys to GitHub Pages on push to main (docs-site/ changes)
 
+## Branding & Colors
+- Palette (hex):
+  - Orange (Glow & Highlights): `#F05A22`
+  - Dark Orange (Shadows & Edges): `#C04010`
+  - Black (Background): `#0A0A0A`
+  - Dark Grey (Silhouette & Elements): `#1A1A1A`
+  - Light Grey/White (Text Highlights): `#E0E0E0`
+- Docs site usage (VuePress Theme Hope):
+  - Primary accent via `docs-site/src/.vuepress/styles/palette.scss`: set `$theme-color: #F05A22;`
+  - Global brand variables in `docs-site/src/.vuepress/styles/index.scss`:
+    - `--brand-orange`, `--brand-orange-dark`, `--brand-black`, `--brand-gray-dark`, `--brand-gray-light`
+  - Keep backgrounds readable; avoid forcing dark background globally. Prefer accents for links, selections, badges.
+- GUI (Tauri) usage:
+  - Define the same CSS variables in `gui/public/` styles and use for accents, focus rings, and active states.
+  - Reserve `#0A0A0A` / `#1A1A1A` for dark theme surfaces; ensure text contrast with `#E0E0E0`.
+- Icons/branding:
+  - Use `#F05A22` for glow/highlights, `#C04010` for shadow edges.
+  - Maintain high contrast on dark backgrounds; check accessibility (AA) when using greys.
+
 ## Backlog (working TODO)
 
 ### Infrastructure (Completed)

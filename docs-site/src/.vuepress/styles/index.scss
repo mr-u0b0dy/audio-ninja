@@ -1,0 +1,23 @@
+:root {
+  --brand-orange: #F05A22;
+  --brand-orange-dark: #C04010;
+  --brand-black: #0A0A0A;
+  --brand-gray-dark: #1A1A1A;
+  --brand-gray-light: #E0E0E0;
+}
+
+/* Gentle link accent */
+a {
+  color: var(--brand-orange);
+}
+
+/* Highlight selections and code accents lightly */
+::selection {
+  background: rgba(240, 90, 34, 0.25);
+}
+
+/* Optional hero/title accents */
+.theme-hope-content h1,
+.theme-hope-content h2 {
+  color: var(--brand-gray-light);
+}
