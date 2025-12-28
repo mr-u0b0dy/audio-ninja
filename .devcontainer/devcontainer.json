@@ -1,0 +1,58 @@
+{
+  "name": "Audio Ninja Dev",
+  "image": "mcr.microsoft.com/devcontainers/rust:1-bullseye",
+  "features": {
+    "ghcr.io/devcontainers/features/git:1": {},
+    "ghcr.io/devcontainers/features/github-cli:1": {}
+  },
+  "remoteUser": "vscode",
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "rust-lang.rust-analyzer",
+        "vadimcn.vscode-lldb",
+        "serayuzgur.crates",
+        "tamasfe.even-better-toml",
+        "fill-labs.dependi",
+        "cargo-edit.cargo-edit-helper",
+        "eamodio.gitlens",
+        "GitHub.copilot"
+      ],
+      "settings": {
+        "[rust]": {
+          "editor.formatOnSave": true,
+          "editor.defaultFormatter": "rust-lang.rust-analyzer",
+          "editor.codeActionsOnSave": {
+            "source.fixAll": true
+          }
+        },
+        "rust-analyzer.checkOnSave.command": "clippy",
+        "rust-analyzer.checkOnSave.extraArgs": ["--all-targets", "--"],
+        "rust-analyzer.inlayHints.bindingModeHints.enable": true,
+        "rust-analyzer.inlayHints.closureReturnTypeHints.enable": "always",
+        "rust-analyzer.inlayHints.lifetimeElisionHints.enable": "always",
+        "search.exclude": {
+          "**/.cargo": true,
+          "**/target": true
+        }
+      }
+    }
+  },
+  "postCreateCommand": "/bin/bash -c 'apt-get update && apt-get install -y libgtk-3-dev libwebkit2gtk-4.0-dev libayatana-appindicator3-dev librsvg2-dev libasound2-dev && cargo build --workspace --release 2>&1 | tail -20'",
+  "forwardPorts": [
+    8080
+  ],
+  "portsAttributes": {
+    "8080": {
+      "label": "Audio Ninja Daemon API",
+      "onAutoForward": "notify"
+    }
+  },
+  "mounts": [
+    "source=${localEnv:HOME}/.cargo/registry,target=/home/vscode/.cargo/registry,type=bind,consistency=cached",
+    "source=${localEnv:HOME}/.cargo/git,target=/home/vscode/.cargo/git,type=bind,consistency=cached"
+  ],
+  "otherPortsAttributes": {
+    "onAutoForward": "silent"
+  }
+}

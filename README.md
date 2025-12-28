@@ -65,8 +65,21 @@ audio-ninja/
 - Rust 1.70 or later
 - Linux: `webkit2gtk-4.0`, `gtk3`, `openssl` (for GUI)
 
-### Quick Setup
+### Setup Options
 
+#### Option 1: DevContainer (Recommended for VS Code)
+Provides a containerized development environment with all dependencies pre-configured.
+
+```bash
+git clone https://github.com/mr-u0b0dy/audio-ninja.git
+cd audio-ninja
+code .  # Open in VS Code
+# Press Ctrl+Shift+P → "Dev Containers: Reopen in Container"
+```
+
+See [.devcontainer/README.md](.devcontainer/README.md) for details.
+
+#### Option 2: Automated Setup
 ```bash
 git clone https://github.com/mr-u0b0dy/audio-ninja.git
 cd audio-ninja
