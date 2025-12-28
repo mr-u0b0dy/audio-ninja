@@ -1,7 +1,9 @@
 import { defineUserConfig } from "vuepress";
+import { viteBundler } from "@vuepress/bundler-vite";
 import { hopeTheme } from "vuepress-theme-hope";
 
 export default defineUserConfig({
+  bundler: viteBundler(),
   base: "/audio-ninja/",
   lang: "en-US",
   title: "Audio Ninja",
@@ -54,24 +56,13 @@ export default defineUserConfig({
           "drc.md",
           "calibration.md",
           "codecs.md",
+          "firmware_update.md",
         ],
       },
       {
-        text: "Deployment",
-        icon: "server",
-        prefix: "/deployment/",
-        children: [
-          "daemon.md",
-          "cli.md",
-          "api.md",
-          "firmware.md",
-          "release.md",
-        ],
-      },
-      {
-        text: "Reference",
-        icon: "book-bookmark",
-        link: "/reference/",
+        text: "API Reference",
+        icon: "code",
+        link: "/api/",
       },
     ],
     
@@ -110,50 +101,29 @@ export default defineUserConfig({
             "drc.md",
             "calibration.md",
             "codecs.md",
+            "codec_integration.md",
+            "firmware_update.md",
           ],
         },
       ],
-      "/deployment/": [
+      "/api/": [
         {
-          text: "Production Deployment",
-          icon: "rocket",
-          children: [
-            "daemon.md",
-            "cli.md",
-            "api.md",
-            "firmware.md",
-            "release.md",
-          ],
-        },
-      ],
-      "/reference/": [
-        {
-          text: "Technical Reference",
-          icon: "book-bookmark",
+          text: "API & Integration",
+          icon: "code",
           children: [
             "README.md",
             "api_usage.md",
-            "calibration.md",
-            "codec_integration.md",
             "daemon_workflow.md",
-            "firmware_update.md",
-            "hoa.md",
-            "hrtf.md",
-            "loudness_drc.md",
             "release.md",
-            "vbap.md",
           ],
         },
       ],
     },
     
-    footer: {
-      display: true,
-      content: "Apache 2.0 Licensed | Copyright © 2024-2025 Audio Ninja Contributors",
-    },
+    displayFooter: true,
+    footer: "Apache 2.0 Licensed | Copyright © 2024-2025 Audio Ninja Contributors",
     
     plugins: {
-      searchPro: true,
       shiki: {
         lineNumbers: false,
         notationHighlight: true,

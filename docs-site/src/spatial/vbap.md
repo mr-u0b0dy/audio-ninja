@@ -55,4 +55,4 @@ for (channel, gain) in audio_channels.iter_mut().zip(gains.iter()) {
 
 ---
 
-📖 **[Full VBAP Documentation](../../docs/vbap.md)**
+

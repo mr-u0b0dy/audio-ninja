@@ -52,4 +52,4 @@ let speaker_gains = decoder.decode(&ambisonic_input);
 
 ---
 
-📖 **[Full HOA Documentation](../../docs/hoa.md)**
+

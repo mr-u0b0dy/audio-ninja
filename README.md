@@ -59,20 +59,21 @@ cargo bench -p audio-ninja --bench main_benchmarks
 
 ## 📖 Documentation
 
-Core documentation is in the [docs/](docs/) directory:
+Core documentation is in the [docs-site/](docs-site/) directory:
 
 | File | Topic |
 |------|-------|
-| [docs/daemon_workflow.md](docs/daemon_workflow.md) | Deployment, configuration, operation |
-| [docs/calibration.md](docs/calibration.md) | Room measurement and optimization |
-| [docs/api_usage.md](docs/api_usage.md) | REST API examples |
-| [docs/vbap.md](docs/vbap.md) | 3D Vector-Based Amplitude Panning |
-| [docs/hoa.md](docs/hoa.md) | Higher-Order Ambisonics |
-| [docs/hrtf.md](docs/hrtf.md) | Binaural HRTF rendering |
-| [docs/loudness_drc.md](docs/loudness_drc.md) | Loudness and dynamic range control |
-| [docs/codec_integration.md](docs/codec_integration.md) | Audio codec support |
-| [docs/firmware_update.md](docs/firmware_update.md) | OTA firmware updates |
-| [docs/release.md](docs/release.md) | Release process |
+| [docs-site/src/guide/](docs-site/src/guide/) | Getting started, installation, configuration |
+| [docs-site/src/spatial/](docs-site/src/spatial/) | VBAP, HOA, HRTF spatial rendering |
+| [docs-site/src/processing/](docs-site/src/processing/) | Calibration, codecs, loudness, DRC, firmware |
+| [docs-site/src/api/](docs-site/src/api/) | REST API, daemon workflow, release process |
+
+Run the documentation site locally:
+```bash
+cd docs-site
+npm install
+npm run docs:dev
+```
 
 Component READMEs:
 - [crates/daemon/README.md](crates/daemon/README.md) - Daemon service

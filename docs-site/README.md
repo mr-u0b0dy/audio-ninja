@@ -207,15 +207,16 @@ Create `src/.vuepress/styles/index.scss`:
 // Custom styles
 ```
 
-## Linking to Project Documentation
+## Documentation Organization
 
-Pages link to main project documentation in `docs/` folder:
+All documentation is self-contained in `docs-site/src/` with the following structure:
 
-```markdown
-📖 **[Full Documentation](../../docs/vbap.md)**
-```
-
-This allows the documentation site to act as a gateway to more detailed technical guides.
+- `guide/` - Getting started, installation, configuration
+- `spatial/` - VBAP, HOA, HRTF spatial rendering
+- `processing/` - Calibration, codecs, loudness, DRC
+- `api/` - REST API reference
+- `deployment/` - Deployment and production guides
+- `reference/` - Architecture and technical details
 
 ## Troubleshooting
 

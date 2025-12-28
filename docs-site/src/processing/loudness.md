@@ -47,4 +47,4 @@ audio-ninja normalize /path/to/audio.wav --target-loudness -14.0 --output normal
 
 ---
 
-📖 **[Full Loudness Documentation](../../docs/loudness_drc.md)**
+

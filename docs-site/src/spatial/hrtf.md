@@ -52,4 +52,4 @@ let (left, right) = renderer.render(&mono_input, &position)?;
 
 ---
 
-📖 **[Full HRTF Documentation](../../docs/hrtf.md)**
+

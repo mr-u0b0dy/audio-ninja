@@ -34,4 +34,4 @@ audio-ninja drc /path/to/audio.wav \
 
 ---
 
-📖 **[Full DRC Documentation](../../docs/loudness_drc.md)**
+

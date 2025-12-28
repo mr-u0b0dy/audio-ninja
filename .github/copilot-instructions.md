@@ -135,6 +135,16 @@ Example GitHub Actions cache:
 - Keep new files small and purposeful; avoid large auto-generated blobs.
 - Document new public APIs with brief Rust doc comments.
 
+## Documentation
+- All user-facing documentation lives in `docs-site/` (VuePress site)
+- Structure:
+  - `docs-site/src/guide/` - Getting started, installation, configuration
+  - `docs-site/src/spatial/` - VBAP, HOA, HRTF spatial rendering
+  - `docs-site/src/processing/` - Calibration, codecs, loudness, DRC, firmware updates
+  - `docs-site/src/api/` - REST API reference, daemon workflow, release process
+- Update docs-site when adding features or changing APIs
+- Run `cd docs-site && npm run dev` to preview documentation locally
+
 ## Backlog (working TODO)
 
 ### Infrastructure (Completed)
