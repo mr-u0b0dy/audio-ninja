@@ -567,3 +567,8 @@ pub struct UpdateMetrics {
 - [Linux Kernel Live Patching](https://www.kernel.org/doc/html/latest/livepatch/livepatch.html)
 - [Debian Package Updates](https://wiki.debian.org/DebianMaintainerGuide)
 - [IETF SUIT Firmware Updates](https://datatracker.ietf.org/doc/html/draft-ietf-suit-manifest/)
+
+## See Also
+
+- [Daemon Workflow](daemon_workflow.md) - Daemon setup and operation (prerequisite for firmware updates)
+- [Release Process](release.md) - How to create firmware releases

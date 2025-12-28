@@ -176,3 +176,9 @@ For urgent bug fixes:
 - **Latest major version**: Full support
 - **Previous major version**: Security fixes only for 6 months
 - **Older versions**: No support (upgrade recommended)
+
+## See Also
+
+- [CHANGELOG](../CHANGELOG.md) - Project version history and changes
+- [Daemon Workflow](daemon_workflow.md) - Deployment and operation
+- [Calibration](calibration.md) - Room calibration versioning

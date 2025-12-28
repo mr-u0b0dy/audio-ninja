@@ -782,7 +782,7 @@ audio-ninja calibrate export \
 
 ## See Also
 
-- [Daemon Workflow](DAEMON_WORKFLOW.md) - Daemon setup and operation
-- [REST API Usage](API_USAGE.md) - API endpoints for calibration
-- [DSP Integration](DSP_INTEGRATION.md) - CamillaDSP/BruteFIR setup
-- [Acoustic Treatment Guide](ACOUSTIC_TREATMENT.md) - Room optimization tips
+- [Daemon Workflow](daemon_workflow.md) - Daemon setup and operation
+- [REST API Usage](api_usage.md) - API endpoints for calibration
+- [Loudness & DRC](loudness_drc.md) - Loudness standards and dynamic range control
+- [Release Process](release.md) - How to release updated calibration configs

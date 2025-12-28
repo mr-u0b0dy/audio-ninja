@@ -476,3 +476,9 @@ Add optional codec feature to CI builds:
 - [Opus Codec Specification](https://datatracker.ietf.org/doc/html/rfc6716)
 - [FLAC Format Specification](https://xiph.org/flac/format.html)
 - [Rust Audio Processing](https://github.com/RustAudio)
+
+## See Also
+
+- [Daemon Workflow](daemon_workflow.md) - Integration with the audio daemon
+- [Audio Pipeline](../crates/core/src/pipeline.rs) - Demux → Decode → Render pipeline
+- [Rendering System](../crates/core/src/render.rs) - Audio rendering and mixing
