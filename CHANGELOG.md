@@ -8,71 +8,119 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
-- **Binaural Rendering**: HRTF-based spatial audio virtualization for headphone playback
-  - 4 headphone profiles: Flat, ClosedBack, OpenBack, IEM
-  - Spatial positioning: azimuth, elevation, distance controls
-  - Automatic multi-channel to stereo downmix
-  - Integration with loudness/DRC pipeline
-  - Documentation: `docs/binaural_rendering.md`; example: `examples/binaural_rendering.rs`
-- Loudness management module (`src/loudness.rs`) implementing ITU-R BS.1770-4 loudness measurement (LUFS), normalization, headroom management, and DRC.
-- Renderer integration: `ReferenceRenderer` supports loudness targets, DRC, headroom protection, and binaural rendering (`src/render.rs`).
-- **DRC Presets**: `DRCPreset` enum with Speech, Music, and Cinema presets; `apply_drc_preset()` method for convenient preset selection.
-- Documentation: `docs/loudness_drc.md` (guide) and example `examples/loudness_processing.rs`.
-- Tests: Integration tests for renderer loudness/headroom (`tests/loudness_render_tests.rs`) and DRC peak reduction (`tests/drc_tests.rs`).
-- CI: GitHub Actions workflow to run fmt, clippy, build, and tests (`.github/workflows/ci.yml`).
-- IAMF (Immersive Audio Model and Formats) parsing and rendering
-- 3D VBAP (Vector-Based Amplitude Panning) spatial renderer
-  - Support for arbitrary speaker layouts with elevation
-  - Standard presets: 2.0, 5.1, 7.1.4
-  - Energy-preserving panning algorithm
-- HOA (Higher-Order Ambisonics) decoder
-  - 1st, 2nd, and 3rd order support
-  - Basic, Max-rE, and In-Phase decoding modes
-  - Standard layouts: stereo, 5.1, 7.1.4, cube
-- Network transport layer
-  - UDP/RTP streaming with timestamp-based sync
-  - mDNS speaker discovery
-  - Forward Error Correction (FEC) with XOR encoding
-  - Packet loss concealment (silence/repeat/interpolate)
-  - Jitter buffer with adaptive latency compensation
-- Clock synchronization
-  - PTP (Precision Time Protocol) support
-  - NTP (Network Time Protocol) support
-  - System clock fallback
-- BLE GATT control plane
-  - Speaker identity and role assignment
-  - Layout configuration (azimuth, elevation, distance)
-  - Volume trim and delay compensation
-  - Pairing and capability negotiation
-- Room calibration pipeline
-  - Log sweep and MLS generation
-  - Impulse response extraction and analysis
-  - FIR and IIR filter design
-  - Parametric EQ, shelving, and crossover filters
-  - CamillaDSP and BruteFIR export
-- Comprehensive test suite (151 tests)
-- Documentation for major modules (VBAP, HOA)
-- Apache 2.0 license with SPDX identifiers
+- Nothing yet
 
 ### Changed
-- README updated with Loudness/DRC section and example instructions.
-- CI clippy relaxed to not fail on warnings (until codebase warnings are addressed).
-
-### Deprecated
-- N/A
-
-### Removed
-- N/A
+- Nothing yet
 
 ### Fixed
-- N/A
+- Nothing yet
 
-### Security
-- N/A
+## [0.1.0] - 2025-12-28
 
-## [0.1.0] - TBD
+### Added
 
-Initial public release.
+#### Core Audio Features
+- IAMF (Immersive Audio Model and Formats) parsing and rendering
+- 3D VBAP (Vector-Based Amplitude Panning) renderer with elevation support
+  - Support for arbitrary speaker layouts
+  - Standard presets: 2.0, 5.1, 7.1.4
+  - Energy-preserving panning algorithm
+- HOA (Higher-Order Ambisonics) decoder (1st/2nd/3rd order)
+  - Basic, Max-rE, and In-Phase decoding modes
+  - Standard layouts: stereo, 5.1, 7.1.4, cube
+- HRTF binaural rendering for headphone playback
+  - 4 headphone profiles: Flat, ClosedBack, OpenBack, IEM
+  - KEMAR HRTF database integration
+  - Spatial positioning: azimuth, elevation, distance controls
+  - Automatic multi-channel to stereo downmix
+- Loudness measurement and normalization (ITU-R BS.1770-4)
+  - Integrated, short-term, and momentary loudness (LUFS)
+  - Loudness range (LRA) measurement
+  - Normalization to streaming targets
+- Dynamic Range Control (DRC)
+  - Speech, Music, and Cinema presets
+  - Configurable threshold, ratio, attack, and release
+- Headroom management with soft limiting (configurable dB, 3ms lookahead)
+
+#### Network & Transport
+- UDP/RTP audio streaming with timestamp synchronization
+- mDNS service discovery for automatic speaker detection
+- Forward Error Correction (FEC) with XOR encoding
+- Packet loss concealment (silence, repeat, interpolate)
+- Jitter buffer with adaptive latency compensation
+- Clock synchronization (PTP, NTP, System)
+- Multi-speaker broadcast support
+
+#### Control & Configuration
+- BLE GATT profiles for wireless speaker control
+  - Speaker identity and role assignment
+  - Layout configuration (azimuth, elevation, distance)
+  - Calibration settings (volume trim, delay, EQ enable)
+  - Pairing and connection management
+- REST API daemon service (Axum, port 8080)
+  - Speaker management endpoints
+  - Layout configuration
+  - Transport control (play/pause/stop)
+  - Calibration runner
+  - Real-time statistics
+- Desktop GUI client (Tauri + vanilla JS)
+- Command-line interface (audio-ninja-cli) with full daemon control
+
+#### Room Calibration
+- Measurement sweep generation (log sweep, MLS)
+- Impulse response analysis
+  - Automatic delay detection
+  - Magnitude response extraction
+- Filter design
+  - FIR filters (linear-phase, windowed sinc)
+  - IIR biquad cascades (PEQ, shelf, high/low-pass)
+- DSP configuration export
+  - CamillaDSP format
+  - BruteFIR format
+
+#### Infrastructure
+- Cargo workspace with 4 crates (core, daemon, cli, gui)
+- Comprehensive test suite (250+ tests)
+  - Unit tests for all modules
+  - Integration tests for transport and network
+  - End-to-end CLI ↔ daemon tests
+- GitHub Actions CI/CD
+  - Format checking (rustfmt)
+  - Linting (clippy with -D warnings)
+  - Build and test automation
+  - Benchmark compilation
+  - Documentation building
+- GitHub Actions release workflow
+  - Automated binary builds for x86_64 and aarch64 Linux
+  - Tarball generation with SHA256 checksums
+- Performance benchmarks (Criterion)
+  - VBAP rendering
+  - Loudness measurement
+  - Vec3 operations
+- OpenAPI/Swagger REST API documentation
+- Systemd service file for Linux deployment
+- Apache 2.0 license with SPDX identifiers
+
+#### Documentation
+- Architecture diagrams and workflow descriptions
+- API documentation with code examples
+- Module-specific guides:
+  - Binaural rendering (`docs/binaural_rendering.md`)
+  - Loudness and DRC (`docs/loudness_drc.md`)
+  - HRTF usage (`docs/hrtf.md`)
+  - VBAP spatial panning (`docs/vbap.md`)
+  - HOA decoding (`docs/hoa.md`)
+- Contributing guidelines
+- Release process documentation (`docs/RELEASE.md`)
+- Build optimization notes in copilot instructions
+
+### Known Issues
+- FFmpeg codec integration uses stubs (Opus, AAC, FLAC decoding planned)
+- IAMF decoder awaits libiamf/AOM reference library integration
+- GUI feature set incomplete
+- No Windows or macOS support yet
+- Some unused variables and dead code warnings in core library
 
 [Unreleased]: https://github.com/mr-u0b0dy/audio-ninja/compare/v0.1.0...HEAD
-[0.1.0]: https://github.com/yourusername/audio-ninja/releases/tag/v0.1.0
+[0.1.0]: https://github.com/mr-u0b0dy/audio-ninja/releases/tag/v0.1.0

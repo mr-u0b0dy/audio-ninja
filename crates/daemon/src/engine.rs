@@ -58,6 +58,12 @@ pub struct EngineState {
     discovery: Option<SpeakerDiscovery>,
 }
 
+impl Default for EngineState {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl EngineState {
     pub fn new() -> Self {
         Self {

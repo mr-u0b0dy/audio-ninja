@@ -58,28 +58,6 @@ audio-ninja/
 │  └─ BLE control plane                   │
 └─────────────────────────────────────────┘
 ```
-┌─────────────────────────────────────────┐
-│  GUI (Tauri) / CLI / HTTP clients       │
-└──────────────┬──────────────────────────┘
-               │ REST API (HTTP/JSON)
-┌──────────────▼──────────────────────────┐
-│  audio-ninja-daemon (port 8080)         │
-│  ├─ Speaker discovery & management      │
-│  ├─ Layout configuration                │
-│  ├─ Transport control (play/pause/stop) │
-│  ├─ Calibration runner                  │
-│  └─ Real-time stats & monitoring        │
-└──────────────┬──────────────────────────┘
-               │
-┌──────────────▼──────────────────────────┐
-│  audio-ninja core library               │
-│  ├─ IAMF decode & spatial render        │
-│  ├─ Network transport (UDP/RTP)         │
-│  ├─ Clock sync (PTP/NTP)                │
-│  ├─ DSP pipeline & calibration          │
-│  └─ BLE control plane                   │
-└─────────────────────────────────────────┘
-```
 
 ## 🚀 Quick Start
 
@@ -165,36 +143,7 @@ cargo run -p audio-ninja-gui --release
 - **Pipeline Architecture**: Demux → Decode → Render workflow
 - **Per-Speaker DSP**: Individual processing chains with filter management
 
-## 🚀 Quick Start
 
-### Prerequisites
-
-- Rust 1.70 or later
-- Linux (primary target), macOS (planned), embedded targets (planned)
-
-### Installation
-
-```bash
-git clone https://github.com/mr-u0b0dy/audio-ninja.git
-cd audio-ninja
-cargo build --release
-```
-
-### Running Tests
-
-```bash
-cargo test
-```
-
-All 50 library tests should pass, covering:
-- HRTF binaural rendering
-- IAMF parsing and decoding
-- VBAP spatial panning
-- HOA ambisonics decoding
-- Loudness measurement and normalization (ITU-R BS.1770)
-- DRC presets and parameters
-- Network transport and RTP
-- Clock synchronization
 
 ## 📖 Documentation
 
@@ -390,29 +339,36 @@ let stats = receiver.statistics();
 
 ### ✅ Completed
 - Core IAMF parsing and rendering
-- 3D VBAP spatial renderer
-- HOA decoder (1st/2nd/3rd order)
-- UDP/RTP network transport
+- 3D VBAP spatial renderer (with 3D elevation support)
+- HOA decoder (1st/2nd/3rd order, Basic/Max-rE/In-Phase modes)
+- HRTF binaural rendering (4 headphone profiles)
+- Loudness measurement and normalization (ITU-R BS.1770-4)
+- Dynamic Range Control (DRC) with Speech/Music/Cinema presets
+- UDP/RTP network transport with mDNS discovery
 - Clock synchronization (PTP/NTP/System)
-- Forward Error Correction
+- Forward Error Correction with packet concealment
 - BLE GATT control plane
-- Room calibration pipeline
-- DSP filter design and export
-- Comprehensive test suite (151 tests)
+- Room calibration pipeline (sweep generation, IR analysis, filter design)
+- DSP filter design and CamillaDSP/BruteFIR export
+- REST API daemon service (Axum on port 8080)
+- CLI tool for daemon control
+- Desktop GUI client (Tauri)
+- Comprehensive test suite (250+ tests including e2e)
+- CI/CD pipeline with GitHub Actions
+- Performance benchmarks (Criterion)
 
 ### 🚧 In Progress
-- Real libiamf integration
-- FFmpeg codec bindings (AC-3, E-AC-3, TrueHD)
-- HRTF binaural rendering
-- REST/gRPC WiFi control API
+- Real libiamf/AOM decoder integration
+- FFmpeg codec bindings (Opus, AAC, FLAC, AC-3, E-AC-3)
+- GUI feature completeness
 
 ### 📋 Planned
 - RTSP session management
 - Adaptive bitrate streaming
 - Firmware update mechanism
-- CI/CD pipeline
 - Python bindings
-- Example applications (CLI player, GUI controller)
+- Cross-platform support (Windows, macOS)
+- ARM/embedded targets
 
 ## 🤝 Contributing
 

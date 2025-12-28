@@ -1,6 +1,5 @@
 // SPDX-License-Identifier: Apache-2.0
 
-use std::io::Read;
 use std::net::{TcpListener, TcpStream};
 use std::process::{Child, Command, Stdio};
 use std::thread::sleep;
@@ -25,7 +24,7 @@ fn wait_for_port(host: &str, port: u16, timeout: Duration) {
 }
 
 fn spawn_daemon(port: u16) -> Child {
-    let mut child = Command::new("cargo")
+    let child = Command::new("cargo")
         .args([
             "run",
             "-p",
@@ -42,7 +41,8 @@ fn spawn_daemon(port: u16) -> Child {
         .expect("spawn daemon");
 
     // Wait until the TCP port is accepting connections
-    wait_for_port("127.0.0.1", port, Duration::from_secs(10));
+    // Building the daemon via `cargo run` can take time on first run
+    wait_for_port("127.0.0.1", port, Duration::from_secs(60));
     child
 }
 
@@ -77,6 +77,7 @@ fn e2e_status_and_info() {
     assert!(info.contains("features"));
 
     let _ = daemon.kill();
+    let _ = daemon.wait();
 }
 
 #[test]
@@ -98,6 +99,7 @@ fn e2e_transport_flow() {
     assert!(s3.contains("\"Stopped\""));
 
     let _ = daemon.kill();
+    let _ = daemon.wait();
 }
 
 #[test]
@@ -111,6 +113,7 @@ fn e2e_layout_set_get() {
     assert!(layout.contains("stereo") || layout.contains("speakers"));
 
     let _ = daemon.kill();
+    let _ = daemon.wait();
 }
 
 #[test]
@@ -126,6 +129,7 @@ fn e2e_speakers_discover_and_list() {
     assert!(list.trim_start().starts_with("[") || list.contains("speakers"));
 
     let _ = daemon.kill();
+    let _ = daemon.wait();
 }
 
 #[test]
@@ -138,4 +142,5 @@ fn e2e_stats() {
     assert!(stats.contains("uptime") || stats.contains("transport_state"));
 
     let _ = daemon.kill();
+    let _ = daemon.wait();
 }

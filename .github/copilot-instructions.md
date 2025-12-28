@@ -60,6 +60,26 @@ cargo run -p audio-ninja-gui --release
 cargo bench -p audio-ninja --bench main_benchmarks
 ```
 
+## Build Optimization
+- Profiles: `.cargo/config.toml` sets `strip = true`, `lto = "thin"`, `codegen-units = 1`, `opt-level = 3` for `release`/`bench`; `panic = "abort"` in `release` to reduce size. `dev` uses `debug = 0` and `incremental = false` to curb target bloat.
+- First-run builds: E2E tests wait up to 60s for the daemon to start to accommodate compilation when using `cargo run` during tests.
+- Measure size: Use `cargo clean` before measuring and `du -sh target target/release` to profile footprint.
+- GUI notes: Tauri pulls GTK/WebKit on Linux; expect larger `deps`. Build GUI with `--release` for smaller binaries.
+- CI caching: Cache cargo registry and `target` to speed builds.
+
+Example GitHub Actions cache:
+```yaml
+- uses: actions/cache@v4
+  with:
+    path: |
+      ~/.cargo/registry
+      ~/.cargo/git
+      target
+    key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}-profiles-${{ hashFiles('.cargo/config.toml') }}
+    restore-keys: |
+      ${{ runner.os }}-cargo-
+```
+
 ## Contributions
 - Keep new files small and purposeful; avoid large auto-generated blobs.
 - Document new public APIs with brief Rust doc comments.
@@ -71,7 +91,8 @@ cargo bench -p audio-ninja --bench main_benchmarks
 - ✅ Daemon service with REST API (Axum on port 8080)
 - ✅ Desktop GUI client (Tauri + vanilla JS)
 - ✅ Systemd service file for Linux deployment
-- ✅ GitHub Actions CI: fmt, clippy, build, test
+- ✅ GitHub Actions CI: fmt, clippy, build, test, benchmarks, doc
+- ✅ GitHub Actions Release: automated binary builds (x86_64/aarch64 Linux)
 
 ### Core Modules (Completed)
 - ✅ iamf-core: parse/render with element types (channel/object/scene), metadata, mix presentations
@@ -197,7 +218,7 @@ cargo bench -p audio-ninja --bench main_benchmarks
 ### Low Priority (Later)
 11. **Fuzz testing**: Add `cargo-fuzz` for IAMF/RTP parsers
 12. **Cross-platform**: Test on macOS, add Windows support
-13. **Release automation**: GitHub Actions workflow for binary builds and releases
+13. ✅ **Release automation**: GitHub Actions workflow for binary builds and releases
 14. **Real codec integration**: Replace FFmpeg stubs with actual Opus/AAC/FLAC decoding
 15. **IAMF decoder**: Integrate libiamf/AOM reference implementation
 16. **ARM/embedded**: Configure cross-compilation targets

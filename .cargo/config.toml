@@ -9,6 +9,7 @@ strip = true
 lto = "thin"
 codegen-units = 1
 opt-level = 3
+panic = "abort"
 
 [profile.bench]
 strip = true
@@ -16,3 +17,4 @@ lto = "thin"
 codegen-units = 1
 opt-level = 3
 debug = 0
+panic = "abort"
