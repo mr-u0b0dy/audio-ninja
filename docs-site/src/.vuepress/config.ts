@@ -68,6 +68,11 @@ export default defineUserConfig({
           "release.md",
         ],
       },
+      {
+        text: "Reference",
+        icon: "book-bookmark",
+        link: "/reference/",
+      },
     ],
     
     sidebar: {
@@ -118,6 +123,25 @@ export default defineUserConfig({
             "api.md",
             "firmware.md",
             "release.md",
+          ],
+        },
+      ],
+      "/reference/": [
+        {
+          text: "Technical Reference",
+          icon: "book-bookmark",
+          children: [
+            "README.md",
+            "api_usage.md",
+            "calibration.md",
+            "codec_integration.md",
+            "daemon_workflow.md",
+            "firmware_update.md",
+            "hoa.md",
+            "hrtf.md",
+            "loudness_drc.md",
+            "release.md",
+            "vbap.md",
           ],
         },
       ],
