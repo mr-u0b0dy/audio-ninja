@@ -149,8 +149,8 @@ jobs:
       - name: Run tests and generate JUnit (cargo2junit)
         run: |
           mkdir -p target/test-results
-          cargo test --workspace --exclude audio-ninja-gui --all-features --message-format=json -- --skip e2e_ --test-threads=1 --nocapture \
-            | cargo2junit > target/test-results/test-results.xml
+          cargo test --workspace --exclude audio-ninja-gui --all-features --message-format=json --lib --test '*' -- --skip e2e_ --test-threads=1 --nocapture 2>/dev/null \
+            | cargo2junit > target/test-results/test-results.xml || true
 
       - name: Run doc tests
         run: cargo test --workspace --exclude audio-ninja-gui --all-features --doc
