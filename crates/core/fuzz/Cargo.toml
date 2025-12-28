@@ -1,0 +1,27 @@
+[package]
+name = "audio-ninja-fuzz"
+version = "0.1.0"
+edition = "2021"
+publish = false
+
+[dependencies]
+audio-ninja = { path = ".." }
+libfuzzer-sys = "0.4"
+
+[[bin]]
+name = "fuzz_rtp_header"
+path = "fuzz_targets/fuzz_rtp_header.rs"
+test = false
+doc = false
+
+[[bin]]
+name = "fuzz_sync_clock"
+path = "fuzz_targets/fuzz_sync_clock.rs"
+test = false
+doc = false
+
+[[bin]]
+name = "fuzz_network_packet"
+path = "fuzz_targets/fuzz_network_packet.rs"
+test = false
+doc = false

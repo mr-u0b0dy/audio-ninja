@@ -120,6 +120,23 @@ cargo run -p audio-ninja-cli --release -- speaker list
 cargo run -p audio-ninja-cli --release -- transport play
 ```
 
+### Fuzz Testing
+
+Audio Ninja includes fuzzing targets for critical parsers (RTP, clock sync, FEC):
+
+```bash
+# Install cargo-fuzz (requires nightly Rust)
+cargo install cargo-fuzz
+
+# Run specific fuzz target (e.g., RTP header)
+cargo +nightly fuzz run fuzz_rtp_header
+
+# Run all fuzz targets with timeout
+cargo +nightly fuzz run --all
+
+# See crates/core/fuzz/README.md for detailed fuzzing guide
+```
+
 See [crates/cli/README.md](crates/cli/README.md) for full CLI documentation.
 
 ### Launch GUI
