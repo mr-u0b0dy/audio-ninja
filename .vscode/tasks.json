@@ -6,28 +6,36 @@
       "type": "shell",
       "command": "cargo build --workspace",
       "group": "build",
-      "problemMatcher": ["$rustc"]
+      "problemMatcher": [
+        "$rustc"
+      ]
     },
     {
       "label": "Build Release",
       "type": "shell",
       "command": "cargo build --workspace --release",
       "group": "build",
-      "problemMatcher": ["$rustc"]
+      "problemMatcher": [
+        "$rustc"
+      ]
     },
     {
       "label": "Test Workspace",
       "type": "shell",
       "command": "cargo test --workspace",
       "group": "test",
-      "problemMatcher": ["$rustc"]
+      "problemMatcher": [
+        "$rustc"
+      ]
     },
     {
       "label": "Clippy",
       "type": "shell",
       "command": "cargo clippy --workspace --all-targets",
       "group": "test",
-      "problemMatcher": ["$rustc"]
+      "problemMatcher": [
+        "$rustc"
+      ]
     },
     {
       "label": "Format Code",
@@ -60,14 +68,18 @@
       "type": "shell",
       "command": "cargo run -p audio-ninja-gui",
       "isBackground": false,
-      "problemMatcher": ["$rustc"]
+      "problemMatcher": [
+        "$rustc"
+      ]
     },
     {
       "label": "Check All",
       "type": "shell",
       "command": "cargo fmt --all -- --check && cargo clippy --workspace --all-targets && cargo test --workspace",
       "group": "test",
-      "problemMatcher": ["$rustc"]
+      "problemMatcher": [
+        "$rustc"
+      ]
     },
     {
       "label": "Pre-Commit: Full Validation",
@@ -77,7 +89,9 @@
         "kind": "test",
         "isDefault": true
       },
-      "problemMatcher": ["$rustc"],
+      "problemMatcher": [
+        "$rustc"
+      ],
       "presentation": {
         "echo": true,
         "reveal": "always",
@@ -92,7 +106,9 @@
       "type": "shell",
       "command": "echo '⚡ Running quick pre-commit check...' && cargo fmt --all -- --check && cargo clippy --workspace --all-targets -- -D warnings && cargo test --workspace --lib && echo '✅ Quick checks passed!'",
       "group": "test",
-      "problemMatcher": ["$rustc"]
+      "problemMatcher": [
+        "$rustc"
+      ]
     }
   ]
 }
