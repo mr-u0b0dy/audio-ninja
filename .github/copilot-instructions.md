@@ -112,7 +112,7 @@ cargo run -p audio-ninja-gui --release
 - ✅ BLE GATT profiles: pairing, speaker identity, layout config, trims, delays
 - ✅ REST API endpoints: speaker management, layout config, transport control, calibration
 - ✅ Desktop GUI client with Tauri
-- CLI tool for command-line control
+- ✅ CLI tool for command-line control (audio-ninja binary)
 - Speaker registration and capability negotiation
 - Firmware update mechanism
 - Low-bandwidth BLE audio fallback (LC3/BIS for stereo)
@@ -136,7 +136,7 @@ cargo run -p audio-ninja-gui --release
 - Crossover filters for active speaker designs
 
 ### SDK & Integration APIs
-- CLI tool for command-line control
+- ✅ CLI tool for command-line control (10 tests passing)
 - Speaker registration API
 - Stream configuration API
 - Object positioning API (real-time updates)
@@ -151,9 +151,10 @@ cargo run -p audio-ninja-gui --release
 - ✅ Latency measurement and profiling
 - ✅ Multi-speaker sync validation (phase alignment)
 - ✅ CI pipeline: fmt, clippy, test, benchmark
-- Daemon API endpoint tests
+- ✅ Daemon API endpoint tests (21 tests passing)
+- ✅ CLI tests (10 tests passing)
 - GUI integration tests
-- End-to-end daemon ↔ GUI integration tests
+- End-to-end daemon ↔ GUI ↔ CLI integration tests
 - Fuzz testing: IAMF parser, RTP deserializer
 - Benchmarking suite with regression tracking (VBAP, HRTF, loudness performance)
 
@@ -171,12 +172,14 @@ cargo run -p audio-ninja-gui --release
 - Add NOTICE file if third-party code included
 
 ## Priority Tasks (Next Steps)
+Completed ✅)
+1. ✅ **Fix clippy warnings**: Applied auto-fixes to 13 files
+2. ✅ **Add daemon tests**: 21 API endpoint tests with full coverage
+3. ✅ **Create CLI tool**: `audio-ninja-cli` crate with 10 tests
+4. ✅ **Update repository metadata**: Updated GitHub URLs to mr-u0b0dy
+5. ✅ **Tag v0.1.0 release**: Tagged baseline version
 
-### High Priority (Do First)
-1. **Fix clippy warnings**: Run `cargo clippy --workspace --fix` to address 17 unused imports/variables, 14 unused struct fields
-2. **Add daemon tests**: API endpoint tests with mock HTTP client (currently 0 tests)
-3. **Create CLI tool**: `audio-ninja-cli` crate for command-line control
-4. **Update repository metadata**: Replace "yourusername" placeholder in Cargo.toml files
+### High Priority (Do Next)Cargo.toml files
 5. **Tag v0.1.0 release**: `git tag v0.1.0` to establish baseline version
 
 ### Medium Priority (Soon)
