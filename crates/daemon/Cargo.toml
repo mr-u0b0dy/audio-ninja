@@ -4,6 +4,10 @@ version.workspace = true
 edition.workspace = true
 license.workspace = true
 
+[lib]
+name = "audio_ninja_daemon"
+path = "src/lib.rs"
+
 [[bin]]
 name = "audio-ninja-daemon"
 path = "src/main.rs"

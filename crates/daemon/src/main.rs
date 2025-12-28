@@ -16,10 +16,7 @@ use tokio::sync::RwLock;
 use tower_http::cors::{Any, CorsLayer};
 use tracing::info;
 
-mod engine;
-mod api;
-
-use engine::EngineState;
+use audio_ninja_daemon::{api, engine::EngineState, AppState};
 
 #[derive(Parser, Debug)]
 #[command(name = "audio-ninja-daemon")]
@@ -36,11 +33,6 @@ struct Args {
     /// Enable verbose logging
     #[arg(short, long)]
     verbose: bool,
-}
-
-#[derive(Clone)]
-pub struct AppState {
-    engine: Arc<RwLock<EngineState>>,
 }
 
 #[tokio::main]
