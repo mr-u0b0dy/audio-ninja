@@ -226,3 +226,9 @@ Example GitHub Actions cache:
 17. **IAMF decoder**: Integrate libiamf/AOM reference implementation
 18. **ARM/embedded**: Configure cross-compilation targets
 19. **Demo applications**: Example projects using the daemon API
+
+## Temporary Summaries
+- Store ephemeral Copilot session summaries in an ignored directory to avoid CI/lint noise.
+- Preferred location: `target/tmp/` (ignored via `.gitignore`).
+- Filename convention: `copilot-session-summary-YYYY-MM-DD.md`.
+- Do not commit or move these into tracked docs; keep them isolated from CI.

@@ -439,11 +439,13 @@ let stats = receiver.statistics();
 - Performance benchmarks (Criterion)
 
 ### 🚧 In Progress
+
 - Real libiamf/AOM decoder integration
 - FFmpeg codec bindings (Opus, AAC, FLAC, AC-3, E-AC-3)
 - GUI feature completeness
 
 ### 📋 Planned
+
 - RTSP session management
 - Adaptive bitrate streaming
 - Firmware update mechanism
@@ -503,7 +505,7 @@ The workspace includes VS Code configurations:
 
 This project is licensed under the Apache License 2.0 - see the [LICENSE](LICENSE) file for details.
 
-```
+```text
 Copyright 2025 Audio Ninja Contributors
 
 Licensed under the Apache License, Version 2.0 (the "License");

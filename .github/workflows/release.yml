@@ -26,12 +26,12 @@ jobs:
 
       - name: Create Release
         id: create_release
-        uses: actions/create-release@v1
+        uses: softprops/action-gh-release@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           tag_name: ${{ github.ref }}
-          release_name: Release ${{ github.ref }}
+          name: Release ${{ github.ref }}
           draft: false
           prerelease: false
 
@@ -95,7 +95,7 @@ jobs:
           brew install gtk4 libsoup webkit2gtk
 
       - name: Cache cargo
-        uses: actions/cache@v5
+        uses: actions/cache@v4
         with:
           path: |
             ~/.cargo/registry
@@ -144,47 +144,16 @@ jobs:
           }
           Compress-Archive @compress
 
-      - name: Upload daemon binary
-        uses: actions/upload-release-asset@v1
+      - name: Upload release artifacts
+        uses: softprops/action-gh-release@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          upload_url: ${{ needs.create-release.outputs.upload_url }}
-          asset_path: target/${{ matrix.target }}/release/audio-ninja-daemon-${{ matrix.asset_name }}${{ runner.os == 'Windows' && '.exe' || '' }}
-          asset_name: audio-ninja-daemon-${{ matrix.asset_name }}${{ runner.os == 'Windows' && '.exe' || '' }}
-          asset_content_type: application/octet-stream
-
-      - name: Upload CLI binary
-        uses: actions/upload-release-asset@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          upload_url: ${{ needs.create-release.outputs.upload_url }}
-          asset_path: target/${{ matrix.target }}/release/audio-ninja-cli-${{ matrix.asset_name }}${{ runner.os == 'Windows' && '.exe' || '' }}
-          asset_name: audio-ninja-cli-${{ matrix.asset_name }}${{ runner.os == 'Windows' && '.exe' || '' }}
-          asset_content_type: application/octet-stream
-
-      - name: Upload archive (tar.gz for Linux/macOS)
-        if: runner.os != 'Windows'
-        uses: actions/upload-release-asset@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          upload_url: ${{ needs.create-release.outputs.upload_url }}
-          asset_path: target/${{ matrix.target }}/release/${{ matrix.asset_name }}.tar.gz
-          asset_name: ${{ matrix.asset_name }}-${{ needs.create-release.outputs.version }}.tar.gz
-          asset_content_type: application/gzip
-
-      - name: Upload archive (zip for Windows)
-        if: runner.os == 'Windows'
-        uses: actions/upload-release-asset@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          upload_url: ${{ needs.create-release.outputs.upload_url }}
-          asset_path: target/${{ matrix.target }}/release/${{ matrix.asset_name }}.zip
-          asset_name: ${{ matrix.asset_name }}-${{ needs.create-release.outputs.version }}.zip
-          asset_content_type: application/zip
+          tag_name: ${{ github.ref }}
+          files: |
+            target/${{ matrix.target }}/release/audio-ninja-daemon-${{ matrix.asset_name }}${{ runner.os == 'Windows' && '.exe' || '' }}
+            target/${{ matrix.target }}/release/audio-ninja-cli-${{ matrix.asset_name }}${{ runner.os == 'Windows' && '.exe' || '' }}
+            target/${{ matrix.target }}/release/${{ matrix.asset_name }}${{ runner.os == 'Windows' && '.zip' || '.tar.gz' }}
 
   checksums:
     name: Generate Checksums
@@ -192,18 +161,16 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Download all artifacts
-        uses: actions/download-artifact@v7
+        uses: actions/download-artifact@v4
 
       - name: Generate checksums
         run: |
           sha256sum audio-ninja-* > checksums.txt
 
       - name: Upload checksums
-        uses: actions/upload-release-asset@v1
+        uses: softprops/action-gh-release@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          upload_url: ${{ needs.create-release.outputs.upload_url }}
-          asset_path: checksums.txt
-          asset_name: checksums.txt
-          asset_content_type: text/plain
+          tag_name: ${{ github.ref }}
+          files: checksums.txt
