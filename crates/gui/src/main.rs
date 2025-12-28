@@ -90,10 +90,12 @@ pub struct SpeakerStats {
 // Tauri commands - these call the daemon API
 
 #[tauri::command]
-async fn get_daemon_status(state: tauri::State<'_, Arc<RwLock<AppState>>>) -> Result<StatusResponse, String> {
+async fn get_daemon_status(
+    state: tauri::State<'_, Arc<RwLock<AppState>>>,
+) -> Result<StatusResponse, String> {
     let app = state.read().await;
     let url = format!("{}/status", app.daemon_url);
-    
+
     app.http_client
         .get(&url)
         .send()
@@ -105,10 +107,12 @@ async fn get_daemon_status(state: tauri::State<'_, Arc<RwLock<AppState>>>) -> Re
 }
 
 #[tauri::command]
-async fn list_speakers(state: tauri::State<'_, Arc<RwLock<AppState>>>) -> Result<Vec<SpeakerInfo>, String> {
+async fn list_speakers(
+    state: tauri::State<'_, Arc<RwLock<AppState>>>,
+) -> Result<Vec<SpeakerInfo>, String> {
     let app = state.read().await;
     let url = format!("{}/speakers", app.daemon_url);
-    
+
     app.http_client
         .get(&url)
         .send()
@@ -123,30 +127,33 @@ async fn list_speakers(state: tauri::State<'_, Arc<RwLock<AppState>>>) -> Result
 async fn discover_speakers(state: tauri::State<'_, Arc<RwLock<AppState>>>) -> Result<(), String> {
     let app = state.read().await;
     let url = format!("{}/speakers/discover", app.daemon_url);
-    
+
     app.http_client
         .post(&url)
         .send()
         .await
         .map_err(|e| e.to_string())?;
-    
+
     Ok(())
 }
 
 #[tauri::command]
-async fn set_layout(preset: String, state: tauri::State<'_, Arc<RwLock<AppState>>>) -> Result<(), String> {
+async fn set_layout(
+    preset: String,
+    state: tauri::State<'_, Arc<RwLock<AppState>>>,
+) -> Result<(), String> {
     let app = state.read().await;
     let url = format!("{}/layout", app.daemon_url);
-    
+
     let body = serde_json::json!({ "preset": preset });
-    
+
     app.http_client
         .post(&url)
         .json(&body)
         .send()
         .await
         .map_err(|e| e.to_string())?;
-    
+
     Ok(())
 }
 
@@ -154,13 +161,13 @@ async fn set_layout(preset: String, state: tauri::State<'_, Arc<RwLock<AppState>
 async fn transport_play(state: tauri::State<'_, Arc<RwLock<AppState>>>) -> Result<(), String> {
     let app = state.read().await;
     let url = format!("{}/transport/play", app.daemon_url);
-    
+
     app.http_client
         .post(&url)
         .send()
         .await
         .map_err(|e| e.to_string())?;
-    
+
     Ok(())
 }
 
@@ -168,13 +175,13 @@ async fn transport_play(state: tauri::State<'_, Arc<RwLock<AppState>>>) -> Resul
 async fn transport_pause(state: tauri::State<'_, Arc<RwLock<AppState>>>) -> Result<(), String> {
     let app = state.read().await;
     let url = format!("{}/transport/pause", app.daemon_url);
-    
+
     app.http_client
         .post(&url)
         .send()
         .await
         .map_err(|e| e.to_string())?;
-    
+
     Ok(())
 }
 
@@ -182,21 +189,23 @@ async fn transport_pause(state: tauri::State<'_, Arc<RwLock<AppState>>>) -> Resu
 async fn transport_stop(state: tauri::State<'_, Arc<RwLock<AppState>>>) -> Result<(), String> {
     let app = state.read().await;
     let url = format!("{}/transport/stop", app.daemon_url);
-    
+
     app.http_client
         .post(&url)
         .send()
         .await
         .map_err(|e| e.to_string())?;
-    
+
     Ok(())
 }
 
 #[tauri::command]
-async fn get_transport_status(state: tauri::State<'_, Arc<RwLock<AppState>>>) -> Result<TransportStatus, String> {
+async fn get_transport_status(
+    state: tauri::State<'_, Arc<RwLock<AppState>>>,
+) -> Result<TransportStatus, String> {
     let app = state.read().await;
     let url = format!("{}/transport/status", app.daemon_url);
-    
+
     app.http_client
         .get(&url)
         .send()
@@ -211,21 +220,23 @@ async fn get_transport_status(state: tauri::State<'_, Arc<RwLock<AppState>>>) ->
 async fn start_calibration(state: tauri::State<'_, Arc<RwLock<AppState>>>) -> Result<(), String> {
     let app = state.read().await;
     let url = format!("{}/calibration/start", app.daemon_url);
-    
+
     app.http_client
         .post(&url)
         .send()
         .await
         .map_err(|e| e.to_string())?;
-    
+
     Ok(())
 }
 
 #[tauri::command]
-async fn get_calibration_status(state: tauri::State<'_, Arc<RwLock<AppState>>>) -> Result<CalibrationStatus, String> {
+async fn get_calibration_status(
+    state: tauri::State<'_, Arc<RwLock<AppState>>>,
+) -> Result<CalibrationStatus, String> {
     let app = state.read().await;
     let url = format!("{}/calibration/status", app.daemon_url);
-    
+
     app.http_client
         .get(&url)
         .send()
@@ -237,10 +248,12 @@ async fn get_calibration_status(state: tauri::State<'_, Arc<RwLock<AppState>>>) 
 }
 
 #[tauri::command]
-async fn get_stats(state: tauri::State<'_, Arc<RwLock<AppState>>>) -> Result<StatsResponse, String> {
+async fn get_stats(
+    state: tauri::State<'_, Arc<RwLock<AppState>>>,
+) -> Result<StatsResponse, String> {
     let app = state.read().await;
     let url = format!("{}/stats", app.daemon_url);
-    
+
     app.http_client
         .get(&url)
         .send()
@@ -252,10 +265,13 @@ async fn get_stats(state: tauri::State<'_, Arc<RwLock<AppState>>>) -> Result<Sta
 }
 
 #[tauri::command]
-async fn get_speaker_stats(id: String, state: tauri::State<'_, Arc<RwLock<AppState>>>) -> Result<SpeakerStats, String> {
+async fn get_speaker_stats(
+    id: String,
+    state: tauri::State<'_, Arc<RwLock<AppState>>>,
+) -> Result<SpeakerStats, String> {
     let app = state.read().await;
     let url = format!("{}/speakers/{}/stats", app.daemon_url, id);
-    
+
     app.http_client
         .get(&url)
         .send()

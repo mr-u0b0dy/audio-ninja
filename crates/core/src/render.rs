@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
-use crate::loudness::{DynamicRangeControl, HeadroomManager, LoudnessNormalizer, LoudnessTarget};
 use crate::hrtf::{BinauralRenderer, HeadphoneProfile, HrtfDatabase, HrtfDataset, HrtfPosition};
+use crate::loudness::{DynamicRangeControl, HeadroomManager, LoudnessNormalizer, LoudnessTarget};
 use crate::{AudioBlock, SpeakerLayout};
 use std::time::Duration;
 
@@ -164,7 +164,8 @@ impl ReferenceRenderer {
 
     /// Set spatial position for binaural rendering (front-left virtual speaker for now)
     pub fn set_binaural_position(&mut self, azimuth_deg: f32, elevation_deg: f32, distance_m: f32) {
-        self.current_binaural_position = Some(HrtfPosition::new(azimuth_deg, elevation_deg, distance_m));
+        self.current_binaural_position =
+            Some(HrtfPosition::new(azimuth_deg, elevation_deg, distance_m));
     }
 
     /// Check if binaural rendering is enabled
@@ -193,7 +194,9 @@ impl Renderer for ReferenceRenderer {
         self.headroom_manager.apply_limiting(&mut input);
 
         // Apply binaural downmix if enabled
-        if let (Some(binaural), Some(position)) = (&self.binaural_renderer, &self.current_binaural_position) {
+        if let (Some(binaural), Some(position)) =
+            (&self.binaural_renderer, &self.current_binaural_position)
+        {
             // For simplicity, use first channel or mix all channels
             let mono_input: Vec<f32> = if input.channels.len() == 1 {
                 input.channels[0].clone()
@@ -209,7 +212,11 @@ impl Renderer for ReferenceRenderer {
                 let len = input.channels.iter().map(|ch| ch.len()).max().unwrap_or(0);
                 (0..len)
                     .map(|i| {
-                        input.channels.iter().filter_map(|ch| ch.get(i)).sum::<f32>()
+                        input
+                            .channels
+                            .iter()
+                            .filter_map(|ch| ch.get(i))
+                            .sum::<f32>()
                             / input.channels.len().max(1) as f32
                     })
                     .collect()
@@ -362,10 +369,10 @@ mod tests {
     fn test_renderer_binaural_enable() {
         let mut renderer = ReferenceRenderer::new(48000);
         assert!(!renderer.has_binaural());
-        
+
         renderer.enable_binaural(HeadphoneProfile::Flat).unwrap();
         assert!(renderer.has_binaural());
-        
+
         renderer.disable_binaural();
         assert!(!renderer.has_binaural());
     }
@@ -373,11 +380,13 @@ mod tests {
     #[test]
     fn test_renderer_binaural_position() {
         let mut renderer = ReferenceRenderer::new(48000);
-        renderer.enable_binaural(HeadphoneProfile::ClosedBack).unwrap();
-        
+        renderer
+            .enable_binaural(HeadphoneProfile::ClosedBack)
+            .unwrap();
+
         renderer.set_binaural_position(0.0, 0.0, 1.0);
         assert!(renderer.current_binaural_position.is_some());
-        
+
         if let Some(pos) = &renderer.current_binaural_position {
             assert_eq!(pos.azimuth, 0.0);
             assert_eq!(pos.elevation, 0.0);
@@ -408,7 +417,9 @@ mod tests {
     #[test]
     fn test_renderer_binaural_mono_upconvert() {
         let mut renderer = ReferenceRenderer::new(48000);
-        renderer.enable_binaural(HeadphoneProfile::OpenBack).unwrap();
+        renderer
+            .enable_binaural(HeadphoneProfile::OpenBack)
+            .unwrap();
         // Set position before rendering
         renderer.set_binaural_position(45.0, 0.0, 1.0);
 
@@ -424,7 +435,10 @@ mod tests {
         // Should output stereo from mono due to binaural processing
         // The output is processed through headroom and loudness first,
         // then binaural converts mono to stereo
-        assert!(!output.channels.is_empty(), "Should have at least 1 channel");
+        assert!(
+            !output.channels.is_empty(),
+            "Should have at least 1 channel"
+        );
     }
 
     #[test]

@@ -20,7 +20,10 @@ fn wait_for_port(host: &str, port: u16, timeout: Duration) {
         }
         sleep(Duration::from_millis(100));
     }
-    panic!("daemon did not start on {}:{} within {:?}", host, port, timeout);
+    panic!(
+        "daemon did not start on {}:{} within {:?}",
+        host, port, timeout
+    );
 }
 
 fn spawn_daemon(port: u16) -> Child {

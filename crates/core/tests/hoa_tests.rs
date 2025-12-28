@@ -30,9 +30,11 @@ fn test_hoa_speaker_properties() {
 
 #[test]
 fn test_decoding_mode_variants() {
-    let modes = [DecodingMode::Basic,
+    let modes = [
+        DecodingMode::Basic,
         DecodingMode::MaxRE,
-        DecodingMode::InPhase];
+        DecodingMode::InPhase,
+    ];
 
     assert_eq!(modes.len(), 3);
     assert_eq!(modes[0], DecodingMode::Basic);

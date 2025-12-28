@@ -15,10 +15,10 @@ use audio_ninja_daemon::AppState;
 
 /// Helper to create app with test state
 fn create_test_app() -> Router {
+    use audio_ninja_daemon::EngineState;
+    use axum::routing::{delete, get, post};
     use std::sync::Arc;
     use tokio::sync::RwLock;
-    use audio_ninja_daemon::EngineState;
-    use axum::routing::{get, post, delete};
 
     let engine_state = EngineState::new();
     let app_state = AppState {
@@ -28,21 +28,57 @@ fn create_test_app() -> Router {
     Router::new()
         .route("/api/v1/status", get(audio_ninja_daemon::api::status))
         .route("/api/v1/info", get(audio_ninja_daemon::api::info))
-        .route("/api/v1/speakers", get(audio_ninja_daemon::api::list_speakers))
-        .route("/api/v1/speakers/discover", post(audio_ninja_daemon::api::discover_speakers))
-        .route("/api/v1/speakers/:id", get(audio_ninja_daemon::api::get_speaker))
-        .route("/api/v1/speakers/:id", delete(audio_ninja_daemon::api::remove_speaker))
+        .route(
+            "/api/v1/speakers",
+            get(audio_ninja_daemon::api::list_speakers),
+        )
+        .route(
+            "/api/v1/speakers/discover",
+            post(audio_ninja_daemon::api::discover_speakers),
+        )
+        .route(
+            "/api/v1/speakers/:id",
+            get(audio_ninja_daemon::api::get_speaker),
+        )
+        .route(
+            "/api/v1/speakers/:id",
+            delete(audio_ninja_daemon::api::remove_speaker),
+        )
         .route("/api/v1/layout", get(audio_ninja_daemon::api::get_layout))
         .route("/api/v1/layout", post(audio_ninja_daemon::api::set_layout))
-        .route("/api/v1/transport/play", post(audio_ninja_daemon::api::transport_play))
-        .route("/api/v1/transport/pause", post(audio_ninja_daemon::api::transport_pause))
-        .route("/api/v1/transport/stop", post(audio_ninja_daemon::api::transport_stop))
-        .route("/api/v1/transport/status", get(audio_ninja_daemon::api::transport_status))
-        .route("/api/v1/calibration/start", post(audio_ninja_daemon::api::calibration_start))
-        .route("/api/v1/calibration/status", get(audio_ninja_daemon::api::calibration_status))
-        .route("/api/v1/calibration/apply", post(audio_ninja_daemon::api::calibration_apply))
+        .route(
+            "/api/v1/transport/play",
+            post(audio_ninja_daemon::api::transport_play),
+        )
+        .route(
+            "/api/v1/transport/pause",
+            post(audio_ninja_daemon::api::transport_pause),
+        )
+        .route(
+            "/api/v1/transport/stop",
+            post(audio_ninja_daemon::api::transport_stop),
+        )
+        .route(
+            "/api/v1/transport/status",
+            get(audio_ninja_daemon::api::transport_status),
+        )
+        .route(
+            "/api/v1/calibration/start",
+            post(audio_ninja_daemon::api::calibration_start),
+        )
+        .route(
+            "/api/v1/calibration/status",
+            get(audio_ninja_daemon::api::calibration_status),
+        )
+        .route(
+            "/api/v1/calibration/apply",
+            post(audio_ninja_daemon::api::calibration_apply),
+        )
         .route("/api/v1/stats", get(audio_ninja_daemon::api::stats))
-        .route("/api/v1/speakers/:id/stats", get(audio_ninja_daemon::api::speaker_stats))
+        .route(
+            "/api/v1/speakers/:id/stats",
+            get(audio_ninja_daemon::api::speaker_stats),
+        )
         .with_state(app_state)
 }
 
@@ -64,7 +100,7 @@ async fn test_status_endpoint() {
     let response = app.oneshot(request).await.unwrap();
 
     assert_eq!(response.status(), StatusCode::OK);
-    
+
     let body = json_body(response.into_body()).await;
     assert_eq!(body["status"], "running");
     assert!(body["version"].is_string());
@@ -83,7 +119,7 @@ async fn test_info_endpoint() {
     let response = app.oneshot(request).await.unwrap();
 
     assert_eq!(response.status(), StatusCode::OK);
-    
+
     let body = json_body(response.into_body()).await;
     assert_eq!(body["name"], "Audio Ninja Engine");
     assert!(body["features"].is_array());
@@ -102,7 +138,7 @@ async fn test_list_speakers_empty() {
     let response = app.oneshot(request).await.unwrap();
 
     assert_eq!(response.status(), StatusCode::OK);
-    
+
     let body = json_body(response.into_body()).await;
     assert!(body.is_array());
     assert_eq!(body.as_array().unwrap().len(), 0);
@@ -285,7 +321,7 @@ async fn test_transport_status() {
     let response = app.oneshot(request).await.unwrap();
 
     assert_eq!(response.status(), StatusCode::OK);
-    
+
     let body = json_body(response.into_body()).await;
     assert!(body["state"].is_string());
 }
@@ -317,7 +353,7 @@ async fn test_calibration_status() {
     let response = app.oneshot(request).await.unwrap();
 
     assert_eq!(response.status(), StatusCode::OK);
-    
+
     let body = json_body(response.into_body()).await;
     assert!(body["running"].is_boolean());
     assert!(body["progress"].is_number());
@@ -351,7 +387,7 @@ async fn test_stats() {
     let response = app.oneshot(request).await.unwrap();
 
     assert_eq!(response.status(), StatusCode::OK);
-    
+
     let body = json_body(response.into_body()).await;
     assert!(body["total_speakers"].is_number());
     assert!(body["online_speakers"].is_number());
@@ -410,7 +446,7 @@ async fn test_layout_workflow() {
 
     let response = app.oneshot(request).await.unwrap();
     assert_eq!(response.status(), StatusCode::OK);
-    
+
     let body = json_body(response.into_body()).await;
     assert!(body["speakers"].is_array());
 }

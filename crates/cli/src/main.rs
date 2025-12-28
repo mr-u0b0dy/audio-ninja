@@ -24,26 +24,26 @@ struct Args {
 enum Commands {
     /// Show daemon status
     Status,
-    
+
     /// Show daemon information
     Info,
-    
+
     /// Speaker management
     #[command(subcommand)]
     Speaker(SpeakerCommands),
-    
+
     /// Layout configuration
     #[command(subcommand)]
     Layout(LayoutCommands),
-    
+
     /// Transport control
     #[command(subcommand)]
     Transport(TransportCommands),
-    
+
     /// Calibration
     #[command(subcommand)]
     Calibration(CalibrationCommands),
-    
+
     /// Show statistics
     Stats,
 }
@@ -52,22 +52,22 @@ enum Commands {
 enum SpeakerCommands {
     /// List all speakers
     List,
-    
+
     /// Discover speakers on the network
     Discover,
-    
+
     /// Get information about a specific speaker
     Get {
         /// Speaker ID (UUID)
         id: Uuid,
     },
-    
+
     /// Remove a speaker
     Remove {
         /// Speaker ID (UUID)
         id: Uuid,
     },
-    
+
     /// Show speaker statistics
     Stats {
         /// Speaker ID (UUID)
@@ -79,7 +79,7 @@ enum SpeakerCommands {
 enum LayoutCommands {
     /// Show current layout
     Get,
-    
+
     /// Set layout from preset
     Set {
         /// Layout preset (stereo, 5.1, 7.1, etc.)
@@ -91,13 +91,13 @@ enum LayoutCommands {
 enum TransportCommands {
     /// Start playback
     Play,
-    
+
     /// Pause playback
     Pause,
-    
+
     /// Stop playback
     Stop,
-    
+
     /// Show transport status
     Status,
 }
@@ -106,10 +106,10 @@ enum TransportCommands {
 enum CalibrationCommands {
     /// Start calibration
     Start,
-    
+
     /// Show calibration status
     Status,
-    
+
     /// Apply calibration results
     Apply,
 }
@@ -126,52 +126,54 @@ impl ApiClient {
             client: reqwest::Client::new(),
         }
     }
-    
+
     async fn get(&self, path: &str) -> Result<Value> {
         let url = format!("{}/api/v1{}", self.base_url, path);
-        let response = self.client
+        let response = self
+            .client
             .get(&url)
             .send()
             .await
             .context("Failed to send request")?;
-        
+
         if !response.status().is_success() {
             anyhow::bail!("Request failed with status: {}", response.status());
         }
-        
+
         let json = response.json().await.context("Failed to parse JSON")?;
         Ok(json)
     }
-    
+
     async fn post(&self, path: &str, body: Option<Value>) -> Result<()> {
         let url = format!("{}/api/v1{}", self.base_url, path);
         let mut request = self.client.post(&url);
-        
+
         if let Some(body) = body {
             request = request.json(&body);
         }
-        
+
         let response = request.send().await.context("Failed to send request")?;
-        
+
         if !response.status().is_success() {
             anyhow::bail!("Request failed with status: {}", response.status());
         }
-        
+
         Ok(())
     }
-    
+
     async fn delete(&self, path: &str) -> Result<()> {
         let url = format!("{}/api/v1{}", self.base_url, path);
-        let response = self.client
+        let response = self
+            .client
             .delete(&url)
             .send()
             .await
             .context("Failed to send request")?;
-        
+
         if !response.status().is_success() {
             anyhow::bail!("Request failed with status: {}", response.status());
         }
-        
+
         Ok(())
     }
 }
@@ -180,102 +182,102 @@ impl ApiClient {
 async fn main() -> Result<()> {
     let args = Args::parse();
     let client = ApiClient::new(args.daemon);
-    
+
     match args.command {
         Commands::Status => {
             let status = client.get("/status").await?;
             println!("{}", serde_json::to_string_pretty(&status)?);
         }
-        
+
         Commands::Info => {
             let info = client.get("/info").await?;
             println!("{}", serde_json::to_string_pretty(&info)?);
         }
-        
+
         Commands::Speaker(cmd) => match cmd {
             SpeakerCommands::List => {
                 let speakers = client.get("/speakers").await?;
                 println!("{}", serde_json::to_string_pretty(&speakers)?);
             }
-            
+
             SpeakerCommands::Discover => {
                 client.post("/speakers/discover", None).await?;
                 println!("Speaker discovery started");
             }
-            
+
             SpeakerCommands::Get { id } => {
                 let speaker = client.get(&format!("/speakers/{}", id)).await?;
                 println!("{}", serde_json::to_string_pretty(&speaker)?);
             }
-            
+
             SpeakerCommands::Remove { id } => {
                 client.delete(&format!("/speakers/{}", id)).await?;
                 println!("Speaker {} removed", id);
             }
-            
+
             SpeakerCommands::Stats { id } => {
                 let stats = client.get(&format!("/speakers/{}/stats", id)).await?;
                 println!("{}", serde_json::to_string_pretty(&stats)?);
             }
         },
-        
+
         Commands::Layout(cmd) => match cmd {
             LayoutCommands::Get => {
                 let layout = client.get("/layout").await?;
                 println!("{}", serde_json::to_string_pretty(&layout)?);
             }
-            
+
             LayoutCommands::Set { preset } => {
                 let body = serde_json::json!({ "preset": preset });
                 client.post("/layout", Some(body)).await?;
                 println!("Layout set to {}", preset);
             }
         },
-        
+
         Commands::Transport(cmd) => match cmd {
             TransportCommands::Play => {
                 client.post("/transport/play", None).await?;
                 println!("Playback started");
             }
-            
+
             TransportCommands::Pause => {
                 client.post("/transport/pause", None).await?;
                 println!("Playback paused");
             }
-            
+
             TransportCommands::Stop => {
                 client.post("/transport/stop", None).await?;
                 println!("Playback stopped");
             }
-            
+
             TransportCommands::Status => {
                 let status = client.get("/transport/status").await?;
                 println!("{}", serde_json::to_string_pretty(&status)?);
             }
         },
-        
+
         Commands::Calibration(cmd) => match cmd {
             CalibrationCommands::Start => {
                 client.post("/calibration/start", None).await?;
                 println!("Calibration started");
             }
-            
+
             CalibrationCommands::Status => {
                 let status = client.get("/calibration/status").await?;
                 println!("{}", serde_json::to_string_pretty(&status)?);
             }
-            
+
             CalibrationCommands::Apply => {
                 client.post("/calibration/apply", None).await?;
                 println!("Calibration applied");
             }
         },
-        
+
         Commands::Stats => {
             let stats = client.get("/stats").await?;
             println!("{}", serde_json::to_string_pretty(&stats)?);
         }
     }
-    
+
     Ok(())
 }

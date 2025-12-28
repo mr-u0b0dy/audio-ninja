@@ -79,18 +79,22 @@ fn test_hrtf_impulse_response_different_lengths() {
 
 #[test]
 fn test_hrtf_dataset_variants() {
-    let datasets = [HrtfDataset::Kemar,
+    let datasets = [
+        HrtfDataset::Kemar,
         HrtfDataset::Cipic,
-        HrtfDataset::MitKemar];
+        HrtfDataset::MitKemar,
+    ];
     assert_eq!(datasets.len(), 3);
 }
 
 #[test]
 fn test_headphone_profile_variants() {
-    let profiles = [HeadphoneProfile::Flat,
+    let profiles = [
+        HeadphoneProfile::Flat,
         HeadphoneProfile::ClosedBack,
         HeadphoneProfile::OpenBack,
-        HeadphoneProfile::IEM];
+        HeadphoneProfile::IEM,
+    ];
     assert_eq!(profiles.len(), 4);
 }
 

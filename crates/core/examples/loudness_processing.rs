@@ -11,7 +11,7 @@ use audio_ninja::{
     loudness::{
         DynamicRangeControl, HeadroomManager, LoudnessMeter, LoudnessNormalizer, LoudnessTarget,
     },
-    render::{ReferenceRenderer, DRCPreset},
+    render::{DRCPreset, ReferenceRenderer},
     AudioBlock,
 };
 

@@ -8,9 +8,9 @@
 // 5. Processing different channel configurations
 
 use audio_ninja::{
-    render::{ReferenceRenderer, RenderOptions, DRCPreset, Renderer},
-    loudness::LoudnessTarget,
     hrtf::HeadphoneProfile,
+    loudness::LoudnessTarget,
+    render::{DRCPreset, ReferenceRenderer, RenderOptions, Renderer},
     AudioBlock,
 };
 
@@ -53,8 +53,14 @@ fn main() -> anyhow::Result<()> {
         let output = renderer.render(surround_5_1.clone(), &opts);
 
         println!("  {} profile:", name);
-        println!("    Input: 5.1 surround ({} channels)", surround_5_1.channels.len());
-        println!("    Output: Binaural stereo ({} channels)", output.channels.len());
+        println!(
+            "    Input: 5.1 surround ({} channels)",
+            surround_5_1.channels.len()
+        );
+        println!(
+            "    Output: Binaural stereo ({} channels)",
+            output.channels.len()
+        );
         println!("    Sample rate: {} Hz", output.sample_rate);
     }
 
@@ -140,7 +146,10 @@ fn main() -> anyhow::Result<()> {
 
     println!("\n  Result:");
     println!("    Input: 5.1 surround with dynamic peaks");
-    println!("    Output: {} channels (binaural stereo)", output.channels.len());
+    println!(
+        "    Output: {} channels (binaural stereo)",
+        output.channels.len()
+    );
     println!("    ✓ All processing applied in correct order");
 
     // ========== Channel Conversion Examples ==========
@@ -148,25 +157,34 @@ fn main() -> anyhow::Result<()> {
 
     let test_cases = vec![
         ("Mono", vec![vec![0.3; DURATION_SAMPLES]]),
-        ("Stereo", vec![vec![0.2; DURATION_SAMPLES], vec![0.2; DURATION_SAMPLES]]),
-        ("5.1", vec![
-            vec![0.1; DURATION_SAMPLES],
-            vec![0.1; DURATION_SAMPLES],
-            vec![0.05; DURATION_SAMPLES],
-            vec![0.1; DURATION_SAMPLES],
-            vec![0.08; DURATION_SAMPLES],
-            vec![0.08; DURATION_SAMPLES],
-        ]),
-        ("7.1", vec![
-            vec![0.1; DURATION_SAMPLES],
-            vec![0.1; DURATION_SAMPLES],
-            vec![0.05; DURATION_SAMPLES],
-            vec![0.1; DURATION_SAMPLES],
-            vec![0.08; DURATION_SAMPLES],
-            vec![0.08; DURATION_SAMPLES],
-            vec![0.08; DURATION_SAMPLES],
-            vec![0.08; DURATION_SAMPLES],
-        ]),
+        (
+            "Stereo",
+            vec![vec![0.2; DURATION_SAMPLES], vec![0.2; DURATION_SAMPLES]],
+        ),
+        (
+            "5.1",
+            vec![
+                vec![0.1; DURATION_SAMPLES],
+                vec![0.1; DURATION_SAMPLES],
+                vec![0.05; DURATION_SAMPLES],
+                vec![0.1; DURATION_SAMPLES],
+                vec![0.08; DURATION_SAMPLES],
+                vec![0.08; DURATION_SAMPLES],
+            ],
+        ),
+        (
+            "7.1",
+            vec![
+                vec![0.1; DURATION_SAMPLES],
+                vec![0.1; DURATION_SAMPLES],
+                vec![0.05; DURATION_SAMPLES],
+                vec![0.1; DURATION_SAMPLES],
+                vec![0.08; DURATION_SAMPLES],
+                vec![0.08; DURATION_SAMPLES],
+                vec![0.08; DURATION_SAMPLES],
+                vec![0.08; DURATION_SAMPLES],
+            ],
+        ),
     ];
 
     for (format, channels) in test_cases {

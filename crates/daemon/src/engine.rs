@@ -2,10 +2,7 @@
 
 //! Engine state management
 
-use audio_ninja::{
-    network::SpeakerDiscovery,
-    SpeakerLayout,
-};
+use audio_ninja::{network::SpeakerDiscovery, SpeakerLayout};
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 use uuid::Uuid;

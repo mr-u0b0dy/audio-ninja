@@ -235,10 +235,7 @@ impl FecReceiver {
         self.stats.update(sequence);
 
         let group_id = sequence as usize / self.fec.group_size;
-        self.group_cache
-            .entry(group_id)
-            .or_default()
-            .push(packet);
+        self.group_cache.entry(group_id).or_default().push(packet);
     }
 
     pub fn process_fec_packet(&mut self, group_id: usize, fec: Vec<u8>) {
