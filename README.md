@@ -14,7 +14,7 @@ Audio Ninja uses a Cargo workspace with a client-server architecture:
 audio-ninja/
 ├── Cargo.toml              # Workspace root
 ├── crates/
-│   ├── audio-ninja/        # Core library (IAMF, VBAP, HOA, transport, DSP)
+│   ├── core/               # Core library (IAMF, VBAP, HOA, transport, DSP)
 │   │   ├── src/
 │   │   ├── examples/
 │   │   └── tests/

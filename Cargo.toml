@@ -1,7 +1,7 @@
 [workspace]
 resolver = "2"
 members = [
-    "crates/audio-ninja",
+    "crates/core",
     "crates/daemon",
     "crates/gui",
 ]
@@ -16,7 +16,7 @@ rust-version = "1.70"
 
 [workspace.dependencies]
 # Core library
-audio-ninja = { path = "crates/audio-ninja" }
+audio-ninja = { path = "crates/core" }
 
 # Common dependencies
 serde = { version = "1.0", features = ["derive"] }
