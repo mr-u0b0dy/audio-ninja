@@ -1,4 +1,4 @@
-.PHONY: help build test clean clippy fmt bench doc run-daemon run-gui run-cli install dev release check
+.PHONY: help build test clean clippy fmt bench doc run-daemon run-gui run-cli install dev release check icons
 
 # Default target
 help:
@@ -25,6 +25,9 @@ help:
 	@echo "Release:"
 	@echo "  make release      - Build optimized release binaries"
 	@echo "  make install      - Install binaries to ~/.cargo/bin"
+	@echo ""
+	@echo "Design:"
+	@echo "  make icons SOURCE='path/to/icon.png' - Generate application icons"
 	@echo ""
 	@echo "Maintenance:"
 	@echo "  make clean        - Clean build artifacts"
@@ -137,6 +140,17 @@ examples:
 	@echo ""
 	@echo "Running loudness processing example..."
 	cargo run --example loudness_processing
+
+# Icon generation
+icons:
+	@if [ -z "$(SOURCE)" ]; then \
+		echo "Error: SOURCE variable not set"; \
+		echo "Usage: make icons SOURCE=path/to/icon.png"; \
+		echo "Icon should be 1024x1024 PNG with transparent background"; \
+		exit 1; \
+	fi
+	@echo "Generating icons from $(SOURCE)..."
+	@./scripts/generate-icons.sh "$(SOURCE)" "crates/gui/icons"
 
 # Quick commands
 .PHONY: d daemon g gui c cli

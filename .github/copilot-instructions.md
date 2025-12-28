@@ -220,7 +220,8 @@ Example GitHub Actions cache:
 11. ✅ **Fuzz testing**: Added `cargo-fuzz` for IAMF/RTP parsers
 12. ✅ **Cross-platform**: Test on macOS, add Windows support
 13. ✅ **Release automation**: GitHub Actions workflow for binary builds and releases
-14. **Real codec integration**: Replace FFmpeg stubs with actual Opus/AAC/FLAC decoding
-15. **IAMF decoder**: Integrate libiamf/AOM reference implementation
-16. **ARM/embedded**: Configure cross-compilation targets
-17. **Demo applications**: Example projects using the daemon API
+14. ✅ **Design proper icons**: Icon design guide and generation script
+15. **Real codec integration**: Replace FFmpeg stubs with actual Opus/AAC/FLAC decoding
+16. **IAMF decoder**: Integrate libiamf/AOM reference implementation
+17. **ARM/embedded**: Configure cross-compilation targets
+18. **Demo applications**: Example projects using the daemon API

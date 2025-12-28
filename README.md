@@ -200,6 +200,7 @@ cargo run -p audio-ninja-gui --release
 
 - **[Cross-Platform Build Guide](docs/CROSS_PLATFORM.md)**: Linux, macOS, and Windows setup and build instructions
 - **[Release Process](docs/RELEASE.md)**: Versioning and automated release workflow
+- **[Icon Design Guide](docs/ICON_DESIGN.md)**: Design and generate application icons for all platforms
 - **[DevContainer Setup](.devcontainer/README.md)**: Containerized development environment
 
 ### Modules
