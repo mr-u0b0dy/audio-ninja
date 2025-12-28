@@ -146,21 +146,51 @@ cargo run -p audio-ninja-gui --release
 - Example applications (CLI player, GUI controller)
 
 ### Testing & Quality
-- ✅ Unit tests: serialization, codec round-trip, renderer mapping
+- ✅ Unit tests: serialization, codec round-trip, renderer mapping (55 tests passing)
 - ✅ Integration tests: end-to-end decode→render→transport with loopback
 - ✅ Latency measurement and profiling
 - ✅ Multi-speaker sync validation (phase alignment)
 - ✅ CI pipeline: fmt, clippy, test, benchmark
 - Daemon API endpoint tests
 - GUI integration tests
+- End-to-end daemon ↔ GUI integration tests
 - Fuzz testing: IAMF parser, RTP deserializer
-- Benchmarking suite with regression tracking
+- Benchmarking suite with regression tracking (VBAP, HRTF, loudness performance)
 
 ### Tooling & Documentation
 - ✅ Build instructions (Linux, macOS, embedded targets)
 - ✅ API documentation with examples
 - ✅ Architecture diagrams
-- OpenAPI/Swagger spec for REST API
-- Performance benchmarks and optimization
-- Add NOTICE file if third-party code included
 - ✅ Contribution guidelines
+- OpenAPI/Swagger spec for REST API
+- REST API usage examples (curl, HTTP clients)
+- Daemon usage examples and workflow guides
+- Calibration workflow documentation
+- Performance benchmarks and latency/throughput specs
+- Sequence diagrams for data flow
+- Add NOTICE file if third-party code included
+
+## Priority Tasks (Next Steps)
+
+### High Priority (Do First)
+1. **Fix clippy warnings**: Run `cargo clippy --workspace --fix` to address 17 unused imports/variables, 14 unused struct fields
+2. **Add daemon tests**: API endpoint tests with mock HTTP client (currently 0 tests)
+3. **Create CLI tool**: `audio-ninja-cli` crate for command-line control
+4. **Update repository metadata**: Replace "yourusername" placeholder in Cargo.toml files
+5. **Tag v0.1.0 release**: `git tag v0.1.0` to establish baseline version
+
+### Medium Priority (Soon)
+6. **Add API documentation**: OpenAPI/Swagger spec for REST API endpoints
+7. **Create integration tests**: End-to-end daemon ↔ GUI ↔ core tests
+8. **Optimize build**: Investigate 4.3GB target directory (2.1GB from GUI)
+9. **Add benchmarks**: Track VBAP, HRTF, loudness performance with `cargo bench`
+10. **Design proper icons**: Replace placeholder blue circles with real branding
+
+### Low Priority (Later)
+11. **Fuzz testing**: Add `cargo-fuzz` for IAMF/RTP parsers
+12. **Cross-platform**: Test on macOS, add Windows support
+13. **Release automation**: GitHub Actions workflow for binary builds and releases
+14. **Real codec integration**: Replace FFmpeg stubs with actual Opus/AAC/FLAC decoding
+15. **IAMF decoder**: Integrate libiamf/AOM reference implementation
+16. **ARM/embedded**: Configure cross-compilation targets
+17. **Demo applications**: Example projects using the daemon API
