@@ -137,6 +137,7 @@ Example GitHub Actions cache:
 
 ## Documentation
 - All user-facing documentation lives in `docs-site/` (VuePress site)
+- Published at: https://mr-u0b0dy.github.io/audio-ninja/
 - Structure:
   - `docs-site/src/guide/` - Getting started, installation, configuration
   - `docs-site/src/spatial/` - VBAP, HOA, HRTF spatial rendering
@@ -144,6 +145,7 @@ Example GitHub Actions cache:
   - `docs-site/src/api/` - REST API reference, daemon workflow, release process
 - Update docs-site when adding features or changing APIs
 - Run `cd docs-site && npm run dev` to preview documentation locally
+- Deployment: Auto-deploys to GitHub Pages on push to main (docs-site/ changes)
 
 ## Backlog (working TODO)
 
@@ -154,6 +156,7 @@ Example GitHub Actions cache:
 - ✅ Systemd service file for Linux deployment
 - ✅ GitHub Actions CI: fmt, clippy, build, test, benchmarks, doc
 - ✅ GitHub Actions Release: automated binary builds (x86_64/aarch64 Linux)
+- ✅ Documentation site deployed to GitHub Pages (https://mr-u0b0dy.github.io/audio-ninja/)
 
 ### Core Modules (Completed)
 - ✅ iamf-core: parse/render with element types (channel/object/scene), metadata, mix presentations

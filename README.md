@@ -59,6 +59,8 @@ cargo bench -p audio-ninja --bench main_benchmarks
 
 ## 📖 Documentation
 
+**📚 Full documentation:** https://mr-u0b0dy.github.io/audio-ninja/
+
 Core documentation is in the [docs-site/](docs-site/) directory:
 
 | File | Topic |
