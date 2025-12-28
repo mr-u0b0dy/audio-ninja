@@ -244,7 +244,8 @@ fn test_decode_varying_buffer() {
     let num_samples = 50;
     let mut input = vec![vec![0.0; num_samples]; 4];
 
-    for (i, _) in input[0].iter().enumerate().take(num_samples) {
+    #[allow(clippy::needless_range_loop)]
+    for i in 0..num_samples {
         let t = i as f32 / num_samples as f32;
         input[0][i] = 1.0; // Constant W
         input[1][i] = (t * 2.0 * std::f32::consts::PI).sin(); // Varying X
