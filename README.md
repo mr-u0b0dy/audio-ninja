@@ -209,23 +209,33 @@ cargo run -p audio-ninja-gui --release
 
 ## 📖 Documentation
 
-### Guides
+### Getting Started
+
+- **[Quick Start](crates/daemon/README.md)**: Get up and running with the daemon
+- **[CLI Usage](crates/cli/README.md)**: Command-line interface reference
+- **[REST API Usage](docs/API_USAGE.md)**: Complete HTTP API examples (curl, Python, JavaScript, Rust)
+- **[Daemon Workflow Guide](docs/DAEMON_WORKFLOW.md)**: Deployment, configuration, and operation
+- **[Calibration Workflow](docs/CALIBRATION.md)**: Room measurement and acoustic optimization
+
+### Setup & Deployment
 
 - **[Cross-Platform Build Guide](docs/CROSS_PLATFORM.md)**: Linux, macOS, and Windows setup and build instructions
+- **[DevContainer Setup](.devcontainer/README.md)**: Containerized development environment
 - **[Release Process](docs/RELEASE.md)**: Versioning and automated release workflow
+
+### Feature Guides
+
 - **[Icon Design Guide](docs/ICON_DESIGN.md)**: Design and generate application icons for all platforms
 - **[Codec Integration Guide](docs/CODEC_INTEGRATION.md)**: Integrate audio codecs (Opus, FLAC, AAC) and FFmpeg
 - **[Firmware Update Mechanism](docs/FIRMWARE_UPDATE.md)**: Over-the-air firmware updates with rollback support
-- **[DevContainer Setup](.devcontainer/README.md)**: Containerized development environment
 
-### Modules
+### Technical Modules
 
 - **[Binaural Rendering](docs/binaural_rendering.md)**: HRTF spatial audio for headphones
 - **[Loudness & DRC](docs/loudness_drc.md)**: ITU-R BS.1770 loudness and dynamic range control
 - **[HRTF](docs/hrtf.md)**: Head-Related Transfer Function binaural rendering
 - **[VBAP](docs/vbap.md)**: 3D Vector-Based Amplitude Panning
 - **[HOA](docs/hoa.md)**: Higher-Order Ambisonics Decoder
-- **Calibration**: Room measurement and correction
 - **Network**: UDP/RTP streaming and speaker discovery
 - **BLE**: Bluetooth Low Energy control plane
 - **FEC**: Forward Error Correction

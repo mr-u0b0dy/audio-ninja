@@ -9,6 +9,9 @@ The GUI and CLI tools communicate with this service for all audio processing ope
 
 ## API Documentation
 
+- **[REST API Usage Examples](../../docs/API_USAGE.md)**: Complete HTTP API guide with curl, Python, JavaScript, and Rust examples
+- **[Daemon Workflow Guide](../../docs/DAEMON_WORKFLOW.md)**: Deployment, configuration, monitoring, and integration
+- **[Calibration Workflow](../../docs/CALIBRATION.md)**: Room calibration and acoustic optimization
 - **API Reference**: See [API.md](API.md) for complete endpoint documentation
 - **OpenAPI Spec**: See [openapi.yaml](openapi.yaml) for machine-readable API specification
 - **CLI Usage**: See [../cli/README.md](../cli/README.md) for command-line interface
