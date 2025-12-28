@@ -7,6 +7,12 @@ Background service providing the core audio engine for Audio Ninja.
 The daemon runs as a system service and exposes a REST API on `http://127.0.0.1:8080/api/v1`.  
 The GUI and CLI tools communicate with this service for all audio processing operations.
 
+## API Documentation
+
+- **API Reference**: See [API.md](API.md) for complete endpoint documentation
+- **OpenAPI Spec**: See [openapi.yaml](openapi.yaml) for machine-readable API specification
+- **CLI Usage**: See [../cli/README.md](../cli/README.md) for command-line interface
+
 ## Architecture
 
 ```

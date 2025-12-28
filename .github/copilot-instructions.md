@@ -163,7 +163,7 @@ cargo run -p audio-ninja-gui --release
 - ✅ API documentation with examples
 - ✅ Architecture diagrams
 - ✅ Contribution guidelines
-- OpenAPI/Swagger spec for REST API
+- ✅ OpenAPI/Swagger spec for REST API
 - REST API usage examples (curl, HTTP clients)
 - Daemon usage examples and workflow guides
 - Calibration workflow documentation
@@ -172,19 +172,17 @@ cargo run -p audio-ninja-gui --release
 - Add NOTICE file if third-party code included
 
 ## Priority Tasks (Next Steps)
-Completed ✅)
+
+### High Priority (Completed ✅)
 1. ✅ **Fix clippy warnings**: Applied auto-fixes to 13 files
 2. ✅ **Add daemon tests**: 21 API endpoint tests with full coverage
 3. ✅ **Create CLI tool**: `audio-ninja-cli` crate with 10 tests
 4. ✅ **Update repository metadata**: Updated GitHub URLs to mr-u0b0dy
 5. ✅ **Tag v0.1.0 release**: Tagged baseline version
 
-### High Priority (Do Next)Cargo.toml files
-5. **Tag v0.1.0 release**: `git tag v0.1.0` to establish baseline version
-
-### Medium Priority (Soon)
-6. **Add API documentation**: OpenAPI/Swagger spec for REST API endpoints
-7. **Create integration tests**: End-to-end daemon ↔ GUI ↔ core tests
+### Medium Priority (Do Next)
+6. ✅ **Add API documentation**: OpenAPI/Swagger spec for REST API endpoints
+7. **Create integration tests**: End-to-end daemon ↔ GUI ↔ CLI tests
 8. **Optimize build**: Investigate 4.3GB target directory (2.1GB from GUI)
 9. **Add benchmarks**: Track VBAP, HRTF, loudness performance with `cargo bench`
 10. **Design proper icons**: Replace placeholder blue circles with real branding

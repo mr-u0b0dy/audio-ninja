@@ -1,0 +1,425 @@
+openapi: 3.0.3
+info:
+  title: Audio Ninja Daemon API
+  description: REST API for controlling the Audio Ninja immersive audio engine
+  version: 0.1.0
+  license:
+    name: Apache 2.0
+    url: https://www.apache.org/licenses/LICENSE-2.0.html
+  contact:
+    name: Audio Ninja
+    url: https://github.com/mr-u0b0dy/audio-ninja
+
+servers:
+  - url: http://127.0.0.1:8080/api/v1
+    description: Local daemon
+
+paths:
+  /status:
+    get:
+      summary: Get daemon status
+      tags: [Status]
+      responses:
+        '200':
+          description: Daemon status
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StatusResponse'
+
+  /info:
+    get:
+      summary: Get daemon information
+      tags: [Status]
+      responses:
+        '200':
+          description: Daemon information
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InfoResponse'
+
+  /speakers:
+    get:
+      summary: List all speakers
+      tags: [Speakers]
+      responses:
+        '200':
+          description: List of speakers
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/SpeakerInfo'
+
+  /speakers/discover:
+    post:
+      summary: Start speaker discovery
+      tags: [Speakers]
+      responses:
+        '202':
+          description: Discovery started
+
+  /speakers/{id}:
+    get:
+      summary: Get speaker information
+      tags: [Speakers]
+      parameters:
+        - $ref: '#/components/parameters/SpeakerId'
+      responses:
+        '200':
+          description: Speaker information
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SpeakerInfo'
+        '404':
+          description: Speaker not found
+    delete:
+      summary: Remove speaker
+      tags: [Speakers]
+      parameters:
+        - $ref: '#/components/parameters/SpeakerId'
+      responses:
+        '204':
+          description: Speaker removed
+        '404':
+          description: Speaker not found
+
+  /speakers/{id}/stats:
+    get:
+      summary: Get speaker statistics
+      tags: [Speakers]
+      parameters:
+        - $ref: '#/components/parameters/SpeakerId'
+      responses:
+        '200':
+          description: Speaker statistics
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SpeakerStats'
+        '404':
+          description: Speaker not found
+
+  /layout:
+    get:
+      summary: Get current layout
+      tags: [Layout]
+      responses:
+        '200':
+          description: Current layout
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SpeakerLayout'
+        '404':
+          description: No layout configured
+    post:
+      summary: Set speaker layout
+      tags: [Layout]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LayoutRequest'
+      responses:
+        '200':
+          description: Layout configured
+        '400':
+          description: Invalid request
+        '501':
+          description: Custom layouts not yet implemented
+
+  /transport/play:
+    post:
+      summary: Start playback
+      tags: [Transport]
+      responses:
+        '200':
+          description: Playback started
+
+  /transport/pause:
+    post:
+      summary: Pause playback
+      tags: [Transport]
+      responses:
+        '200':
+          description: Playback paused
+
+  /transport/stop:
+    post:
+      summary: Stop playback
+      tags: [Transport]
+      responses:
+        '200':
+          description: Playback stopped
+
+  /transport/status:
+    get:
+      summary: Get transport status
+      tags: [Transport]
+      responses:
+        '200':
+          description: Transport status
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TransportStatus'
+
+  /calibration/start:
+    post:
+      summary: Start calibration
+      tags: [Calibration]
+      responses:
+        '202':
+          description: Calibration started
+
+  /calibration/status:
+    get:
+      summary: Get calibration status
+      tags: [Calibration]
+      responses:
+        '200':
+          description: Calibration status
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CalibrationStatus'
+
+  /calibration/apply:
+    post:
+      summary: Apply calibration results
+      tags: [Calibration]
+      responses:
+        '200':
+          description: Calibration applied
+        '501':
+          description: Not yet implemented
+
+  /stats:
+    get:
+      summary: Get system statistics
+      tags: [Statistics]
+      responses:
+        '200':
+          description: System statistics
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SystemStats'
+
+components:
+  parameters:
+    SpeakerId:
+      name: id
+      in: path
+      required: true
+      description: Speaker UUID
+      schema:
+        type: string
+        format: uuid
+
+  schemas:
+    StatusResponse:
+      type: object
+      required: [status, version, uptime_secs]
+      properties:
+        status:
+          type: string
+          example: running
+        version:
+          type: string
+          example: 0.1.0
+        uptime_secs:
+          type: integer
+          format: int64
+          example: 3600
+
+    InfoResponse:
+      type: object
+      required: [name, version, features]
+      properties:
+        name:
+          type: string
+          example: Audio Ninja Engine
+        version:
+          type: string
+          example: 0.1.0
+        features:
+          type: array
+          items:
+            type: string
+          example: [IAMF, VBAP, HOA, RTP Transport, Room Calibration]
+
+    SpeakerPosition:
+      type: object
+      required: [azimuth, elevation, distance]
+      properties:
+        azimuth:
+          type: number
+          format: float
+          description: Horizontal angle in degrees (-180 to 180)
+          example: -30.0
+        elevation:
+          type: number
+          format: float
+          description: Vertical angle in degrees (-90 to 90)
+          example: 0.0
+        distance:
+          type: number
+          format: float
+          description: Distance in meters
+          example: 2.0
+
+    SpeakerInfo:
+      type: object
+      required: [id, name, address, online]
+      properties:
+        id:
+          type: string
+          format: uuid
+          example: 550e8400-e29b-41d4-a716-446655440000
+        name:
+          type: string
+          example: Left Speaker
+        address:
+          type: string
+          example: 192.168.1.100
+        position:
+          $ref: '#/components/schemas/SpeakerPosition'
+        online:
+          type: boolean
+          example: true
+
+    SpeakerStats:
+      type: object
+      required: [packets_sent, packets_lost, latency_ms, jitter_ms, buffer_fill]
+      properties:
+        packets_sent:
+          type: integer
+          format: int64
+          example: 10000
+        packets_lost:
+          type: integer
+          format: int64
+          example: 5
+        latency_ms:
+          type: number
+          format: float
+          example: 12.5
+        jitter_ms:
+          type: number
+          format: float
+          example: 2.1
+        buffer_fill:
+          type: number
+          format: float
+          description: Buffer fill level (0.0 to 1.0)
+          example: 0.75
+
+    SpeakerLayout:
+      type: object
+      required: [speakers]
+      properties:
+        speakers:
+          type: array
+          items:
+            $ref: '#/components/schemas/SpeakerPosition'
+
+    LayoutRequest:
+      type: object
+      oneOf:
+        - required: [preset]
+          properties:
+            preset:
+              type: string
+              enum: [stereo, 5.1, 7.1, 7.1.4, 9.1.6]
+              example: stereo
+        - required: [speakers]
+          properties:
+            speakers:
+              type: array
+              items:
+                type: object
+                required: [speaker_id, azimuth, elevation, distance]
+                properties:
+                  speaker_id:
+                    type: string
+                    format: uuid
+                  azimuth:
+                    type: number
+                    format: float
+                  elevation:
+                    type: number
+                    format: float
+                  distance:
+                    type: number
+                    format: float
+
+    TransportStatus:
+      type: object
+      required: [state]
+      properties:
+        state:
+          type: string
+          enum: [Stopped, Playing, Paused]
+          example: Playing
+
+    CalibrationStatus:
+      type: object
+      required: [running, progress, measurements]
+      properties:
+        running:
+          type: boolean
+          example: true
+        progress:
+          type: number
+          format: float
+          description: Progress from 0.0 to 1.0
+          example: 0.45
+        measurements:
+          type: integer
+          description: Number of measurements completed
+          example: 3
+
+    SystemStats:
+      type: object
+      required: [total_speakers, online_speakers, transport_state, has_layout]
+      properties:
+        total_speakers:
+          type: integer
+          example: 6
+        online_speakers:
+          type: integer
+          example: 5
+        transport_state:
+          type: string
+          example: Playing
+        has_layout:
+          type: boolean
+          example: true
+
+    ErrorResponse:
+      type: object
+      required: [error]
+      properties:
+        error:
+          type: string
+          example: Speaker not found
+
+tags:
+  - name: Status
+    description: Daemon status and information
+  - name: Speakers
+    description: Speaker discovery and management
+  - name: Layout
+    description: Speaker layout configuration
+  - name: Transport
+    description: Playback transport control
+  - name: Calibration
+    description: Room calibration
+  - name: Statistics
+    description: System statistics
