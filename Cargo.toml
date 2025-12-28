@@ -1,24 +1,55 @@
-[package]
-name = "audio-ninja"
+[workspace]
+resolver = "2"
+members = [
+    "crates/audio-ninja",
+    "crates/daemon",
+    "crates/gui",
+]
+
+[workspace.package]
 version = "0.1.0"
 edition = "2021"
 license = "Apache-2.0"
 authors = ["Audio Ninja Contributors"]
-description = "Open-source wireless immersive audio platform with IAMF support, spatial rendering (VBAP, HOA), networked transport, and room calibration"
 repository = "https://github.com/yourusername/audio-ninja"
-homepage = "https://github.com/yourusername/audio-ninja"
-documentation = "https://docs.rs/audio-ninja"
-readme = "README.md"
-keywords = ["audio", "iamf", "spatial-audio", "ambisonics", "vbap"]
-categories = ["multimedia::audio", "network-programming", "embedded"]
 rust-version = "1.70"
 
-[dependencies]
-thiserror = "1.0"
-anyhow = "1.0"
-bincode = "1.3"
+[workspace.dependencies]
+# Core library
+audio-ninja = { path = "crates/audio-ninja" }
+
+# Common dependencies
 serde = { version = "1.0", features = ["derive"] }
-rand = "0.8"
-tokio = { version = "1.42", features = ["net", "sync", "time", "rt", "macros"] }
-mdns-sd = "0.11"
+serde_json = "1.0"
+tokio = { version = "1.42", features = ["full"] }
+anyhow = "1.0"
+thiserror = "1.0"
 uuid = { version = "1.11", features = ["v4", "serde"] }
+
+# Networking
+reqwest = { version = "0.11", features = ["json"] }
+axum = "0.7"
+tower = "0.4"
+tower-http = { version = "0.5", features = ["cors", "trace"] }
+mdns-sd = "0.11"
+
+# Logging
+tracing = "0.1"
+tracing-subscriber = { version = "0.3", features = ["env-filter"] }
+
+# CLI
+clap = { version = "4.5", features = ["derive"] }
+
+# GUI
+tauri = { version = "1.5", features = ["shell-open"] }
+tauri-build = "1.5"
+
+# Other
+bincode = "1.3"
+rand = "0.8"
+
+[profile.release]
+lto = true
+codegen-units = 1
+opt-level = 3
+strip = true

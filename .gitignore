@@ -1,6 +1,15 @@
 # Ignore build artifacts
 /target/
+/crates/*/target/
 Cargo.lock
+/crates/*/Cargo.lock
+
+# GUI build artifacts
+/crates/gui/dist/
+/crates/gui/icons/*.png
+/crates/gui/icons/*.ico
+/crates/gui/icons/*.icns
+/crates/gui/.tauri/
 
 # IDE files
 .vscode/
@@ -24,6 +33,12 @@ Cargo.lock
 # Environment
 .env
 .env.local
+
+# Runtime state
+/var/lib/audio-ninja/
+
+# Daemon logs
+audio-ninja-daemon.log
 
 # Coverage
 cobertura.xml

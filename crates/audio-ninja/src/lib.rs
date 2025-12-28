@@ -24,7 +24,7 @@ pub mod vbap;
 use serde::{Deserialize, Serialize};
 use std::time::Duration;
 
-#[derive(Clone, Debug, PartialEq)]
+#[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
 pub enum SpeakerRole {
     FrontLeft,
     FrontRight,
@@ -45,23 +45,44 @@ pub enum SpeakerRole {
     Custom(String),
 }
 
-#[derive(Clone, Debug, PartialEq)]
+#[derive(Clone, Copy, Debug, PartialEq, Serialize, Deserialize)]
 pub struct Position3 {
     pub x: f32,
     pub y: f32,
     pub z: f32,
 }
 
-#[derive(Clone, Debug, PartialEq)]
+#[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
 pub struct SpeakerDescriptor {
     pub id: String,
     pub role: SpeakerRole,
     pub position: Position3,
     pub max_spl_db: f32,
+    #[serde(with = "duration_serde")]
     pub latency: Duration,
 }
 
-#[derive(Clone, Debug, PartialEq)]
+mod duration_serde {
+    use serde::{Deserialize, Deserializer, Serialize, Serializer};
+    use std::time::Duration;
+
+    pub fn serialize<S>(duration: &Duration, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: Serializer,
+    {
+        duration.as_secs_f64().serialize(serializer)
+    }
+
+    pub fn deserialize<'de, D>(deserializer: D) -> Result<Duration, D::Error>
+    where
+        D: Deserializer<'de>,
+    {
+        let secs = f64::deserialize(deserializer)?;
+        Ok(Duration::from_secs_f64(secs))
+    }
+}
+
+#[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
 pub struct SpeakerLayout {
     pub name: String,
     pub speakers: Vec<SpeakerDescriptor>,
@@ -70,6 +91,14 @@ pub struct SpeakerLayout {
 impl SpeakerLayout {
     pub fn by_id(&self, id: &str) -> Option<&SpeakerDescriptor> {
         self.speakers.iter().find(|s| s.id == id)
+    }
+
+    pub fn stereo() -> Self {
+        crate::mapping::layout_from_name("stereo").expect("stereo layout")
+    }
+
+    pub fn surround_5_1() -> Self {
+        crate::mapping::layout_from_name("5.1").expect("5.1 layout")
     }
 }
 

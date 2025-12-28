@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Audio Ninja - Audio Processing</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <header class="header">
+            <h1>🥷 Audio Ninja</h1>
+            <p class="subtitle">Professional Audio Processing</p>
+        </header>
+
+        <main class="main-content">
+            <!-- Status Panel -->
+            <section class="panel status-panel">
+                <h2>Status</h2>
+                <div class="status-grid">
+                    <div class="status-item">
+                        <span class="label">Sample Rate:</span>
+                        <span id="statusSampleRate" class="value">48000 Hz</span>
+                    </div>
+                    <div class="status-item">
+                        <span class="label">DRC:</span>
+                        <span id="statusDRC" class="value status-off">Inactive</span>
+                    </div>
+                    <div class="status-item">
+                        <span class="label">Loudness:</span>
+                        <span id="statusLoudness" class="value status-off">Inactive</span>
+                    </div>
+                    <div class="status-item">
+                        <span class="label">Binaural:</span>
+                        <span id="statusBinaural" class="value status-off">Inactive</span>
+                    </div>
+                </div>
+            </section>
+
+            <div class="config-grid">
+                <!-- DRC Panel -->
+                <section class="panel config-panel">
+                    <h2>🎚️ DRC (Dynamic Range Control)</h2>
+                    <div class="control-group">
+                        <label for="drcPreset">Preset:</label>
+                        <select id="drcPreset">
+                            <option value="">None</option>
+                            <option value="Speech">Speech (3:1, -16dB)</option>
+                            <option value="Music" selected>Music (4:1, -18dB)</option>
+                            <option value="Cinema">Cinema (2:1, -14dB)</option>
+                        </select>
+                    </div>
+                    <div class="preset-info" id="drcInfo">
+                        Music: 4:1 ratio, -18dB threshold, 10ms/100ms attack/release
+                    </div>
+                </section>
+
+                <!-- Loudness Panel -->
+                <section class="panel config-panel">
+                    <h2>📊 Loudness (ITU-R BS.1770)</h2>
+                    <div class="control-group">
+                        <label for="loudnessTarget">Target:</label>
+                        <select id="loudnessTarget">
+                            <option value="">None</option>
+                            <option value="Television">Television (-23 LUFS)</option>
+                            <option value="StreamingMusic" selected>Streaming Music (-14 LUFS)</option>
+                            <option value="FilmTheatrical">Film Theatrical (-27 LUFS)</option>
+                            <option value="FilmHome">Film Home (-20 LUFS)</option>
+                        </select>
+                    </div>
+                    <div class="preset-info" id="loudnessInfo">
+                        Streaming Music: Standard for music streaming platforms
+                    </div>
+                </section>
+
+                <!-- Headroom Panel -->
+                <section class="panel config-panel">
+                    <h2>🔊 Headroom Protection</h2>
+                    <div class="control-group">
+                        <label for="headroomDb">Threshold (dB):</label>
+                        <input type="range" id="headroomDb" min="1" max="6" value="3" step="0.5">
+                        <span id="headroomDbValue">3.0</span>
+                    </div>
+                    <div class="control-group">
+                        <label for="headroomLookahead">Lookahead (ms):</label>
+                        <input type="range" id="headroomLookahead" min="0" max="10" value="3" step="0.5">
+                        <span id="headroomLookaheadValue">3.0</span>
+                    </div>
+                </section>
+
+                <!-- Binaural Panel -->
+                <section class="panel config-panel">
+                    <h2>🎧 Binaural Rendering</h2>
+                    <div class="control-group">
+                        <input type="checkbox" id="binauralEnabled">
+                        <label for="binauralEnabled">Enable Binaural for Headphones</label>
+                    </div>
+
+                    <div id="binauralControls" class="binaural-controls hidden">
+                        <div class="control-group">
+                            <label for="binauralProfile">Headphone Profile:</label>
+                            <select id="binauralProfile">
+                                <option value="Flat">Flat (Reference)</option>
+                                <option value="ClosedBack" selected>ClosedBack (Most common)</option>
+                                <option value="OpenBack">OpenBack (Spacious)</option>
+                                <option value="IEM">IEM (In-ear)</option>
+                            </select>
+                        </div>
+
+                        <div class="control-group">
+                            <label for="binauralAzimuth">Azimuth (°):</label>
+                            <input type="range" id="binauralAzimuth" min="-180" max="180" value="0" step="15">
+                            <span id="binauralAzimuthValue">0°</span>
+                            <div class="help-text">0° = Front, -90° = Left, 90° = Right</div>
+                        </div>
+
+                        <div class="control-group">
+                            <label for="binauralElevation">Elevation (°):</label>
+                            <input type="range" id="binauralElevation" min="-90" max="90" value="0" step="15">
+                            <span id="binauralElevationValue">0°</span>
+                            <div class="help-text">0° = Ear level, 45° = Above, -45° = Below</div>
+                        </div>
+
+                        <div class="control-group">
+                            <label for="binauralDistance">Distance (m):</label>
+                            <input type="range" id="binauralDistance" min="0.5" max="3" value="1" step="0.1">
+                            <span id="binauralDistanceValue">1.0</span>
+                            <div class="help-text">0.5m = Close, 1.0m = Normal, 2.0m = Far</div>
+                        </div>
+
+                        <div class="spatial-viz">
+                            <svg width="200" height="200" viewBox="0 0 200 200">
+                                <!-- Circle representing head -->
+                                <circle cx="100" cy="100" r="30" fill="none" stroke="#666" stroke-width="2"/>
+                                <!-- Ears -->
+                                <circle cx="70" cy="100" r="5" fill="#999"/>
+                                <circle cx="130" cy="100" r="5" fill="#999"/>
+                                <!-- Sound source indicator -->
+                                <circle id="soundSource" cx="100" cy="70" r="8" fill="#ff6b6b"/>
+                                <!-- Grid -->
+                                <line x1="0" y1="100" x2="200" y2="100" stroke="#ddd" stroke-width="1" stroke-dasharray="5,5"/>
+                                <line x1="100" y1="0" x2="100" y2="200" stroke="#ddd" stroke-width="1" stroke-dasharray="5,5"/>
+                            </svg>
+                            <p class="help-text">Sound source position</p>
+                        </div>
+                    </div>
+                </section>
+            </div>
+
+            <!-- Control Panel -->
+            <section class="panel control-panel">
+                <h2>Controls</h2>
+                <div class="button-group">
+                    <button id="applyConfigBtn" class="btn btn-primary">Apply Configuration</button>
+                    <button id="processAudioBtn" class="btn btn-success">Process Audio</button>
+                    <button id="resetBtn" class="btn btn-secondary">Reset to Defaults</button>
+                </div>
+            </section>
+
+            <!-- Results Panel -->
+            <section class="panel results-panel">
+                <h2>Results</h2>
+                <div id="resultsContent" class="results-content">
+                    <p class="placeholder">Configure and apply settings to see results</p>
+                </div>
+            </section>
+        </main>
+
+        <footer class="footer">
+            <p>Audio Ninja v0.1.0 • <a href="https://github.com/your-repo/audio-ninja">GitHub</a></p>
+        </footer>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>

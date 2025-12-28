@@ -5,6 +5,73 @@
 
 **Audio Ninja** is an open-source wireless immersive audio platform with IAMF-first architecture, flexible speaker layouts, networked transport with sync, DSP processing, and room calibration.
 
+## 🏗️ Architecture
+
+Audio Ninja uses a Cargo workspace with a client-server architecture:
+
+**Workspace Structure:**
+```
+audio-ninja/
+├── Cargo.toml              # Workspace root
+├── crates/
+│   ├── audio-ninja/        # Core library (IAMF, VBAP, HOA, transport, DSP)
+│   │   ├── src/
+│   │   ├── examples/
+│   │   └── tests/
+│   ├── daemon/             # Background engine service (REST API)
+│   │   └── src/
+│   └── gui/                # Desktop GUI client (Tauri)
+│       ├── src/
+│       └── public/
+├── docs/                   # Documentation
+└── .github/                # CI/CD workflows
+```
+
+**Components:**
+- **`audio-ninja`**: Core library with IAMF parsing, spatial rendering, transport, calibration
+- **`audio-ninja-daemon`**: Background service running the audio engine with REST API (port 8080)
+- **`audio-ninja-gui`**: Desktop GUI client for control and monitoring (Tauri + vanilla JS)
+
+```
+┌─────────────────────────────────────────┐
+│  GUI (Tauri) / CLI / HTTP clients       │
+└──────────────┬──────────────────────────┘
+               │ REST API (HTTP/JSON)
+┌──────────────▼──────────────────────────┐
+│  audio-ninja-daemon (port 8080)         │
+│  ├─ Speaker discovery & management      │
+│  ├─ Layout configuration                │
+│  ├─ Transport control (play/pause/stop) │
+│  ├─ Calibration runner                  │
+│  └─ Real-time stats & monitoring        │
+└──────────────┬──────────────────────────┘
+               │
+┌──────────────▼──────────────────────────┐
+│  audio-ninja core library               │
+│  ├─ IAMF decode & spatial render        │
+│  ├─ Network transport (UDP/RTP)         │
+│  ├─ Clock sync (PTP/NTP)                │
+│  ├─ DSP pipeline & calibration          │
+│  └─ BLE control plane                   │
+└─────────────────────────────────────────┘
+```
+
+**Quick Start:**
+```bash
+# Build entire workspace
+cargo build --release
+
+# Or build individual components:
+cargo build -p audio-ninja-daemon --release
+cargo build -p audio-ninja-gui --release
+
+# Terminal 1: Start daemon
+cd crates/daemon && cargo run --release
+
+# Terminal 2: Launch GUI
+cd crates/gui && cargo run --release
+```
+
 ### New: Spatial Audio for Headphones
 - **Binaural Rendering**: HRTF-based spatial audio virtualization (Flat, ClosedBack, OpenBack, IEM profiles)
 - **Spatial Positioning**: Azimuth, elevation, and distance controls for virtual speaker placement
