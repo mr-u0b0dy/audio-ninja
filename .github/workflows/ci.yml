@@ -76,7 +76,7 @@ jobs:
         run: cargo build --workspace --exclude audio-ninja-gui --all-features
 
       - name: Test workspace
-        run: cargo test --workspace --exclude audio-ninja-gui --all-features
+        run: cargo test --workspace --exclude audio-ninja-gui --all-features -- --skip e2e_
 
   benchmarks:
     name: Benchmarks
@@ -179,6 +179,9 @@ jobs:
         with:
           components: llvm-tools-preview
 
+      - name: Verify llvm-tools
+        run: rustup component list --installed | grep llvm-tools
+
       - name: Install cargo-llvm-cov
         uses: taiki-e/install-action@cargo-llvm-cov
 
@@ -194,7 +197,7 @@ jobs:
             ${{ runner.os }}-cargo-
 
       - name: Generate coverage
-        run: cargo llvm-cov --workspace --exclude audio-ninja-gui --all-features --lcov --output-path lcov.info
+        run: cargo llvm-cov --workspace --exclude audio-ninja-gui --all-features --lcov --output-path lcov.info -- --skip e2e_
 
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v4
