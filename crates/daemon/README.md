@@ -15,26 +15,25 @@ The GUI and CLI tools communicate with this service for all audio processing ope
 
 ## Architecture
 
-```
-┌─────────────────────────────────────────┐
-│  Clients (GUI, CLI, HTTP)               │
-└──────────────┬──────────────────────────┘
-               │ REST API (HTTP/JSON)
-┌──────────────▼──────────────────────────┐
-│  audio-ninja-daemon                     │
-│  ├─ REST API server (Axum)              │
-│  ├─ Engine state management             │
-│  └─ Background worker threads           │
-└──────────────┬──────────────────────────┘
-               │
-┌──────────────▼──────────────────────────┐
-│  audio-ninja core library               │
-│  ├─ IAMF decode/render                  │
-│  ├─ Network transport (RTP)             │
-│  ├─ Sync engine (PTP/NTP)               │
-│  ├─ DSP pipeline                        │
-│  └─ Calibration engine                  │
-└─────────────────────────────────────────┘
+```mermaid
+flowchart TD
+    A[Clients: GUI, CLI, HTTP]
+    B[audio-ninja-daemon]
+    C[audio-ninja core library]
+    
+    A -->|REST API HTTP/JSON| B
+    
+    B -->|REST API server Axum| B
+    B -->|Engine state management| B
+    B -->|Background worker threads| B
+    
+    B --> C
+    
+    C -->|IAMF decode/render| C
+    C -->|Network transport RTP| C
+    C -->|Sync engine PTP/NTP| C
+    C -->|DSP pipeline| C
+    C -->|Calibration engine| C
 ```
 
 ## Building

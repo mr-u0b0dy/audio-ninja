@@ -35,28 +35,22 @@ audio-ninja/
 - **`audio-ninja-gui`**: Desktop GUI client for control and monitoring (Tauri + vanilla JS)
 - **`audio-ninja-cli`**: Command-line interface for daemon control (`audio-ninja` binary)
 
-```
-┌─────────────────────────────────────────┐
-│  GUI (Tauri) / CLI / HTTP clients       │
-└──────────────┬──────────────────────────┘
-               │ REST API (HTTP/JSON)
-┌──────────────▼──────────────────────────┐
-│  audio-ninja-daemon (port 8080)         │
-│  ├─ Speaker discovery & management      │
-│  ├─ Layout configuration                │
-│  ├─ Transport control (play/pause/stop) │
-│  ├─ Calibration runner                  │
-│  └─ Real-time stats & monitoring        │
-└──────────────┬──────────────────────────┘
-               │
-┌──────────────▼──────────────────────────┐
-│  audio-ninja core library               │
-│  ├─ IAMF decode & spatial render        │
-│  ├─ Network transport (UDP/RTP)         │
-│  ├─ Clock sync (PTP/NTP)                │
-│  ├─ DSP pipeline & calibration          │
-│  └─ BLE control plane                   │
-└─────────────────────────────────────────┘
+```mermaid
+flowchart TD
+    A[GUI Tauri / CLI / HTTP clients] -->|REST API HTTP/JSON| B[audio-ninja-daemon port 8080]
+    B --> C[audio-ninja core library]
+    
+    B -->|Speaker discovery & management| B
+    B -->|Layout configuration| B
+    B -->|Transport control| B
+    B -->|Calibration runner| B
+    B -->|Real-time stats & monitoring| B
+    
+    C -->|IAMF decode & spatial render| C
+    C -->|Network transport UDP/RTP| C
+    C -->|Clock sync PTP/NTP| C
+    C -->|DSP pipeline & calibration| C
+    C -->|BLE control plane| C
 ```
 
 ## 🚀 Quick Start

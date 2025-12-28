@@ -14,21 +14,14 @@ Audio Ninja's firmware update system enables:
 
 ## Architecture
 
-```
-┌─────────────────────────────────────┐
-│  Update Server / Repository         │
-│  (GitHub Releases, S3, or Custom)   │
-└──────────────┬──────────────────────┘
-               │ HTTP/HTTPS
-┌──────────────▼──────────────────────┐
-│  Audio Ninja Daemon / GUI           │
-│  (Update Manager)                   │
-└──────────────┬──────────────────────┘
-               │ UDP/RTP + BLE
-┌──────────────▼──────────────────────┐
-│  Speaker Devices / Remote Nodes     │
-│  (Update Agent + Bootloader)        │
-└─────────────────────────────────────┘
+```mermaid
+flowchart TD
+    A[Update Server / Repository<br/>GitHub Releases, S3, or Custom]
+    B[Audio Ninja Daemon / GUI<br/>Update Manager]
+    C[Speaker Devices / Remote Nodes<br/>Update Agent + Bootloader]
+    
+    A -->|HTTP/HTTPS| B
+    B -->|UDP/RTP + BLE| C
 ```
 
 ## Components
