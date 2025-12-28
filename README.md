@@ -2,8 +2,9 @@
 
 [![License](https://img.shields.io/badge/license-Apache%202.0-blue.svg)](LICENSE)
 [![Rust](https://img.shields.io/badge/rust-1.70%2B-orange.svg)](https://www.rust-lang.org/)
-[![codecov](https://codecov.io/gh/mr-u0b0dy/audio-ninja/branch/main/graph/badge.svg)](https://codecov.io/gh/mr-u0b0dy/audio-ninja)
 [![CI](https://github.com/mr-u0b0dy/audio-ninja/workflows/CI/badge.svg)](https://github.com/mr-u0b0dy/audio-ninja/actions)
+[![Tests](https://img.shields.io/github/actions/workflow/status/mr-u0b0dy/audio-ninja/ci.yml?branch=main&label=tests&logo=github)](https://github.com/mr-u0b0dy/audio-ninja/actions)
+[![codecov](https://codecov.io/gh/mr-u0b0dy/audio-ninja/branch/main/graph/badge.svg)](https://codecov.io/gh/mr-u0b0dy/audio-ninja)
 
 **Audio Ninja** is an open-source wireless immersive audio platform with IAMF-first architecture, flexible speaker layouts, networked transport with sync, DSP processing, and room calibration.
 
@@ -37,9 +38,11 @@ audio-ninja/
 - **`audio-ninja-gui`**: Desktop GUI client for control and monitoring (Tauri + vanilla JS)
 - **`audio-ninja-cli`**: Command-line interface for daemon control (`audio-ninja` binary)
 
+### High-Level Flow
+
 ```mermaid
 flowchart TD
-    A[GUI Tauri / CLI / HTTP clients] -->|REST API HTTP/JSON| B[audio-ninja-daemon port 8080]
+    A[GUI / CLI / HTTP Clients] -->|REST API| B[audio-ninja-daemon :8080]
     B --> C[audio-ninja core library]
     
     B -->|Speaker discovery & management| B
@@ -365,55 +368,52 @@ let stats = receiver.statistics();
 
 ## 🏗️ Architecture
 
-```
-┌─────────────────────────────────────────────────────────────┐
-│                     Audio Ninja Platform                     │
-├─────────────────────────────────────────────────────────────┤
-│  Input Layer                                                 │
-│  ┌──────────┐  ┌──────────┐  ┌──────────┐                  │
-│  │  IAMF    │  │  Opus    │  │  AAC     │  ...              │
-│  │  Parser  │  │  Decoder │  │  Decoder │                   │
-│  └────┬─────┘  └────┬─────┘  └────┬─────┘                  │
-│       └─────────────┴─────────────┘                          │
-│                      │                                        │
-│  ┌──────────────────▼───────────────────────┐               │
-│  │         Render Pipeline                   │               │
-│  │  ┌──────────┐  ┌──────────┐  ┌─────────┐│               │
-│  │  │  VBAP    │  │   HOA    │  │ Channel ││               │
-│  │  │ Object   │  │  Scene   │  │  Bed    ││               │
-│  │  │ Renderer │  │ Decoder  │  │  Mix    ││               │
-│  │  └────┬─────┘  └────┬─────┘  └────┬────┘│               │
-│  │       └─────────────┴─────────────┘     │               │
-│  │                Mixer                      │               │
-│  └──────────────────┬────────────────────────┘               │
-│                     │                                        │
-│  ┌──────────────────▼────────────────────────┐              │
-│  │         DSP Processing                     │              │
-│  │  ┌─────────┐  ┌──────────┐  ┌──────────┐ │              │
-│  │  │ Delay   │  │  Volume  │  │   EQ     │ │              │
-│  │  │  Comp   │  │   Trim   │  │ Filters  │ │              │
-│  │  └─────────┘  └──────────┘  └──────────┘ │              │
-│  └──────────────────┬────────────────────────┘              │
-│                     │                                        │
-│  ┌──────────────────▼────────────────────────┐              │
-│  │         Network Transport                  │              │
-│  │  ┌─────────┐  ┌──────────┐  ┌──────────┐ │              │
-│  │  │   FEC   │  │   RTP    │  │  Jitter  │ │              │
-│  │  │ Encoder │  │ Packetize│  │  Buffer  │ │              │
-│  │  └─────────┘  └──────────┘  └──────────┘ │              │
-│  └──────────────────┬────────────────────────┘              │
-│                     │                                        │
-│                UDP/IP Network                                │
-│                     │                                        │
-│  ┌──────────────────▼────────────────────────┐              │
-│  │         Speaker Nodes (1..N)               │              │
-│  │  ┌─────────┐  ┌──────────┐  ┌──────────┐ │              │
-│  │  │   FEC   │  │  Clock   │  │   DAC    │ │              │
-│  │  │ Decoder │  │   Sync   │  │  Output  │ │              │
-│  │  └─────────┘  └──────────┘  └──────────┘ │              │
-│  │          (BLE Control Plane)              │              │
-│  └───────────────────────────────────────────┘              │
-└─────────────────────────────────────────────────────────────┘
+### Processing Pipeline
+
+```mermaid
+flowchart TD
+    Input["Input: IAMF | MP4/MKV | Ogg | RAW | Network RTP"]
+    
+    subgraph Demux ["Demuxer / Parser Layer"]
+        Parser["IAMF Parser"]
+        OpusDec["Opus Decoder"]
+        FlacDec["FLAC Decoder"]
+    end
+    
+    subgraph Render ["Render Pipeline"]
+        VBAP["VBAP Object Renderer"]
+        HOA["HOA Scene Decoder"]
+        ChanBed["Channel Bed Mix"]
+        Mixer["Mixer"]
+        VBAP --> Mixer
+        HOA --> Mixer
+        ChanBed --> Mixer
+    end
+    
+    subgraph DSP ["DSP Processing"]
+        Delay["Delay Comp"]
+        Volume["Volume Trim"]
+        EQ["EQ Filters"]
+    end
+    
+    subgraph Transport ["Network Transport"]
+        FEC["FEC Encoder"]
+        RTP["RTP Packetize"]
+        Jitter["Jitter Buffer"]
+    end
+    
+    subgraph Speakers ["Speaker Nodes 1..N"]
+        FECDec["FEC Decoder"]
+        ClockSync["Clock Sync"]
+        DAC["DAC Output"]
+        BLE["BLE Control Plane"]
+    end
+    
+    Input --> Demux
+    Demux --> Render
+    Render --> DSP
+    DSP --> Transport
+    Transport -->|UDP/IP Network| Speakers
 ```
 
 ## 🛠️ Current Status
