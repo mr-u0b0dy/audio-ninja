@@ -194,7 +194,7 @@ jobs:
             ${{ runner.os }}-cargo-
 
       - name: Generate coverage
-        run: cargo llvm-cov --workspace --all-features --lcov --output-path lcov.info
+        run: cargo llvm-cov --workspace --exclude audio-ninja-gui --all-features --lcov --output-path lcov.info
 
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v6
@@ -206,5 +206,5 @@ jobs:
 
       - name: Generate coverage report
         run: |
-          cargo llvm-cov report --workspace --all-features
+          cargo llvm-cov report --workspace --exclude audio-ninja-gui --all-features
           echo "Coverage report generated successfully"
