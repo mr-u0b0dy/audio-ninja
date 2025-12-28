@@ -28,7 +28,7 @@ thiserror = "1.0"
 uuid = { version = "1.11", features = ["v4", "serde"] }
 
 # Networking
-reqwest = { version = "0.11", features = ["json"] }
+reqwest = { version = "0.12", features = ["json"] }
 axum = "0.8"
 tower = { version = "0.4", features = ["util"] }
 tower-http = { version = "0.5", features = ["cors", "trace"] }
