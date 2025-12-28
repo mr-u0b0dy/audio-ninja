@@ -2,6 +2,8 @@ name: CI
 
 permissions:
   contents: read
+  pages: write
+  id-token: write
 
 on:
   push:
@@ -312,3 +314,43 @@ jobs:
           name: coverage-report
           path: lcov.info
           retention-days: 30
+  docs-build:
+    name: Build Documentation Site
+    runs-on: ubuntu-latest
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+
+      - name: Install dependencies
+        working-directory: docs-site
+        run: npm install
+
+      - name: Build VuePress site
+        working-directory: docs-site
+        run: npm run docs:build
+
+      - name: Upload artifact for GitHub Pages
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: docs-site/src/.vuepress/dist
+
+  docs-deploy:
+    name: Deploy to GitHub Pages
+    runs-on: ubuntu-latest
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    needs: docs-build
+    concurrency:
+      group: pages
+      cancel-in-progress: true
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
