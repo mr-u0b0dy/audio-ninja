@@ -484,12 +484,71 @@ Add optional codec feature to CI builds:
 - [ ] Codec parameter negotiation
 - [ ] Network streaming codec selection
 
+## Error Handling Best Practices
+
+When implementing codec integration, use proper error handling to provide diagnostic information:
+
+```rust
+use anyhow::{Context, Result};
+
+// ✅ Good: Use Context for error chains
+pub fn decode_frame(data: &[u8]) -> Result<Vec<f32>> {
+    let header = parse_header(data)
+        .context("Failed to parse codec header")?;
+    
+    validate_header(&header)
+        .context("Codec header validation failed")?;
+    
+    let frame = decode_impl(data, &header)
+        .context("Decoding failed")?;
+    
+    Ok(frame)
+}
+
+// ❌ Avoid: unwrap() without error context
+pub fn decode_frame_bad(data: &[u8]) -> Vec<f32> {
+    let header = parse_header(data).unwrap(); // Bad: no context
+    let frame = decode_impl(data, &header).unwrap(); // Bad: loses error info
+    frame
+}
+
+// ✅ Good: thiserror for custom error types
+use thiserror::Error;
+
+#[derive(Error, Debug)]
+pub enum CodecError {
+    #[error("Invalid codec header: {reason}")]
+    InvalidHeader { reason: String },
+    
+    #[error("Unsupported codec version {version}")]
+    UnsupportedVersion { version: u32 },
+    
+    #[error("Decode error: {0}")]
+    DecodeError(String),
+}
+
+// ✅ Good: Provide recovery options
+pub fn decode_with_fallback(data: &[u8]) -> Result<Vec<f32>> {
+    match decode_frame(data) {
+        Ok(frame) => Ok(frame),
+        Err(e) => {
+            log::warn!("Decode failed, attempting fallback: {}", e);
+            // Try alternative decoder or use silence
+            decode_fallback(data)
+                .context("Fallback decode also failed")
+        }
+    }
+}
+```
+
 ## References
 
 - [FFmpeg Documentation](https://ffmpeg.org/documentation.html)
 - [Opus Codec Specification](https://datatracker.ietf.org/doc/html/rfc6716)
 - [FLAC Format Specification](https://xiph.org/flac/format.html)
 - [Rust Audio Processing](https://github.com/RustAudio)
+- [IETF Media Type Registration](https://www.iana.org/assignments/media-types/media-types.xhtml) - Audio codec MIME types
+- [Audio Codec Comparison](https://en.wikipedia.org/wiki/Audio_codec) - Wikipedia overview of codec standards
 
 ## See Also
 
