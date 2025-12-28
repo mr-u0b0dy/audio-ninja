@@ -44,6 +44,9 @@ cargo build -p audio-ninja-daemon --release
 # Run tests
 cargo test --workspace
 
+# Run end-to-end daemon ↔ CLI tests
+cargo test -p audio-ninja-cli --test e2e_daemon_cli
+
 # Lint and fix
 cargo clippy --workspace --fix
 
@@ -52,6 +55,9 @@ cargo run -p audio-ninja-daemon --release
 
 # Run GUI
 cargo run -p audio-ninja-gui --release
+
+# Run core benchmarks
+cargo bench -p audio-ninja --bench main_benchmarks
 ```
 
 ## Contributions
@@ -153,6 +159,7 @@ cargo run -p audio-ninja-gui --release
 - ✅ CI pipeline: fmt, clippy, test, benchmark
 - ✅ Daemon API endpoint tests (21 tests passing)
 - ✅ CLI tests (10 tests passing)
+- ✅ End-to-end daemon ↔ CLI integration tests (5 tests passing)
 - GUI integration tests
 - End-to-end daemon ↔ GUI ↔ CLI integration tests
 - Fuzz testing: IAMF parser, RTP deserializer
@@ -182,9 +189,9 @@ cargo run -p audio-ninja-gui --release
 
 ### Medium Priority (Do Next)
 6. ✅ **Add API documentation**: OpenAPI/Swagger spec for REST API endpoints
-7. **Create integration tests**: End-to-end daemon ↔ GUI ↔ CLI tests
+7. ✅ **Create integration tests**: End-to-end daemon ↔ CLI tests
 8. **Optimize build**: Investigate 4.3GB target directory (2.1GB from GUI)
-9. **Add benchmarks**: Track VBAP, HRTF, loudness performance with `cargo bench`
+9. ✅ **Add benchmarks**: Track VBAP, loudness, Vec3 performance with `cargo bench`
 10. **Design proper icons**: Replace placeholder blue circles with real branding
 
 ### Low Priority (Later)
