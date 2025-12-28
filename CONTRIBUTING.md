@@ -48,20 +48,33 @@ Feature requests are welcome! Please:
    - Follow the [coding style](#coding-style)
    - Add tests for new functionality
    - Update documentation as needed
+   - Test in workspace context:
+     ```bash
+     # Build all crates
+     cargo build --workspace
+     
+     # Run all tests
+     cargo test --workspace
+     
+     # Check specific crate
+     cargo check -p audio-ninja-daemon
+     ```
    - Ensure all tests pass
 
 4. **Commit**
    ```bash
    # Add SPDX header to new files
-   # Run tests
-   cargo test
    
-   # Run linters
-   cargo clippy -- -D warnings
-   cargo fmt
+   # Run tests
+   cargo test --workspace
+   
+   # Run linters and auto-fix
+   cargo clippy --workspace --fix --allow-dirty
+   cargo fmt --all
    
    # Commit with descriptive message
-   git commit -m "Add feature: brief description"
+   git commit -m "feat: brief description"
+   # or: fix:, docs:, refactor:, test:, chore:
    ```
 
 5. **Push and Create PR**
@@ -99,6 +112,14 @@ Feature requests are welcome! Please:
 - Use clear separation of concerns
 - Maintain public API stability
 - Document public items with `///` doc comments
+
+**Workspace Structure**
+- Core library code goes in `crates/core/src/`
+- Daemon service code in `crates/daemon/src/`
+- GUI client code in `crates/gui/src/`
+- Shared dependencies defined in workspace root `Cargo.toml`
+- Examples in `crates/core/examples/`
+- Tests in `crates/core/tests/` (integration) or alongside code (unit)
 
 **Naming Conventions**
 - `snake_case` for functions, variables, modules

@@ -3,13 +3,22 @@
 ## Scope
 This repo is an OSS wireless immersive audio platform (IAMF-first) with flexible speaker layouts, networked transport/sync, DSP, and room calibration.
 
+**Architecture**: Cargo workspace with client-server design
+- `crates/core/` - Core library (audio-ninja crate)
+- `crates/daemon/` - Background engine service with REST API
+- `crates/gui/` - Desktop GUI client (Tauri)
+
 ## Coding style
 - Rust 2021, prefer explicit structs and enums; avoid unnecessary macros.
 - Keep functions small and focused; add concise comments only when logic is non-obvious.
 - Serialization uses `serde`; error handling via `anyhow`/`thiserror` where appropriate.
 - Maintain ASCII-only unless existing files require otherwise.
+- Run `cargo clippy --fix` before committing; address warnings.
 
 ## Architecture guidelines
+- **Workspace structure**: All code in `crates/` with shared dependencies in root Cargo.toml
+- **Daemon-first**: Core audio engine runs in daemon service; GUI/CLI are thin clients
+- **REST API**: Daemon exposes HTTP API on port 8080 for control and monitoring
 - Maintain clear separation: iamf (parse/decode), render (object/channel mapping), transport (RTP/WebRTC-style, sync), control (BLE/WiFi), calibration (measurement/EQ), dsp (filters).
 - Renderer must support arbitrary layouts (2.0 through height layouts like 9.1.6) with downmix/upmix rules.
 - Transport should carry timestamps and support PTP/NTP-based skew correction.
@@ -19,7 +28,31 @@ This repo is an OSS wireless immersive audio platform (IAMF-first) with flexible
 - SPDX: Apache-2.0 in sources; LICENSE file present. Avoid adding other licensed code without notice.
 
 ## Testing
-- Add unit tests for serialization, transport, renderer mappings, and calibration math; prefer property/fuzz tests for parsers.
+- Add unit tests for serialization, transport, renderer mappings, and calibration math
+- Prefer property/fuzz tests for parsers
+- Add integration tests for daemon API endpoints
+- Target 80%+ coverage for core library
+
+## Workspace Commands
+```bash
+# Build entire workspace
+cargo build --workspace --release
+
+# Build specific crate
+cargo build -p audio-ninja-daemon --release
+
+# Run tests
+cargo test --workspace
+
+# Lint and fix
+cargo clippy --workspace --fix
+
+# Run daemon
+cargo run -p audio-ninja-daemon --release
+
+# Run GUI
+cargo run -p audio-ninja-gui --release
+```
 
 ## Contributions
 - Keep new files small and purposeful; avoid large auto-generated blobs.
@@ -27,17 +60,29 @@ This repo is an OSS wireless immersive audio platform (IAMF-first) with flexible
 
 ## Backlog (working TODO)
 
+### Infrastructure (Completed)
+- ✅ Cargo workspace structure with crates/core, crates/daemon, crates/gui
+- ✅ Daemon service with REST API (Axum on port 8080)
+- ✅ Desktop GUI client (Tauri + vanilla JS)
+- ✅ Systemd service file for Linux deployment
+- ✅ GitHub Actions CI: fmt, clippy, build, test
+
 ### Core Modules (Completed)
 - ✅ iamf-core: parse/render with element types (channel/object/scene), metadata, mix presentations
 - ✅ transport-sync: RTP packet format, PTP/NTP/System clock sync, jitter buffer, loopback transport
 - ✅ latency: per-speaker latency compensation, multi-speaker sync buffers
 - ✅ mapping: VBAP stereo panning, downmix/upmix, layout presets (2.0, 5.1)
 - ✅ vbap: full 3D VBAP for arbitrary speaker arrays with elevation support
+- ✅ hoa: Higher-Order Ambisonics (1st/2nd/3rd order, Basic/Max-rE/In-Phase modes)
+- ✅ hrtf: Binaural rendering with 4 headphone profiles (Flat, ClosedBack, OpenBack, IEM)
+- ✅ loudness: ITU-R BS.1770-4 measurement, normalization, headroom management
+- ✅ drc: Dynamic Range Control with Speech/Music/Cinema presets
 - ✅ ffmpeg: demuxer/decoder stubs for Opus/AAC/FLAC/PCM
 - ✅ pipeline: demux→decode→render pipeline with IamfRenderBlock output
 - ✅ network: UDP/RTP sender/receiver, mDNS discovery, multi-speaker broadcast
 - ✅ fec: XOR-based FEC, loss statistics, packet concealment (silence/repeat/interpolate)
 - ✅ ble: GATT profiles for speaker control, pairing, calibration, layout config
+- ✅ calibration: Sweep generation, IR analysis, FIR/IIR filter design, DSP export
 
 ### Format Support & Codecs
 - Integrate real libiamf/AOM reference decoder (replace stubs)
@@ -49,34 +94,36 @@ This repo is an OSS wireless immersive audio platform (IAMF-first) with flexible
 ### Spatial Renderer & Object Positioning
 - ✅ Implement full VBAP for 3D speaker arrays (beyond stereo)
 - ✅ Add HOA (Higher-Order Ambisonics) decoder for scene-based elements
-- HRTF processing for binaural downmix
-- Headroom management and loudness normalization per ITU-R BS.1770
-- DRC (Dynamic Range Control) handling
+- ✅ HRTF processing for binaural downmix
+- ✅ Headroom management and loudness normalization per ITU-R BS.1770
+- ✅ DRC (Dynamic Range Control) handling
 - ✅ Support all layouts: 2.0, 2.1, 3.1, 4.0, 5.1, 5.1.2, 7.1, 7.1.4, 9.1.6, custom
 
 ### Transport & Networking
 - ✅ Real UDP/RTP sender and receiver (replace loopback)
 - ✅ mDNS service discovery for speaker announcement/discovery
+- ✅ Packet loss handling and FEC (Forward Error Correction)
 - WiFi Direct peer-to-peer mode
 - RTSP session management
 - Sample-accurate sync across speakers (±5ms tolerance initially, ±1ms target)
-- ✅ Packet loss handling and FEC (Forward Error Correction)
 - Adaptive bitrate for varying network conditions
 
-### Control Plane
+### Control Plane & API
 - ✅ BLE GATT profiles: pairing, speaker identity, layout config, trims, delays
-- WiFi REST API or gRPC endpoints for control
+- ✅ REST API endpoints: speaker management, layout config, transport control, calibration
+- ✅ Desktop GUI client with Tauri
+- CLI tool for command-line control
 - Speaker registration and capability negotiation
 - Firmware update mechanism
 - Low-bandwidth BLE audio fallback (LC3/BIS for stereo)
 
 ### Room Calibration
 - ✅ Sweep generation (log sweep, MLS) for impulse response capture
-- Microphone input handling (ALSA/PortAudio)
 - ✅ IR analysis: peak detection for delay, magnitude response for EQ
 - ✅ FIR filter design (linear-phase, windowed sinc)
 - ✅ IIR biquad cascade design (PEQ, shelf, high/low-pass)
 - ✅ Export to CamillaDSP/BruteFIR config formats
+- Microphone input handling (ALSA/PortAudio)
 - Multi-point averaging and target curve selection
 - Calibration verification loop (re-measure after applying filters)
 
@@ -89,6 +136,7 @@ This repo is an OSS wireless immersive audio platform (IAMF-first) with flexible
 - Crossover filters for active speaker designs
 
 ### SDK & Integration APIs
+- CLI tool for command-line control
 - Speaker registration API
 - Stream configuration API
 - Object positioning API (real-time updates)
@@ -100,15 +148,19 @@ This repo is an OSS wireless immersive audio platform (IAMF-first) with flexible
 ### Testing & Quality
 - ✅ Unit tests: serialization, codec round-trip, renderer mapping
 - ✅ Integration tests: end-to-end decode→render→transport with loopback
-- Fuzz testing: IAMF parser, RTP deserializer
 - ✅ Latency measurement and profiling
 - ✅ Multi-speaker sync validation (phase alignment)
-- CI pipeline: fmt, clippy, test, benchmark
+- ✅ CI pipeline: fmt, clippy, test, benchmark
+- Daemon API endpoint tests
+- GUI integration tests
+- Fuzz testing: IAMF parser, RTP deserializer
+- Benchmarking suite with regression tracking
 
 ### Tooling & Documentation
-- Build instructions (Linux, macOS, embedded targets)
-- API documentation with examples
-- Architecture diagrams
+- ✅ Build instructions (Linux, macOS, embedded targets)
+- ✅ API documentation with examples
+- ✅ Architecture diagrams
+- OpenAPI/Swagger spec for REST API
 - Performance benchmarks and optimization
 - Add NOTICE file if third-party code included
-- Contribution guidelines
+- ✅ Contribution guidelines
