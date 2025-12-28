@@ -209,5 +209,5 @@ jobs:
 
       - name: Generate coverage report
         run: |
-          cargo llvm-cov report --workspace --exclude audio-ninja-gui
+          cargo llvm-cov report
           echo "Coverage report generated successfully"
