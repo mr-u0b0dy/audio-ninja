@@ -1,0 +1,20 @@
+{
+  "name": "audio-ninja-docs",
+  "version": "0.1.0",
+  "description": "Audio Ninja - Wireless Immersive Audio Platform Documentation",
+  "scripts": {
+    "docs:dev": "vuepress dev src",
+    "docs:build": "vuepress build src",
+    "docs:clean": "vuepress clean src"
+  },
+  "dependencies": {
+    "vue": "^3.4.0"
+  },
+  "devDependencies": {
+    "vuepress": "^2.1.0",
+    "vuepress-theme-hope": "^2.1.0",
+    "@vuepress/plugin-search": "^2.1.0",
+    "@vuepress/plugin-docsearch": "^2.1.0",
+    "@vuepress/plugin-google-analytics": "^2.1.0"
+  }
+}
