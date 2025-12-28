@@ -12,7 +12,7 @@ Cargo.lock
 /crates/gui/.tauri/
 
 # IDE files
-.vscode/
+# .vscode/ - Keep VS Code configs for workspace consistency
 .idea/
 *.swp
 *.swo

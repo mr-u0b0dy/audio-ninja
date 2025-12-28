@@ -1,0 +1,73 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "Build Workspace",
+      "type": "shell",
+      "command": "cargo build --workspace",
+      "group": "build",
+      "problemMatcher": ["$rustc"]
+    },
+    {
+      "label": "Build Release",
+      "type": "shell",
+      "command": "cargo build --workspace --release",
+      "group": "build",
+      "problemMatcher": ["$rustc"]
+    },
+    {
+      "label": "Test Workspace",
+      "type": "shell",
+      "command": "cargo test --workspace",
+      "group": "test",
+      "problemMatcher": ["$rustc"]
+    },
+    {
+      "label": "Clippy",
+      "type": "shell",
+      "command": "cargo clippy --workspace --all-targets",
+      "group": "test",
+      "problemMatcher": ["$rustc"]
+    },
+    {
+      "label": "Format Code",
+      "type": "shell",
+      "command": "cargo fmt --all",
+      "group": "none",
+      "problemMatcher": []
+    },
+    {
+      "label": "Run Daemon",
+      "type": "shell",
+      "command": "cargo run -p audio-ninja-daemon",
+      "isBackground": true,
+      "problemMatcher": {
+        "pattern": {
+          "regexp": "^(.*)$",
+          "file": 1,
+          "location": 2,
+          "message": 3
+        },
+        "background": {
+          "activeOnStart": true,
+          "beginsPattern": "Compiling",
+          "endsPattern": "Finished"
+        }
+      }
+    },
+    {
+      "label": "Run GUI",
+      "type": "shell",
+      "command": "cargo run -p audio-ninja-gui",
+      "isBackground": false,
+      "problemMatcher": ["$rustc"]
+    },
+    {
+      "label": "Check All",
+      "type": "shell",
+      "command": "cargo fmt --all -- --check && cargo clippy --workspace --all-targets && cargo test --workspace",
+      "group": "test",
+      "problemMatcher": ["$rustc"]
+    }
+  ]
+}

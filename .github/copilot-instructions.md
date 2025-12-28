@@ -211,9 +211,10 @@ Example GitHub Actions cache:
 ### Medium Priority (Do Next)
 6. ✅ **Add API documentation**: OpenAPI/Swagger spec for REST API endpoints
 7. ✅ **Create integration tests**: End-to-end daemon ↔ CLI tests
-8. **Optimize build**: Investigate 4.3GB target directory (2.1GB from GUI)
+8. ✅ **Optimize build**: Added Cargo profiles, reduced binaries to ~2-6 MB
 9. ✅ **Add benchmarks**: Track VBAP, loudness, Vec3 performance with `cargo bench`
-10. **Design proper icons**: Replace placeholder blue circles with real branding
+10. ✅ **Developer tooling**: Makefile, setup script, VS Code configs
+11. **Design proper icons**: Replace placeholder blue circles with real branding
 
 ### Low Priority (Later)
 11. **Fuzz testing**: Add `cargo-fuzz` for IAMF/RTP parsers

@@ -1,0 +1,88 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "type": "lldb",
+      "request": "launch",
+      "name": "Debug Daemon",
+      "cargo": {
+        "args": [
+          "build",
+          "-p",
+          "audio-ninja-daemon"
+        ],
+        "filter": {
+          "name": "audio-ninja-daemon",
+          "kind": "bin"
+        }
+      },
+      "args": [],
+      "cwd": "${workspaceFolder}",
+      "env": {
+        "RUST_BACKTRACE": "1",
+        "RUST_LOG": "debug"
+      }
+    },
+    {
+      "type": "lldb",
+      "request": "launch",
+      "name": "Debug CLI",
+      "cargo": {
+        "args": [
+          "build",
+          "-p",
+          "audio-ninja-cli"
+        ],
+        "filter": {
+          "name": "audio-ninja",
+          "kind": "bin"
+        }
+      },
+      "args": ["status"],
+      "cwd": "${workspaceFolder}",
+      "env": {
+        "RUST_BACKTRACE": "1"
+      }
+    },
+    {
+      "type": "lldb",
+      "request": "launch",
+      "name": "Debug Core Tests",
+      "cargo": {
+        "args": [
+          "test",
+          "-p",
+          "audio-ninja",
+          "--lib",
+          "--no-run"
+        ],
+        "filter": {
+          "name": "audio-ninja",
+          "kind": "lib"
+        }
+      },
+      "args": [],
+      "cwd": "${workspaceFolder}",
+      "env": {
+        "RUST_BACKTRACE": "1"
+      }
+    },
+    {
+      "type": "lldb",
+      "request": "launch",
+      "name": "Debug Binaural Example",
+      "cargo": {
+        "args": [
+          "build",
+          "--example",
+          "binaural_rendering"
+        ]
+      },
+      "args": [],
+      "cwd": "${workspaceFolder}",
+      "env": {
+        "RUST_BACKTRACE": "1"
+      }
+    }
+  ]
+}

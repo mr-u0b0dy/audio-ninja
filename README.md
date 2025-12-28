@@ -65,12 +65,31 @@ audio-ninja/
 - Rust 1.70 or later
 - Linux: `webkit2gtk-4.0`, `gtk3`, `openssl` (for GUI)
 
-### Build All
+### Quick Setup
 
 ```bash
 git clone https://github.com/mr-u0b0dy/audio-ninja.git
 cd audio-ninja
+
+# Automated setup (installs dependencies and builds)
+./scripts/dev-setup.sh
+
+# Or manual build
 cargo build --workspace --release
+```
+
+### Development Workflow
+
+Use the Makefile for common tasks:
+
+```bash
+make help         # Show all available commands
+make dev          # Quick check: format + lint + test
+make build        # Build workspace
+make test         # Run all tests
+make run-daemon   # Start the daemon
+make run-gui      # Launch the GUI
+make release      # Build optimized binaries
 ```
 
 ### Run Daemon
@@ -378,19 +397,37 @@ We welcome contributions! Please see [CONTRIBUTING.md](CONTRIBUTING.md) for guid
 
 ```bash
 # Clone the repository
-git clone https://github.com/yourusername/audio-ninja.git
+git clone https://github.com/mr-u0b0dy/audio-ninja.git
 cd audio-ninja
 
-# Install development dependencies
+# Automated setup (recommended)
+./scripts/dev-setup.sh
+
+# Or manual setup
 rustup component add clippy rustfmt
-
-# Run tests
-cargo test
-
-# Run linters
-cargo clippy -- -D warnings
-cargo fmt --check
+make dev  # Format, lint, and test
 ```
+
+### Available Make Commands
+
+```bash
+make help         # Show all commands
+make dev          # Quick dev check (fmt + clippy + test)
+make build        # Build workspace
+make test         # Run all tests
+make bench        # Build benchmarks
+make check        # Full CI-like check
+make release      # Build optimized binaries
+make install      # Install to ~/.cargo/bin
+```
+
+### VS Code Integration
+
+The workspace includes VS Code configurations:
+- Debug configurations for daemon, CLI, and tests
+- Tasks for build, test, and run
+- Recommended extensions
+- Rust-analyzer settings
 
 ### Code Style
 
