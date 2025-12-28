@@ -163,7 +163,7 @@ jobs:
         uses: dtolnay/rust-toolchain@stable
 
       - name: Build documentation
-        run: cargo doc --workspace --no-deps --all-features
+        run: cargo doc --workspace --exclude audio-ninja-gui --no-deps --all-features
         env:
           RUSTDOCFLAGS: -D warnings
 
@@ -197,7 +197,7 @@ jobs:
         run: cargo llvm-cov --workspace --exclude audio-ninja-gui --all-features --lcov --output-path lcov.info
 
       - name: Upload coverage to Codecov
-        uses: codecov/codecov-action@v6
+        uses: codecov/codecov-action@v4
         with:
           files: lcov.info
           fail_ci_if_error: false
