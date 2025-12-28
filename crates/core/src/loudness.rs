@@ -269,7 +269,7 @@ impl DynamicRangeControl {
         let makeup_gain = db_to_linear(self.makeup_gain_db);
 
         // Envelope follower coefficients (simple one-pole)
-        let attack_coeff = (1.0 / self.attack_samples.max(1) as f32).min(1.0);
+        let _attack_coeff = (1.0 / self.attack_samples.max(1) as f32).min(1.0);
         let release_coeff = (1.0 / self.release_samples.max(1) as f32).min(1.0);
 
         for channel in &mut block.channels {
@@ -464,7 +464,7 @@ mod tests {
             channels: vec![vec![0.5; 100]],
         };
 
-        let before = block.channels[0][0];
+        let _before = block.channels[0][0];
         drc.process(&mut block);
         let after = block.channels[0][0];
 

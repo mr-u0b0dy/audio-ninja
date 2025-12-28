@@ -30,10 +30,12 @@ pub struct InfoResponse {
 #[derive(Deserialize)]
 pub struct LayoutRequest {
     preset: Option<String>,
+    #[allow(dead_code)]
     speakers: Option<Vec<SpeakerPositionRequest>>,
 }
 
 #[derive(Deserialize)]
+#[allow(dead_code)]
 pub struct SpeakerPositionRequest {
     speaker_id: Uuid,
     azimuth: f32,
@@ -47,7 +49,7 @@ pub struct ErrorResponse {
 }
 
 /// GET /api/v1/status
-pub async fn status(State(state): State<AppState>) -> Json<StatusResponse> {
+pub async fn status(State(_state): State<AppState>) -> Json<StatusResponse> {
     Json(StatusResponse {
         status: "running".to_string(),
         version: env!("CARGO_PKG_VERSION").to_string(),
@@ -191,7 +193,7 @@ pub async fn calibration_status(State(state): State<AppState>) -> Json<serde_jso
 }
 
 /// POST /api/v1/calibration/apply
-pub async fn calibration_apply(State(state): State<AppState>) -> StatusCode {
+pub async fn calibration_apply(State(_state): State<AppState>) -> StatusCode {
     // TODO: Apply calibration results
     StatusCode::NOT_IMPLEMENTED
 }

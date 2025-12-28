@@ -192,14 +192,14 @@ impl GattCharacteristic {
 
 /// BLE GATT service
 pub struct GattService {
-    uuid: Uuid,
+    _uuid: Uuid,
     characteristics: HashMap<Uuid, GattCharacteristic>,
 }
 
 impl GattService {
     pub fn new(uuid: Uuid) -> Self {
         Self {
-            uuid,
+            _uuid: uuid,
             characteristics: HashMap::new(),
         }
     }

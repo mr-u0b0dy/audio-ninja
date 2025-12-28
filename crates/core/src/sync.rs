@@ -27,7 +27,7 @@ pub trait ClockSync {
 }
 
 pub struct PtpClock {
-    config: ClockConfig,
+    _config: ClockConfig,
     offset: Duration,
     last_sync: Option<ClockTimestamp>,
 }
@@ -35,7 +35,7 @@ pub struct PtpClock {
 impl PtpClock {
     pub fn new(config: ClockConfig) -> Self {
         Self {
-            config,
+            _config: config,
             offset: Duration::ZERO,
             last_sync: None,
         }
@@ -86,7 +86,7 @@ impl ClockSync for PtpClock {
 }
 
 pub struct NtpClock {
-    config: ClockConfig,
+    _config: ClockConfig,
     offset: Duration,
     last_sync: Option<ClockTimestamp>,
 }
@@ -94,7 +94,7 @@ pub struct NtpClock {
 impl NtpClock {
     pub fn new(config: ClockConfig) -> Self {
         Self {
-            config,
+            _config: config,
             offset: Duration::ZERO,
             last_sync: None,
         }
@@ -151,13 +151,13 @@ impl ClockSync for NtpClock {
 }
 
 pub struct SystemClock {
-    config: ClockConfig,
+    _config: ClockConfig,
 }
 
 impl SystemClock {
     pub fn new() -> Self {
         Self {
-            config: ClockConfig::default(),
+            _config: ClockConfig::default(),
         }
     }
 }

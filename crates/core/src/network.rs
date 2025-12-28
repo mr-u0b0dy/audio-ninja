@@ -171,14 +171,14 @@ impl Default for SpeakerCapabilities {
 /// mDNS service discovery for speakers
 pub struct SpeakerDiscovery {
     speakers: Arc<Mutex<Vec<SpeakerInfo>>>,
-    service_type: String,
+    _service_type: String,
 }
 
 impl SpeakerDiscovery {
     pub fn new() -> Self {
         Self {
             speakers: Arc::new(Mutex::new(Vec::new())),
-            service_type: "_audio-ninja._udp.local.".into(),
+            _service_type: "_audio-ninja._udp.local.".into(),
         }
     }
 

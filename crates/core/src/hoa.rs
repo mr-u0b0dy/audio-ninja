@@ -327,7 +327,6 @@ fn transpose_matrix(matrix: &[Vec<f32>]) -> Vec<Vec<f32>> {
 }
 
 /// Create standard HOA speaker layouts
-
 /// Stereo layout (not ideal for HOA but useful for testing)
 pub fn create_stereo_hoa_layout() -> Vec<HoaSpeaker> {
     vec![

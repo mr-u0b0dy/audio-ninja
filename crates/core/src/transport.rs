@@ -187,7 +187,7 @@ pub trait SyncStrategy {
 pub struct LoopbackTransport {
     queue: Vec<RtpPacket>,
     sequence: u16,
-    ssrc: u32,
+    _ssrc: u32,
 }
 
 impl LoopbackTransport {
@@ -195,7 +195,7 @@ impl LoopbackTransport {
         Self {
             queue: Vec::new(),
             sequence: 0,
-            ssrc: rand::random(),
+            _ssrc: rand::random(),
         }
     }
 
@@ -203,7 +203,7 @@ impl LoopbackTransport {
         Self {
             queue: Vec::new(),
             sequence: 0,
-            ssrc,
+            _ssrc: ssrc,
         }
     }
 }

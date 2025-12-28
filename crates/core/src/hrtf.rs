@@ -503,10 +503,10 @@ mod tests {
         let input = vec![0.5; 512];
 
         let pos_front = HrtfPosition::new(0.0, 0.0, 1.0);
-        let (left_f, right_f) = renderer.render(&input, &pos_front).unwrap();
+        let (left_f, _right_f) = renderer.render(&input, &pos_front).unwrap();
 
         let pos_left = HrtfPosition::new(90.0, 0.0, 1.0);
-        let (left_l, right_l) = renderer.render(&input, &pos_left).unwrap();
+        let (left_l, _right_l) = renderer.render(&input, &pos_left).unwrap();
 
         // Different positions should produce different results
         let diff: f32 = left_f

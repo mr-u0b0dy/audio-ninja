@@ -188,7 +188,7 @@ impl BruteFirConfig {
         config.push_str(&format!("partitions: {};\n", self.partitions));
         config.push_str("float_bits: 32;\n\n");
 
-        for (idx, coeffs) in self.coeffs.iter().enumerate() {
+        for (idx, _coeffs) in self.coeffs.iter().enumerate() {
             config.push_str(&format!("coeff \"ch{}\" {{\n", idx));
             config.push_str("  format: \"FLOAT_LE\";\n");
             config.push_str(&format!("  filename: \"ch{}_coeffs.raw\";\n", idx));

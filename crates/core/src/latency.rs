@@ -90,7 +90,7 @@ pub struct TimestampedAudioBlock {
 }
 
 pub struct SpeakerBuffer {
-    speaker_id: String,
+    _speaker_id: String,
     delay: Duration,
     buffer: Vec<TimestampedAudioBlock>,
 }
@@ -98,7 +98,7 @@ pub struct SpeakerBuffer {
 impl SpeakerBuffer {
     pub fn new(speaker_id: String, delay: Duration) -> Self {
         Self {
-            speaker_id,
+            _speaker_id: speaker_id,
             delay,
             buffer: Vec::new(),
         }
