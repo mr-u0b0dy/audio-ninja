@@ -2,6 +2,23 @@
 
 This document describes the release process for Audio Ninja.
 
+## Release Workflow
+
+```mermaid
+flowchart TD
+    A["Update Version<br/>in Cargo.toml"] --> B["Update CHANGELOG.md<br/>with new features/fixes"]
+    B --> C["Commit & Create Git Tag<br/>git tag v0.2.0"]
+    C --> D["Push to GitHub<br/>including tag"]
+    D --> E{GitHub Actions<br/>Triggered}
+    E -->|Builds Binaries| F["Linux x86_64<br/>Build"]
+    E -->|Builds Binaries| G["Linux ARM64<br/>Build"]
+    F --> H["Create Release<br/>with Assets"]
+    G --> H
+    H --> I["Upload SHA256<br/>Checksums"]
+    I --> J["Publish Release<br/>on GitHub"]
+    J --> K["Announce:<br/>Discussions, Social"]
+```
+
 ## Version Numbering
 
 Audio Ninja follows [Semantic Versioning](https://semver.org/):

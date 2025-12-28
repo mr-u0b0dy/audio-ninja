@@ -2,6 +2,21 @@
 
 This guide provides practical examples for interacting with the Audio Ninja daemon REST API.
 
+## API Flow
+
+```mermaid
+flowchart TD
+    A["Client Applications<br/>(GUI / CLI / HTTP)"] -->|HTTP Request| B["Audio Ninja Daemon<br/>(port 8080)"]
+    B -->|JSON Response| A
+    B --> C["Speaker Management<br/>(discovery, config)"]
+    B --> D["Audio Rendering<br/>(VBAP, HOA, HRTF)"]
+    B --> E["Calibration System<br/>(measurement, EQ)"]
+    C --> F["Network Transport<br/>(RTP/UDP)"]
+    D --> F
+    E --> F
+    F --> G["Speaker Devices<br/>(wireless audio output)"]
+```
+
 ## Table of Contents
 
 - [Quick Start](#quick-start)

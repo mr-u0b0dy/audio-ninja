@@ -2,6 +2,20 @@
 
 This guide covers integrating real codec libraries into Audio Ninja's demuxer/decoder pipeline, replacing the current stub implementations.
 
+## Codec Pipeline Architecture
+
+```mermaid
+flowchart TD
+    A["Input Media File<br/>(MP4, WebM, WAV, etc.)"] --> B["Demuxer<br/>(Extract streams)"]
+    B --> C["Decoders<br/>(Opus, AAC, FLAC, PCM)"]
+    C --> D["Audio Buffers<br/>(PCM samples)"]
+    D --> E["Renderer<br/>(VBAP, HOA, HRTF)"]
+    E --> F["Speaker Output<br/>(RTP transport)"]
+    
+    style A fill:#e1f5fe
+    style F fill:#c8e6c9
+```
+
 ## Current Status
 
 Audio Ninja currently uses stub implementations for media demuxing and decoding:
