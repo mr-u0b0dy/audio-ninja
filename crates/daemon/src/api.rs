@@ -10,7 +10,7 @@ use axum::{
 use serde::{Deserialize, Serialize};
 use uuid::Uuid;
 
-use crate::{AppState, engine::{SpeakerInfo, SpeakerPosition, SpeakerStats}};
+use crate::{AppState, engine::{SpeakerInfo, SpeakerStats}};
 use audio_ninja::SpeakerLayout;
 
 #[derive(Serialize)]

@@ -7,19 +7,14 @@
 
 use anyhow::Result;
 use axum::{
-    extract::{Path, State},
-    http::StatusCode,
-    response::Json,
     routing::{get, post, delete},
     Router,
 };
 use clap::Parser;
-use serde::{Deserialize, Serialize};
 use std::{net::SocketAddr, sync::Arc};
 use tokio::sync::RwLock;
 use tower_http::cors::{Any, CorsLayer};
-use tracing::{info, warn};
-use uuid::Uuid;
+use tracing::info;
 
 mod engine;
 mod api;

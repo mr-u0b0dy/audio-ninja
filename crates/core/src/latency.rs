@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: Apache-2.0
 
-use crate::transport::{ClockTimestamp, RtpPacket};
+use crate::transport::ClockTimestamp;
 use crate::{AudioBlock, SpeakerDescriptor};
 use std::collections::HashMap;
 use std::time::Duration;

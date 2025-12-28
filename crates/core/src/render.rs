@@ -298,7 +298,7 @@ mod tests {
         let mut renderer = ReferenceRenderer::new(48000);
         renderer.set_headroom_db(3.0);
 
-        let mut loud_block = AudioBlock {
+        let loud_block = AudioBlock {
             sample_rate: 48000,
             channels: vec![vec![0.99; 100], vec![0.99; 100]],
         };
@@ -424,7 +424,7 @@ mod tests {
         // Should output stereo from mono due to binaural processing
         // The output is processed through headroom and loudness first,
         // then binaural converts mono to stereo
-        assert!(output.channels.len() >= 1, "Should have at least 1 channel");
+        assert!(!output.channels.is_empty(), "Should have at least 1 channel");
     }
 
     #[test]

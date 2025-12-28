@@ -193,10 +193,9 @@ impl HrtfDatabase {
         let mut min_distance = f32::INFINITY;
 
         for (&(az, el, _), response) in &self.responses {
-            let dist = ((az as f32 - pos.azimuth)
+            let dist = (az as f32 - pos.azimuth)
                 .abs()
                 .min(360.0 - (az as f32 - pos.azimuth).abs().max(0.0))
-                as f32)
                 .powi(2)
                 + (el as f32 - pos.elevation).powi(2);
 
@@ -459,18 +458,16 @@ mod tests {
 
         let pos = HrtfPosition::new(0.0, 0.0, 1.0);
         let ir = db.get_response(&pos).unwrap();
-        assert!(ir.left.len() > 0);
-        assert!(ir.right.len() > 0);
+        assert!(!ir.left.is_empty());
+        assert!(!ir.right.is_empty());
     }
 
     #[test]
     fn test_headphone_profile_variants() {
-        let profiles = vec![
-            HeadphoneProfile::Flat,
+        let profiles = [HeadphoneProfile::Flat,
             HeadphoneProfile::ClosedBack,
             HeadphoneProfile::OpenBack,
-            HeadphoneProfile::IEM,
-        ];
+            HeadphoneProfile::IEM];
         assert_eq!(profiles.len(), 4);
     }
 

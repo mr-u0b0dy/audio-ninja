@@ -126,7 +126,7 @@ fn test_map_channel_element_to_layout() {
 
 #[test]
 fn test_vbap_stereo_center() {
-    use audio_ninja::{Position3, SpeakerDescriptor};
+    use audio_ninja::Position3;
 
     let speakers = layout_from_name("stereo").unwrap().speakers;
 

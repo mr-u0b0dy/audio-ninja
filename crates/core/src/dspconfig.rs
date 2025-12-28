@@ -1,8 +1,6 @@
 // SPDX-License-Identifier: Apache-2.0
 
 use crate::calibration::CalibrationSolution;
-use crate::dsp::{BiquadFilter, FirFilter};
-use std::time::Duration;
 
 #[derive(Clone, Debug, PartialEq)]
 pub struct CamillaDspConfig {
@@ -50,7 +48,7 @@ impl CamillaDspConfig {
     pub fn to_yaml(&self) -> String {
         let mut yaml = String::new();
 
-        yaml.push_str(&format!("devices:\n"));
+        yaml.push_str("devices:\n");
         yaml.push_str(&format!("  samplerate: {}\n", self.devices.sample_rate));
         yaml.push_str(&format!("  chunksize: {}\n", self.devices.chunk_size));
         yaml.push_str(&format!("  channels: {}\n\n", self.devices.channels));
@@ -62,7 +60,7 @@ impl CamillaDspConfig {
                 match &filter.filter_type {
                     FilterType::Biquad { coeffs } => {
                         yaml.push_str("    type: Biquad\n");
-                        yaml.push_str(&format!("    parameters:\n"));
+                        yaml.push_str("    parameters:\n");
                         if coeffs.len() >= 5 {
                             yaml.push_str(&format!("      b0: {}\n", coeffs[0]));
                             yaml.push_str(&format!("      b1: {}\n", coeffs[1]));
@@ -73,27 +71,27 @@ impl CamillaDspConfig {
                     }
                     FilterType::Conv { filename } => {
                         yaml.push_str("    type: Conv\n");
-                        yaml.push_str(&format!("    parameters:\n"));
+                        yaml.push_str("    parameters:\n");
                         yaml.push_str(&format!("      filename: {}\n", filename));
                     }
                     FilterType::Delay { delay_samples } => {
                         yaml.push_str("    type: Delay\n");
-                        yaml.push_str(&format!("    parameters:\n"));
+                        yaml.push_str("    parameters:\n");
                         yaml.push_str(&format!("      delay: {}\n", delay_samples));
                     }
                 }
             }
-            yaml.push_str("\n");
+            yaml.push('\n');
         }
 
         if !self.pipeline.is_empty() {
             yaml.push_str("pipeline:\n");
             for step in &self.pipeline {
-                yaml.push_str(&format!("  - type: Filter\n"));
+                yaml.push_str("  - type: Filter\n");
                 if let Some(ch) = step.channel {
                     yaml.push_str(&format!("    channel: {}\n", ch));
                 }
-                yaml.push_str(&format!("    names:\n"));
+                yaml.push_str("    names:\n");
                 yaml.push_str(&format!("      - {}\n", step.filter_name));
             }
         }

@@ -79,22 +79,18 @@ fn test_hrtf_impulse_response_different_lengths() {
 
 #[test]
 fn test_hrtf_dataset_variants() {
-    let datasets = vec![
-        HrtfDataset::Kemar,
+    let datasets = [HrtfDataset::Kemar,
         HrtfDataset::Cipic,
-        HrtfDataset::MitKemar,
-    ];
+        HrtfDataset::MitKemar];
     assert_eq!(datasets.len(), 3);
 }
 
 #[test]
 fn test_headphone_profile_variants() {
-    let profiles = vec![
-        HeadphoneProfile::Flat,
+    let profiles = [HeadphoneProfile::Flat,
         HeadphoneProfile::ClosedBack,
         HeadphoneProfile::OpenBack,
-        HeadphoneProfile::IEM,
-    ];
+        HeadphoneProfile::IEM];
     assert_eq!(profiles.len(), 4);
 }
 
@@ -124,8 +120,8 @@ fn test_hrtf_database_load_default_kemar() {
 
     let pos = HrtfPosition::new(0.0, 0.0, 1.0);
     let ir = db.get_response(&pos).unwrap();
-    assert!(ir.left.len() > 0);
-    assert!(ir.right.len() > 0);
+    assert!(!ir.left.is_empty());
+    assert!(!ir.right.is_empty());
 }
 
 #[test]
@@ -136,7 +132,7 @@ fn test_hrtf_database_nearest_neighbor() {
     // Try a position that's not exactly in the database
     let pos = HrtfPosition::new(7.5, 8.5, 1.0);
     let ir = db.get_response(&pos).unwrap();
-    assert!(ir.left.len() > 0);
+    assert!(!ir.left.is_empty());
 }
 
 #[test]

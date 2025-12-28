@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: Apache-2.0
 
-use crate::transport::{RtpPacket, RtpSequence};
+use crate::transport::RtpPacket;
 use std::collections::BTreeMap;
 use std::time::Duration;
 

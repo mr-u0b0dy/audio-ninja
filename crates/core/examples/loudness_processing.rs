@@ -11,7 +11,7 @@ use audio_ninja::{
     loudness::{
         DynamicRangeControl, HeadroomManager, LoudnessMeter, LoudnessNormalizer, LoudnessTarget,
     },
-    render::{ReferenceRenderer, RenderOptions, DRCPreset},
+    render::{ReferenceRenderer, DRCPreset},
     AudioBlock,
 };
 
@@ -26,7 +26,7 @@ fn main() -> anyhow::Result<()> {
 
     // Create synthetic test audio with dynamic peaks
     println!("1. Generating test audio with dynamic peaks...");
-    let mut test_audio = generate_dynamic_audio(NUM_SAMPLES, NUM_CHANNELS, SAMPLE_RATE);
+    let test_audio = generate_dynamic_audio(NUM_SAMPLES, NUM_CHANNELS, SAMPLE_RATE);
     println!(
         "   Generated {} samples at {} Hz\n",
         NUM_SAMPLES, SAMPLE_RATE
@@ -63,7 +63,7 @@ fn main() -> anyhow::Result<()> {
     println!("4. Applying Dynamic Range Control (4:1 ratio, -18dB threshold)...");
     let mut drc_audio = normalized_audio.clone();
     let mut drc = DynamicRangeControl::new(4.0, -18.0, 10.0, 100.0, SAMPLE_RATE);
-    drc.set_makeup_gain(((-18.0 * 3.0) / 4.0)); // Calculate makeup gain for 4:1
+    drc.set_makeup_gain((-18.0 * 3.0) / 4.0); // Calculate makeup gain for 4:1
 
     drc.process(&mut drc_audio);
     println!("   ✓ DRC compression applied");

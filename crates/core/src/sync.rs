@@ -134,7 +134,7 @@ impl ClockSync for NtpClock {
         };
 
         // Apply 10% of the difference each sync
-        self.offset = self.offset + diff / 10;
+        self.offset += diff / 10;
 
         self.last_sync = Some(reference.clone());
         Ok(())

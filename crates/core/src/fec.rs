@@ -237,7 +237,7 @@ impl FecReceiver {
         let group_id = sequence as usize / self.fec.group_size;
         self.group_cache
             .entry(group_id)
-            .or_insert_with(Vec::new)
+            .or_default()
             .push(packet);
     }
 
