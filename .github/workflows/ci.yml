@@ -131,10 +131,8 @@ jobs:
         with:
           targets: ${{ matrix.target }}
 
-      - name: Install cargo-nextest
-        uses: taiki-e/install-action@v2
-        with:
-          tool: nextest
+      - name: Install cargo2junit
+        run: cargo install cargo2junit --locked
 
       - name: Cache cargo
         uses: actions/cache@v4
@@ -148,16 +146,11 @@ jobs:
             ${{ runner.os }}-dev-cargo-
             ${{ runner.os }}-cargo-
 
-      - name: Run unit tests (cargo)
-        run: cargo test --workspace --exclude audio-ninja-gui --all-features --lib -- --test-threads=1 --nocapture
-
-      - name: Run integration tests (cargo)
-        run: cargo test --workspace --exclude audio-ninja-gui --all-features --test '*' -- --skip e2e_ --test-threads=1 --nocapture
-
-      - name: Generate JUnit test report (nextest)
+      - name: Run tests and generate JUnit (cargo2junit)
         run: |
           mkdir -p target/test-results
-          cargo nextest run --workspace --exclude audio-ninja-gui --all-features --profile default --junit-xml target/test-results/test-results.xml
+          cargo test --workspace --exclude audio-ninja-gui --all-features --message-format=json -- --skip e2e_ --test-threads=1 --nocapture \
+            | cargo2junit > target/test-results/test-results.xml
 
       - name: Run doc tests
         run: cargo test --workspace --exclude audio-ninja-gui --all-features --doc
