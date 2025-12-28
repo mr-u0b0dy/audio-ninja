@@ -58,6 +58,10 @@ Feature requests are welcome! Please:
      
      # Check specific crate
      cargo check -p audio-ninja-daemon
+     cargo check -p audio-ninja-cli
+     
+     # Test CLI commands
+     cargo run -p audio-ninja-cli -- --help
      ```
    - Ensure all tests pass
 
@@ -296,38 +300,75 @@ Common types: `feat`, `fix`, `docs`, `test`, `refactor`, `perf`, `chore`
 ```
 audio-ninja/
 ├── .github/
-│   ├── workflows/          # CI/CD (planned)
+│   ├── workflows/          # CI/CD
 │   └── copilot-instructions.md
-├── docs/                   # Documentation
+├── crates/
+│   ├── core/              # Core library
+│   │   ├── src/
+│   │   │   ├── lib.rs     # Library root
+│   │   │   ├── iamf.rs    # IAMF parsing
+│   │   │   ├── vbap.rs    # VBAP renderer
+│   │   │   ├── hoa.rs     # HOA decoder
+│   │   │   ├── hrtf.rs    # Binaural rendering
+│   │   │   ├── loudness.rs # ITU-R BS.1770
+│   │   │   ├── drc.rs     # Dynamic range control
+│   │   │   ├── transport.rs # RTP transport
+│   │   │   ├── network.rs # UDP/networking
+│   │   │   ├── sync.rs    # Clock sync
+│   │   │   ├── calibration.rs # Room calibration
+│   │   │   └── ...
+│   │   ├── examples/      # Example programs
+│   │   └── tests/         # Integration tests
+│   ├── daemon/            # Background service
+│   │   ├── src/
+│   │   │   ├── main.rs    # Entry point
+│   │   │   ├── lib.rs     # Library for testing
+│   │   │   ├── api.rs     # REST API handlers
+│   │   │   └── engine.rs  # State management
+│   │   └── tests/         # API tests
+│   ├── gui/               # Desktop GUI
+│   │   ├── src/           # Tauri backend
+│   │   └── public/        # HTML/JS/CSS
+│   └── cli/               # Command-line interface
+│       ├── src/
+│       │   └── main.rs    # CLI implementation
+│       └── README.md      # CLI documentation
+├── docs/                  # Documentation
 │   ├── vbap.md
 │   ├── hoa.md
+│   ├── binaural_rendering.md
 │   └── ...
-├── src/
-│   ├── lib.rs             # Library root
-│   ├── iamf.rs            # IAMF parsing
-│   ├── render.rs          # Rendering
-│   ├── vbap.rs            # VBAP renderer
-│   ├── hoa.rs             # HOA decoder
-│   ├── transport.rs       # RTP transport
-│   ├── network.rs         # UDP/networking
-│   ├── sync.rs            # Clock sync
-│   ├── jitter.rs          # Jitter buffer
-│   ├── latency.rs         # Latency compensation
-│   ├── fec.rs             # Forward error correction
-│   ├── ble.rs             # BLE control
-│   ├── calibration.rs     # Room calibration
-│   ├── dsp.rs             # DSP filters
-│   ├── dspconfig.rs       # DSP config export
-│   ├── mapping.rs         # Channel mapping
-│   ├── pipeline.rs        # Audio pipeline
-│   ├── control.rs         # Control protocols
-│   └── ffmpeg.rs          # Codec interfaces
-├── tests/                 # Integration tests
-├── Cargo.toml             # Dependencies
-├── LICENSE                # Apache 2.0
-├── README.md              # Project overview
-├── CONTRIBUTING.md        # This file
-└── CODE_OF_CONDUCT.md     # Code of conduct
+├── Cargo.toml            # Workspace root
+├── README.md
+├── CONTRIBUTING.md
+└── LICENSE
+```
+
+## Workspace Commands
+
+```bash
+# Build entire workspace
+cargo build --workspace --release
+
+# Build specific crate
+cargo build -p audio-ninja-daemon --release
+cargo build -p audio-ninja-cli --release
+cargo build -p audio-ninja-gui --release
+
+# Run tests
+cargo test --workspace
+
+# Lint and fix
+cargo clippy --workspace --fix
+
+# Run daemon
+cargo run -p audio-ninja-daemon --release
+
+# Run CLI
+cargo run -p audio-ninja-cli --release -- status
+
+# Run GUI
+cargo run -p audio-ninja-gui --release
 ```
 
 ## Review Process

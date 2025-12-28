@@ -20,9 +20,11 @@ audio-ninja/
 │   │   └── tests/
 │   ├── daemon/             # Background engine service (REST API)
 │   │   └── src/
-│   └── gui/                # Desktop GUI client (Tauri)
-│       ├── src/
-│       └── public/
+│   ├── gui/                # Desktop GUI client (Tauri)
+│   │   ├── src/
+│   │   └── public/
+│   └── cli/                # Command-line interface
+│       └── src/
 ├── docs/                   # Documentation
 └── .github/                # CI/CD workflows
 ```
@@ -31,6 +33,7 @@ audio-ninja/
 - **`audio-ninja`**: Core library with IAMF parsing, spatial rendering, transport, calibration
 - **`audio-ninja-daemon`**: Background service running the audio engine with REST API (port 8080)
 - **`audio-ninja-gui`**: Desktop GUI client for control and monitoring (Tauri + vanilla JS)
+- **`audio-ninja-cli`**: Command-line interface for daemon control (`audio-ninja` binary)
 
 ```
 ┌─────────────────────────────────────────┐
@@ -55,21 +58,64 @@ audio-ninja/
 │  └─ BLE control plane                   │
 └─────────────────────────────────────────┘
 ```
+┌─────────────────────────────────────────┐
+│  GUI (Tauri) / CLI / HTTP clients       │
+└──────────────┬──────────────────────────┘
+               │ REST API (HTTP/JSON)
+┌──────────────▼──────────────────────────┐
+│  audio-ninja-daemon (port 8080)         │
+│  ├─ Speaker discovery & management      │
+│  ├─ Layout configuration                │
+│  ├─ Transport control (play/pause/stop) │
+│  ├─ Calibration runner                  │
+│  └─ Real-time stats & monitoring        │
+└──────────────┬──────────────────────────┘
+               │
+┌──────────────▼──────────────────────────┐
+│  audio-ninja core library               │
+│  ├─ IAMF decode & spatial render        │
+│  ├─ Network transport (UDP/RTP)         │
+│  ├─ Clock sync (PTP/NTP)                │
+│  ├─ DSP pipeline & calibration          │
+│  └─ BLE control plane                   │
+└─────────────────────────────────────────┘
+```
 
-**Quick Start:**
+## 🚀 Quick Start
+
+### Prerequisites
+- Rust 1.70 or later
+- Linux: `webkit2gtk-4.0`, `gtk3`, `openssl` (for GUI)
+
+### Build All
+
 ```bash
-# Build entire workspace
-cargo build --release
+git clone https://github.com/mr-u0b0dy/audio-ninja.git
+cd audio-ninja
+cargo build --workspace --release
+```
 
-# Or build individual components:
-cargo build -p audio-ninja-daemon --release
-cargo build -p audio-ninja-gui --release
+### Run Daemon
 
-# Terminal 1: Start daemon
-cd crates/daemon && cargo run --release
+```bash
+cargo run -p audio-ninja-daemon --release
+# Or use the systemd service (see daemon README)
+```
 
-# Terminal 2: Launch GUI
-cd crates/gui && cargo run --release
+### Use CLI
+
+```bash
+cargo run -p audio-ninja-cli --release -- status
+cargo run -p audio-ninja-cli --release -- speaker list
+cargo run -p audio-ninja-cli --release -- transport play
+```
+
+See [crates/cli/README.md](crates/cli/README.md) for full CLI documentation.
+
+### Launch GUI
+
+```bash
+cargo run -p audio-ninja-gui --release
 ```
 
 ### New: Spatial Audio for Headphones

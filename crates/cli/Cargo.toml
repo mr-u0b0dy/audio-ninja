@@ -1,0 +1,19 @@
+[package]
+name = "audio-ninja-cli"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+
+[[bin]]
+name = "audio-ninja"
+path = "src/main.rs"
+
+[dependencies]
+audio-ninja.workspace = true
+tokio.workspace = true
+reqwest.workspace = true
+serde.workspace = true
+serde_json.workspace = true
+anyhow.workspace = true
+clap.workspace = true
+uuid.workspace = true
