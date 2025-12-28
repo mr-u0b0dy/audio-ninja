@@ -50,8 +50,8 @@ impl HrtfPosition {
         } else if azimuth < -180.0 {
             azimuth += 360.0;
         }
-        let elevation = elevation.max(-90.0).min(90.0); // Clamp to -90..90
-        let distance = distance.max(0.1).min(10.0); // Clamp to reasonable range
+        let elevation = elevation.clamp(-90.0, 90.0); // Clamp to -90..90
+        let distance = distance.clamp(0.1, 10.0); // Clamp to reasonable range
 
         Self {
             azimuth,

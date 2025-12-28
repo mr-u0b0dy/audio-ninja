@@ -107,7 +107,6 @@ impl Default for NtpClock {
             source: ClockSource::Ntp,
             sync_interval: Duration::from_secs(1), // NTP syncs less frequently
             max_skew: Duration::from_millis(10),   // ±10 ms for NTP
-            ..Default::default()
         })
     }
 }

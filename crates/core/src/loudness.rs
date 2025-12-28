@@ -179,13 +179,10 @@ impl HeadroomManager {
 
                 // Lookahead: inspect upcoming window for potential peaks
                 let end = (i + self.lookahead_samples).min(len);
-                let mut ahead_max = abs_sample;
-                for j in i..end {
-                    let v = channel[j].abs();
-                    if v > ahead_max {
-                        ahead_max = v;
-                    }
-                }
+                let ahead_max = channel[i..end]
+                    .iter()
+                    .map(|&v| v.abs())
+                    .fold(abs_sample, f32::max);
 
                 if ahead_max > threshold {
                     // Calculate required gain reduction ahead of peak

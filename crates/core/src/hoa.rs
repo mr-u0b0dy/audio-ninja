@@ -317,9 +317,9 @@ fn transpose_matrix(matrix: &[Vec<f32>]) -> Vec<Vec<f32>> {
 
     let mut result = vec![vec![0.0; rows]; cols];
 
-    for i in 0..rows {
-        for j in 0..cols {
-            result[j][i] = matrix[i][j];
+    for (i, row) in matrix.iter().enumerate() {
+        for (j, &val) in row.iter().enumerate() {
+            result[j][i] = val;
         }
     }
 

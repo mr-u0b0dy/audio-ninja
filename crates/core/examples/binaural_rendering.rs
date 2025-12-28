@@ -128,8 +128,8 @@ fn main() -> anyhow::Result<()> {
         let end = (i + 1) * 10000;
         if end <= DURATION_SAMPLES {
             for ch in &mut surround_dynamic.channels {
-                for j in start..end {
-                    ch[j] *= 1.5; // Add peaks
+                for sample in &mut ch[start..end] {
+                    *sample *= 1.5; // Add peaks
                 }
             }
         }

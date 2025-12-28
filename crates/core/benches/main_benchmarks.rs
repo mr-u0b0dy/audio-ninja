@@ -97,10 +97,9 @@ fn bench_vec3_operations(c: &mut Criterion) {
 // Loudness Measurement Benchmarks
 fn bench_loudness_mono(c: &mut Criterion) {
     c.bench_function("loudness_mono_1sec", |b| {
-        let mut audio = vec![0.0; 48000];
-        for i in 0..48000 {
-            audio[i] = ((i as f32 / 48000.0) * 2.0 * std::f32::consts::PI).sin() * 0.1;
-        }
+        let audio: Vec<f32> = (0..48000)
+            .map(|i| ((i as f32 / 48000.0) * 2.0 * std::f32::consts::PI).sin() * 0.1)
+            .collect();
         let block = AudioBlock {
             channels: vec![audio],
             sample_rate: 48000,
@@ -137,13 +136,16 @@ fn bench_loudness_stereo(c: &mut Criterion) {
 
 fn bench_loudness_5_1(c: &mut Criterion) {
     c.bench_function("loudness_5.1_1sec", |b| {
-        let mut channels = vec![vec![0.0; 48000]; 6];
-        for i in 0..48000 {
-            let freq = (i as f32 / 48000.0) * 2.0 * std::f32::consts::PI;
-            for ch in 0..6 {
-                channels[ch][i] = (freq + (ch as f32) * 0.2).sin() * 0.1;
-            }
-        }
+        let channels: Vec<Vec<f32>> = (0..6)
+            .map(|ch| {
+                (0..48000)
+                    .map(|i| {
+                        let freq = (i as f32 / 48000.0) * 2.0 * std::f32::consts::PI;
+                        (freq + (ch as f32) * 0.2).sin() * 0.1
+                    })
+                    .collect()
+            })
+            .collect();
         let block = AudioBlock {
             channels,
             sample_rate: 48000,
