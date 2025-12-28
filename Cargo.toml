@@ -11,7 +11,7 @@ version = "0.1.0"
 edition = "2021"
 license = "Apache-2.0"
 authors = ["Audio Ninja Contributors"]
-repository = "https://github.com/yourusername/audio-ninja"
+repository = "https://github.com/mr-u0b0dy/audio-ninja"
 rust-version = "1.70"
 
 [workspace.dependencies]

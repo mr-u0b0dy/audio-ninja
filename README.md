@@ -129,7 +129,7 @@ cd crates/gui && cargo run --release
 ### Installation
 
 ```bash
-git clone https://github.com/yourusername/audio-ninja.git
+git clone https://github.com/mr-u0b0dy/audio-ninja.git
 cd audio-ninja
 cargo build --release
 ```
@@ -427,8 +427,8 @@ limitations under the License.
 
 ## 📞 Contact & Support
 
-- **Issues**: [GitHub Issues](https://github.com/yourusername/audio-ninja/issues)
-- **Discussions**: [GitHub Discussions](https://github.com/yourusername/audio-ninja/discussions)
+- **Issues**: [GitHub Issues](https://github.com/mr-u0b0dy/audio-ninja/issues)
+- **Discussions**: [GitHub Discussions](https://github.com/mr-u0b0dy/audio-ninja/discussions)
 - **Documentation**: [docs/](docs/)
 
 ## 🌟 Star History

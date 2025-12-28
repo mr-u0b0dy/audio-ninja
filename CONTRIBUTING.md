@@ -11,7 +11,7 @@ This project follows the [Contributor Covenant Code of Conduct](CODE_OF_CONDUCT.
 ### Reporting Bugs
 
 Before creating a bug report:
-1. Check the [issue tracker](https://github.com/yourusername/audio-ninja/issues) for existing reports
+1. Check the [issue tracker](https://github.com/mr-u0b0dy/audio-ninja/issues) for existing reports
 2. Verify the bug exists in the latest version
 
 When filing a bug report, include:
@@ -33,7 +33,7 @@ Feature requests are welcome! Please:
 
 1. **Fork and Clone**
    ```bash
-   git clone https://github.com/yourusername/audio-ninja.git
+   git clone https://github.com/mr-u0b0dy/audio-ninja.git
    cd audio-ninja
    ```
 
@@ -351,8 +351,8 @@ audio-ninja/
 
 ## Getting Help
 
-- **Questions**: Use [GitHub Discussions](https://github.com/yourusername/audio-ninja/discussions)
-- **Issues**: Use [GitHub Issues](https://github.com/yourusername/audio-ninja/issues)
+- **Questions**: Use [GitHub Discussions](https://github.com/mr-u0b0dy/audio-ninja/discussions)
+- **Issues**: Use [GitHub Issues](https://github.com/mr-u0b0dy/audio-ninja/issues)
 - **Chat**: (Discord/Matrix/IRC - if established)
 
 ## License
