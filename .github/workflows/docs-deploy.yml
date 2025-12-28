@@ -3,10 +3,11 @@ name: Build and Deploy VuePress Docs
 on:
   push:
     branches:
-      - docs/vuepress-theme-hope
-  pull_request:
-    branches:
-      - docs/vuepress-theme-hope
+      - main
+    paths:
+      - 'docs-site/**'
+      - '.github/workflows/docs-deploy.yml'
+  workflow_dispatch:
 
 permissions:
   contents: read
@@ -42,7 +43,7 @@ jobs:
           path: docs-site/src/.vuepress/dist
 
   deploy:
-    if: github.event_name == 'push' && github.ref == 'refs/heads/docs/vuepress-theme-hope'
+    if: github.event_name == 'push' || github.event_name == 'workflow_dispatch'
     needs: build
     environment:
       name: github-pages
