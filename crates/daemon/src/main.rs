@@ -64,8 +64,8 @@ async fn main() -> Result<()> {
         // Speaker management
         .route("/api/v1/speakers", get(api::list_speakers))
         .route("/api/v1/speakers/discover", post(api::discover_speakers))
-        .route("/api/v1/speakers/:id", get(api::get_speaker))
-        .route("/api/v1/speakers/:id", delete(api::remove_speaker))
+        .route("/api/v1/speakers/{id}", get(api::get_speaker))
+        .route("/api/v1/speakers/{id}", delete(api::remove_speaker))
         // Layout configuration
         .route("/api/v1/layout", get(api::get_layout))
         .route("/api/v1/layout", post(api::set_layout))
@@ -80,7 +80,7 @@ async fn main() -> Result<()> {
         .route("/api/v1/calibration/apply", post(api::calibration_apply))
         // Statistics and monitoring
         .route("/api/v1/stats", get(api::stats))
-        .route("/api/v1/speakers/:id/stats", get(api::speaker_stats))
+        .route("/api/v1/speakers/{id}/stats", get(api::speaker_stats))
         // Add CORS middleware
         .layer(
             CorsLayer::new()

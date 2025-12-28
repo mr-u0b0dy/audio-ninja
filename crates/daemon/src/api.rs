@@ -89,7 +89,7 @@ pub async fn discover_speakers(State(state): State<AppState>) -> StatusCode {
     StatusCode::ACCEPTED
 }
 
-/// GET /api/v1/speakers/:id
+/// GET /api/v1/speakers/{id}
 pub async fn get_speaker(
     State(state): State<AppState>,
     Path(id): Path<Uuid>,
@@ -103,7 +103,7 @@ pub async fn get_speaker(
         .ok_or(StatusCode::NOT_FOUND)
 }
 
-/// DELETE /api/v1/speakers/:id
+/// DELETE /api/v1/speakers/{id}
 pub async fn remove_speaker(State(state): State<AppState>, Path(id): Path<Uuid>) -> StatusCode {
     let mut engine = state.engine.write().await;
     if engine.remove_speaker(&id).is_some() {
@@ -208,7 +208,7 @@ pub async fn stats(State(state): State<AppState>) -> Json<serde_json::Value> {
     }))
 }
 
-/// GET /api/v1/speakers/:id/stats
+/// GET /api/v1/speakers/{id}/stats
 pub async fn speaker_stats(
     State(state): State<AppState>,
     Path(id): Path<Uuid>,
