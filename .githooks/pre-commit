@@ -1,0 +1,41 @@
+#!/bin/bash
+# Pre-commit hook for Audio Ninja
+# Install: git config core.hooksPath .githooks
+
+set -e
+
+echo "🔍 Running pre-commit validation..."
+
+# Check formatting
+echo "  ├─ Checking code format..."
+if ! cargo fmt --all -- --check; then
+    echo "  ❌ Format check failed. Run: cargo fmt --all"
+    exit 1
+fi
+echo "  ✅ Format check passed"
+
+# Run clippy
+echo "  ├─ Running clippy..."
+if ! cargo clippy --workspace --all-targets --all-features -- -D warnings; then
+    echo "  ❌ Clippy failed. Fix warnings or run: cargo clippy --fix"
+    exit 1
+fi
+echo "  ✅ Clippy passed"
+
+# Run tests (skip E2E tests for speed)
+echo "  ├─ Running tests..."
+if ! cargo test --workspace -- --skip e2e_; then
+    echo "  ❌ Tests failed"
+    exit 1
+fi
+echo "  ✅ Tests passed"
+
+# Build documentation
+echo "  ├─ Building documentation..."
+if ! cargo doc --workspace --no-deps --all-features 2>&1 | grep -v "warning: unused"; then
+    echo "  ❌ Documentation build failed"
+    exit 1
+fi
+echo "  ✅ Documentation built"
+
+echo "✅ All pre-commit checks passed!"

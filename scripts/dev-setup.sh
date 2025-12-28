@@ -95,6 +95,17 @@ else
     exit 1
 fi
 
+# Configure git hooks
+echo ""
+echo "Configuring git hooks..."
+if git config core.hooksPath .githooks; then
+    echo "✅ Git hooks enabled (.githooks/pre-commit)"
+    echo "   Pre-commit validation will run automatically"
+    echo "   To skip: git commit --no-verify"
+else
+    echo "⚠️  Failed to configure git hooks"
+fi
+
 # Optional tools
 echo ""
 echo "Optional development tools:"

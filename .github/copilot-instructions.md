@@ -32,6 +32,57 @@ This repo is an OSS wireless immersive audio platform (IAMF-first) with flexible
 - Prefer property/fuzz tests for parsers
 - Add integration tests for daemon API endpoints
 - Target 80%+ coverage for core library
+- **Pre-commit validation**: Use VS Code task "Pre-Commit: Full Validation" (Ctrl+Shift+P → Tasks: Run Task) or run `cargo fmt --check && cargo clippy --workspace -- -D warnings && cargo test --workspace -- --skip e2e_`
+
+## VS Code Workflow
+
+### Pre-Commit Testing (Recommended)
+Before committing changes, run comprehensive validation:
+- **Method 1**: Press `Ctrl+Shift+P` → "Tasks: Run Task" → "Pre-Commit: Full Validation"
+- **Method 2**: Press `Ctrl+Shift+B` (default test task)
+- **Method 3**: From VS Code menu: Terminal → Run Task → "Pre-Commit: Full Validation"
+
+This runs:
+1. Format check (`cargo fmt --check`)
+2. Clippy with warnings as errors (`cargo clippy -- -D warnings`)
+3. All tests except E2E (`cargo test -- --skip e2e_`)
+4. Documentation build (`cargo doc`)
+
+### Quick Pre-Commit Check
+For faster iteration during development:
+- Run task "Pre-Commit: Quick Check" (format + clippy + lib tests only)
+
+### Available VS Code Tasks
+- **Build Workspace**: Standard debug build
+- **Build Release**: Optimized release build
+- **Test Workspace**: Run all tests
+- **Clippy**: Lint checks
+- **Format Code**: Auto-format with rustfmt
+- **Run Daemon**: Start daemon in background
+- **Run GUI**: Launch desktop GUI
+- **Check All**: Format check + clippy + tests
+- **Pre-Commit: Full Validation**: Comprehensive pre-commit checks (default test task)
+- **Pre-Commit: Quick Check**: Fast pre-commit validation
+
+### Git Pre-Commit Hooks
+Automated validation on every commit (optional but recommended):
+
+**Install hooks:**
+```bash
+git config core.hooksPath .githooks
+# Or run: ./scripts/dev-setup.sh
+```
+
+**What runs:**
+- Format check
+- Clippy lints
+- Tests (except E2E)
+- Documentation build
+
+**Skip when needed:**
+```bash
+git commit --no-verify -m "message"
+```
 
 ## Workspace Commands
 ```bash
