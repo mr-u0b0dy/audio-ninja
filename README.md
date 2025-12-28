@@ -63,16 +63,16 @@ Core documentation is in the [docs/](docs/) directory:
 
 | File | Topic |
 |------|-------|
-| [docs/DAEMON_WORKFLOW.md](docs/DAEMON_WORKFLOW.md) | Deployment, configuration, operation |
-| [docs/CALIBRATION.md](docs/CALIBRATION.md) | Room measurement and optimization |
-| [docs/API_USAGE.md](docs/API_USAGE.md) | REST API examples |
-| [docs/VBAP.md](docs/vbap.md) | 3D Vector-Based Amplitude Panning |
-| [docs/HOA.md](docs/hoa.md) | Higher-Order Ambisonics |
-| [docs/HRTF.md](docs/hrtf.md) | Binaural HRTF rendering |
-| [docs/LOUDNESS_DRC.md](docs/loudness_drc.md) | Loudness and dynamic range control |
-| [docs/CODEC_INTEGRATION.md](docs/CODEC_INTEGRATION.md) | Audio codec support |
-| [docs/FIRMWARE_UPDATE.md](docs/FIRMWARE_UPDATE.md) | OTA firmware updates |
-| [docs/RELEASE.md](docs/RELEASE.md) | Release process |
+| [docs/daemon_workflow.md](docs/daemon_workflow.md) | Deployment, configuration, operation |
+| [docs/calibration.md](docs/calibration.md) | Room measurement and optimization |
+| [docs/api_usage.md](docs/api_usage.md) | REST API examples |
+| [docs/vbap.md](docs/vbap.md) | 3D Vector-Based Amplitude Panning |
+| [docs/hoa.md](docs/hoa.md) | Higher-Order Ambisonics |
+| [docs/hrtf.md](docs/hrtf.md) | Binaural HRTF rendering |
+| [docs/loudness_drc.md](docs/loudness_drc.md) | Loudness and dynamic range control |
+| [docs/codec_integration.md](docs/codec_integration.md) | Audio codec support |
+| [docs/firmware_update.md](docs/firmware_update.md) | OTA firmware updates |
+| [docs/release.md](docs/release.md) | Release process |
 
 Component READMEs:
 - [crates/daemon/README.md](crates/daemon/README.md) - Daemon service
