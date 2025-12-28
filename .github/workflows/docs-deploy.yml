@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - main
+      - docs/vuepress-theme-hope
     paths:
       - 'docs-site/**'
       - '.github/workflows/docs-deploy.yml'
