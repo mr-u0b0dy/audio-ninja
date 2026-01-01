@@ -55,6 +55,17 @@ export default defineUserConfig({
         ],
       },
       {
+        text: "Roadmap & Todos",
+        icon: "list",
+        link: "/todo/",
+      },
+        children: [
+          "README.md",
+          "design-system.md",
+          "phase2-tasks.md",
+        ],
+      },
+      {
         text: "Spatial Audio",
         icon: "headphones",
         prefix: "/spatial/",
@@ -150,6 +161,15 @@ export default defineUserConfig({
             "api_usage.md",
             "daemon_workflow.md",
             "release.md",
+          ],
+        },
+      ],
+      "/todo/": [
+        {
+          text: "Project Roadmap",
+          icon: "list",
+          children: [
+            "README.md",
           ],
         },
       ],
