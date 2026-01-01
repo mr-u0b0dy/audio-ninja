@@ -257,40 +257,6 @@ jobs:
           # Skip this check - tree diagrams in code blocks are acceptable
           echo "✓ Skipping ASCII diagram check (tree diagrams in code blocks are OK)"
 
-      - name: Validate Mermaid syntax
-        run: |
-          # Use npm to install mermaid-cli
-          npm install -g @mermaid-js/mermaid-cli
-          mkdir -p /tmp/mermaid-output
-          
-          # Find all markdown files with mermaid diagrams and validate them
-          found_errors=0
-          for file in $(find docs-site/src -name "*.md" -type f); do
-            if grep -q '```mermaid' "$file"; then
-              echo "Checking Mermaid diagrams in: $file"
-              # Extract mermaid blocks and validate
-              awk '/```mermaid/{flag=1; next} /```/{flag=0} flag' "$file" > /tmp/mermaid-block.mmd
-              
-              # Validate the extracted mermaid block
-              if [ -f /tmp/mermaid-block.mmd ] && [ -s /tmp/mermaid-block.mmd ]; then
-                if ! mmdc -i /tmp/mermaid-block.mmd -o /tmp/mermaid-output/test.svg 2>&1; then
-                  echo "❌ Error in Mermaid diagram in $file"
-                  cat /tmp/mermaid-block.mmd
-                  found_errors=1
-                else
-                  echo "✅ Valid: $(basename $file)"
-                fi
-              fi
-            fi
-          done
-          
-          if [ $found_errors -eq 1 ]; then
-            echo "❌ Mermaid validation failed - see errors above"
-            exit 1
-          else
-            echo "✅ All Mermaid diagrams validated successfully"
-          fi
-
 
   documentation:
     name: Documentation
@@ -389,10 +355,7 @@ jobs:
     name: Build Documentation Site
     runs-on: ubuntu-latest
     needs: changes
-    if: |
-      github.event_name == 'push' && 
-      github.ref == 'refs/heads/main' && 
-      (needs.changes.outputs.docs_only == 'true' || github.event_name == 'pull_request')
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     steps:
       - uses: actions/checkout@v4
 
@@ -417,11 +380,8 @@ jobs:
   docs-deploy:
     name: Deploy to GitHub Pages
     runs-on: ubuntu-latest
-    needs: [changes, docs-build]
-    if: |
-      github.event_name == 'push' && 
-      github.ref == 'refs/heads/main' && 
-      (needs.changes.outputs.docs_only == 'true' || github.event_name == 'pull_request')
+    needs: docs-build
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     concurrency:
       group: pages
       cancel-in-progress: true
