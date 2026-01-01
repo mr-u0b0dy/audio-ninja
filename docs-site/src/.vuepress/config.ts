@@ -167,6 +167,7 @@ export default defineUserConfig({
           ],
         },
       ],
+      "/": [],
     },
 
     displayFooter: true,
