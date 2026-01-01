@@ -257,8 +257,37 @@ jobs:
 
       - name: Validate Mermaid syntax
         run: |
-          # Mermaid validation requires browser automation which doesn't work in container
-          echo "⚠️ Skipping Mermaid validation (requires browser, verified manually)"
+          # Use npm to install mermaid-cli
+          npm install -g @mermaid-js/mermaid-cli
+          mkdir -p /tmp/mermaid-output
+          
+          # Find all markdown files with mermaid diagrams and validate them
+          found_errors=0
+          for file in $(find docs-site/src -name "*.md" -type f); do
+            if grep -q '```mermaid' "$file"; then
+              echo "Checking Mermaid diagrams in: $file"
+              # Extract mermaid blocks and validate
+              awk '/```mermaid/{flag=1; next} /```/{flag=0} flag' "$file" > /tmp/mermaid-block.mmd
+              
+              # Validate the extracted mermaid block
+              if [ -f /tmp/mermaid-block.mmd ] && [ -s /tmp/mermaid-block.mmd ]; then
+                if ! mmdc -i /tmp/mermaid-block.mmd -o /tmp/mermaid-output/test.svg 2>&1; then
+                  echo "❌ Error in Mermaid diagram in $file"
+                  cat /tmp/mermaid-block.mmd
+                  found_errors=1
+                else
+                  echo "✅ Valid: $(basename $file)"
+                fi
+              fi
+            fi
+          done
+          
+          if [ $found_errors -eq 1 ]; then
+            echo "❌ Mermaid validation failed - see errors above"
+            exit 1
+          else
+            echo "✅ All Mermaid diagrams validated successfully"
+          fi
 
 
   documentation:
