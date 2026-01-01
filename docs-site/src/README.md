@@ -73,12 +73,6 @@ highlights:
 
 ---
 
-<div align="center">
-
-![Audio Ninja Banner](/banner.png)
-
-</div>
-
 ## Quick Links
 
 <div align="center">
