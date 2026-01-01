@@ -56,11 +56,13 @@ npm run docs:clean
 ```
 docs-site/src/
 ├── api/                      # API reference and workflow guides
+│   ├── README.md             # API overview
 │   ├── reference.md          # REST API endpoint reference
 │   ├── api_usage.md          # API usage examples (curl, Python, JS, Rust)
 │   ├── daemon_workflow.md    # Daemon deployment and integration guide
 │   └── release.md            # Release process documentation
 ├── guide/                    # Getting started and user guides
+│   ├── README.md             # Guide overview
 │   ├── quick-start.md        # Quick start guide
 │   ├── installation.md       # Installation instructions
 │   ├── configuration.md      # Daemon configuration guide
@@ -68,6 +70,7 @@ docs-site/src/
 │   ├── tui.md                # Terminal UI detailed guide
 │   └── gui-quick-reference.md # GUI quick reference
 ├── design/                   # GUI design and implementation
+│   ├── README.md             # Design overview
 │   ├── design-system.md      # Magma Orange design system
 │   └── phase2-tasks.md       # 43 Phase 2 implementation tasks
 ├── spatial/                  # Spatial audio processing
@@ -83,33 +86,6 @@ docs-site/src/
     ├── codecs.md             # Codec support and formats
     ├── codec_integration.md  # FFmpeg and codec integration guide
     └── firmware_update.md    # Firmware update mechanism
-```
-    ├── README.md             # Home page
-    ├── guide/                # Getting Started section
-    │   ├── README.md
-    │   ├── quick-start.md
-    │   ├── installation.md
-    │   └── configuration.md
-    ├── spatial/              # Spatial Audio section
-    │   ├── overview.md
-    │   ├── vbap.md
-    │   ├── hoa.md
-    │   ├── hrtf.md
-    │   └── comparison.md
-    ├── processing/           # Audio Processing section
-    │   ├── loudness.md
-    │   ├── drc.md
-    │   ├── calibration.md
-    │   └── codecs.md
-    ├── deployment/           # Deployment section
-    │   ├── daemon.md
-    │   ├── api.md
-    │   ├── cli.md
-    │   ├── firmware.md
-    │   └── release.md
-    └── .vuepress/
-        ├── config.ts         # VuePress configuration
-        └── dist/             # Built site (generated)
 ```
 
 ## Configuration
@@ -167,139 +143,91 @@ npm install gh-pages --save-dev
 npx gh-pages -d src/.vuepress/dist -b gh-pages
 ```
 
-## Writing Documentation
+## Contributing to Documentation
+
+### Adding New Pages
+
+1. Create markdown file in appropriate section (guide, spatial, processing, api, design)
+2. Update navbar/sidebar config in `src/.vuepress/config.ts` if it's a major section
+3. Build and test locally: `npm run docs:dev`
+4. Commit and push
 
 ### Markdown Features
 
 VuePress Theme Hope supports:
 
 - **Callouts**: :::info, :::warning, :::danger, :::success
-- **Code Blocks**: Syntax highlighting with line numbers
-- **Charts**: Mermaid diagrams
-- **Tabs**: Tabbed content
+- **Code Blocks**: Syntax highlighting with language selection
+- **Diagrams**: Mermaid flowcharts and diagrams
+- **Tabs**: Tabbed content blocks
 - **Components**: Custom Vue components
 
-### Example Callout
+### Documentation Standards
 
-```markdown
-:::warning Important
-This is a warning message.
-:::
+- Use clear, concise headings (## for sections, ### for subsections)
+- Include code examples where relevant
+- Link to related documentation
+- Update the main navbar/sidebar when adding major sections
+- Keep file sizes reasonable (split large docs into subsections)
 
-:::success Completed
-This is a success message.
-:::
-```
+## Theme & Color Palette
 
-### Example Code Block
+Current design uses the **Magma Orange/Dark Bronze** theme:
 
-````markdown
-```rust
-// Rust code with syntax highlighting
-fn main() {
-    println!("Hello, world!");
-}
-```
-````
+| Component | Color | Hex |
+|-----------|-------|-----|
+| Background | Void Black | #050203 |
+| Cards/Sidebars | Deep Bronze | #26140D |
+| Primary CTA | Magma Orange | #E65100 |
+| Hover/Accents | Neon Amber | #FF8C00 |
+| Highlights | Blade Glow | #FFD580 |
+| Text | Mist White | #F5F5F5 |
 
-### Example Diagram
-
-````markdown
-```mermaid
-flowchart TD
-    A[Start] --> B[End]
-```
-````
-
-## Customization
-
-### Adding New Pages
-
-1. Create markdown file in appropriate section
-2. Add to navbar/sidebar config if needed
-3. Build and deploy
-
-### Color Palette
-
-Current palette (Dark Orange/Magma theme):
-- Void Black (Background): #050203
-- Deep Bronze (Cards/Sidebars): #26140D
-- Magma Orange (Primary): #E65100
-- Neon Amber (Accents): #FF8C00
-- Blade Glow (Highlights): #FFD580
-- Mist White (Text): #F5F5F5
-
-Update `src/.vuepress/config.ts` if you need to change it:
+Theme colors are configured in `src/.vuepress/config.ts`:
 
 ```typescript
-theme: hopeTheme({
-  themeColor: {
-    "#E65100": "Magma Orange",
-    "#FF8C00": "Neon Amber",
-    "#FFD580": "Blade Glow",
-  },
-})
+themeColor: {
+  "#E65100": "Magma Orange",
+  "#FF8C00": "Neon Amber",
+  "#FFD580": "Blade Glow",
+}
 ```
-
-### Adding Custom CSS
-
-Create `src/.vuepress/styles/index.scss`:
-
-```scss
-// Custom styles
-```
-
-## Documentation Organization
-
-All documentation is self-contained in `docs-site/src/` with the following structure:
-
-- `guide/` - Getting started, installation, configuration
-- `spatial/` - VBAP, HOA, HRTF spatial rendering
-- `processing/` - Calibration, codecs, loudness, DRC
-- `api/` - REST API reference
-- `deployment/` - Deployment and production guides
-- `reference/` - Architecture and technical details
 
 ## Troubleshooting
 
-### Build Errors
+### Common Issues
 
+**Build fails with missing dependencies**:
 ```bash
-# Clear node_modules and reinstall
 rm -rf node_modules package-lock.json
 npm install
 ```
 
-### Port Already in Use
-
+**Port 8080 already in use**:
 ```bash
-# Use different port
 npm run docs:dev -- --port 9000
 ```
 
-### Git Issues with GitHub Pages
-
+**Changes not reflecting**:
 ```bash
-# Check GitHub Pages settings in repository
-# Settings → Pages → Source should be "GitHub Actions"
+npm run docs:clean
+npm run docs:dev
 ```
 
-## Performance
+## Performance & Optimization
 
-VuePress Theme Hope provides:
+- ⚡ Hot Module Replacement (HMR) for instant updates
+- 📦 Optimized production builds (tree-shaking, compression)
+- 🔍 Built-in search with Algolia integration
+- 📱 Fully responsive design (mobile-first)
+- ♿ WCAG AA accessibility standards
 
-- ⚡ Fast dev server with HMR
-- 📦 Optimized production builds
-- 🔍 Built-in search functionality
-- 📱 Mobile-responsive design
-- ♿ Accessible markup
+## Related Resources
 
-## See Also
-
-- [VuePress Documentation](https://v2.vuepress.vuejs.org/)
-- [Theme Hope Documentation](https://theme-hope.vuejs.press/)
-- [GitHub Pages Docs](https://docs.github.com/en/pages)
-- [Main Audio Ninja Repository](https://github.com/mr-u0b0dy/audio-ninja)
+- [VuePress 2.x Documentation](https://v2.vuepress.vuejs.org/)
+- [VuePress Theme Hope Guide](https://theme-hope.vuejs.press/)
+- [GitHub Pages Deployment](https://docs.github.com/en/pages)
+- [Audio Ninja Repository](https://github.com/mr-u0b0dy/audio-ninja)
 
 ## License
 

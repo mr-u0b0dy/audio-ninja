@@ -43,10 +43,18 @@ cargo run -p audio-ninja-cli --release -- status
 - make run-gui - launch Tauri GUI
 
 ## Documentation
-- Daemon quick start: [crates/daemon/README.md](crates/daemon/README.md)
-- CLI usage: [crates/cli/README.md](crates/cli/README.md)
-- REST examples and workflow: [docs/](docs)
-- VuePress docs site: [docs-site/src/](docs-site/src)
+
+### Quick Links
+- 📖 **[Full Documentation Site](docs-site/)** - Complete VuePress site with guides and API reference
+- 🚀 **[Quick Start Guide](docs-site/src/guide/quick-start.md)** - Get up and running in 5 minutes
+- 🎯 **[Installation Guide](docs-site/src/guide/installation.md)** - Platform-specific setup
+- 🔌 **[REST API Reference](docs-site/src/api/reference.md)** - Complete API documentation
+- 🎨 **[GUI Design System](docs-site/src/design/design-system.md)** - Design guidelines and CSS components
+
+### Component Documentation
+- **Daemon**: [crates/daemon/README.md](crates/daemon/README.md) - REST API service
+- **CLI**: [crates/cli/README.md](crates/cli/README.md) - Command-line interface
+- **Core**: [crates/core/](crates/core/) - Audio processing library
 
 ## Status
 - Completed: IAMF pipeline, VBAP/HOA/HRTF, calibration + DSP, UDP/RTP transport, CLI/GUI clients
@@ -64,7 +72,7 @@ cargo run -p audio-ninja-cli --release -- status
 - **Calibration UI**: Sweep controls, IR visualization, filter design preview
 - **Stats Dashboard**: Real-time metrics (latency, packet loss, sync error, CPU/memory)
 
-See [docs-site/GUI_PHASE2_TASKS.md](docs-site/GUI_PHASE2_TASKS.md) for 43 implementation tasks.
+See [docs-site/src/design/phase2-tasks.md](docs-site/src/design/phase2-tasks.md) for 43 implementation tasks.
 
 ### Phase 3: Backend Audio I/O Implementation (3-4 months, 95-135 hours)
 Production-ready trait-based abstraction ready for real audio backends
@@ -75,7 +83,7 @@ Production-ready trait-based abstraction ready for real audio backends
 - **FFmpeg Codec Support**: Opus, AAC, FLAC, AC-3, E-AC-3, TrueHD decoding (25-35 hours)
 - **Testing & Optimization**: Unit/integration tests, latency profiling, cross-platform validation (15-20 hours)
 
-See [.github/copilot-instructions.md](.github/copilot-instructions.md#phase-3-backend-audio-io-implementation-production-ready-backend-audio-io-implementation-production-ready) for detailed implementation plan.
+See [.github/copilot-instructions.md](.github/copilot-instructions.md#phase-3-backend-audio-io-implementation-production-ready) for detailed implementation plan.
 
 ## License
 
