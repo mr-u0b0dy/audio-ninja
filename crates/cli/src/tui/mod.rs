@@ -3,7 +3,7 @@
 //! Terminal User Interface (TUI) module using Ratatui
 
 pub mod app;
-pub mod ui;
 pub mod handler;
+pub mod ui;
 
 pub use app::App;

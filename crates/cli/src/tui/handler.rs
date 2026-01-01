@@ -2,8 +2,8 @@
 
 //! Input handling for the TUI
 
-use crossterm::event::{self, Event, KeyCode};
 use super::app::App;
+use crossterm::event::{self, Event, KeyCode};
 
 pub async fn handle_input(app: &mut App) -> bool {
     if crossterm::event::poll(std::time::Duration::from_millis(250)).unwrap_or(false) {

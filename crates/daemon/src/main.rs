@@ -76,7 +76,10 @@ async fn main() -> Result<()> {
         .route("/api/v1/transport/status", get(api::transport_status))
         .route("/api/v1/transport/load-file", post(api::load_audio_file))
         .route("/api/v1/transport/mode", post(api::set_transport_mode))
-        .route("/api/v1/transport/playback-status", get(api::playback_status))
+        .route(
+            "/api/v1/transport/playback-status",
+            get(api::playback_status),
+        )
         // Input/Output management
         .route("/api/v1/input/devices", get(api::list_input_devices))
         .route("/api/v1/input/select", post(api::select_input_source))

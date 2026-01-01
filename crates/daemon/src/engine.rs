@@ -205,7 +205,12 @@ impl EngineState {
         self.input_manager
             .enumerate_devices()
             .map_err(|e| e.to_string())
-            .map(|devices| devices.iter().map(|d| format!("{} ({})", d.name, d.device_type)).collect())
+            .map(|devices| {
+                devices
+                    .iter()
+                    .map(|d| format!("{} ({})", d.name, d.device_type))
+                    .collect()
+            })
     }
 
     /// Enumerate all output devices
@@ -213,7 +218,12 @@ impl EngineState {
         self.output_manager
             .enumerate_devices()
             .map_err(|e| e.to_string())
-            .map(|devices| devices.iter().map(|d| format!("{} ({})", d.name, d.device_type)).collect())
+            .map(|devices| {
+                devices
+                    .iter()
+                    .map(|d| format!("{} ({})", d.name, d.device_type))
+                    .collect()
+            })
     }
 
     /// Select input source (system audio, external device, or app)

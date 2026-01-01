@@ -3,11 +3,11 @@
 //! UI rendering logic
 
 use ratatui::{
-    Frame,
     layout::{Alignment, Constraint, Direction, Layout, Rect},
     style::{Color, Modifier, Style},
     text::{Line, Span},
     widgets::{Block, Borders, Paragraph, Tabs, Wrap},
+    Frame,
 };
 
 use super::app::{App, Screen};
@@ -32,7 +32,15 @@ pub fn draw(f: &mut Frame, app: &App) {
 }
 
 fn draw_header(f: &mut Frame, area: Rect, app: &App) {
-    let screens = vec!["Dashboard", "Speakers", "Layout", "Transport", "Input", "Output", "Calibration"];
+    let screens = vec![
+        "Dashboard",
+        "Speakers",
+        "Layout",
+        "Transport",
+        "Input",
+        "Output",
+        "Calibration",
+    ];
     let current = match app.current_screen {
         Screen::Dashboard => 0,
         Screen::Speakers => 1,
@@ -44,7 +52,11 @@ fn draw_header(f: &mut Frame, area: Rect, app: &App) {
     };
 
     let tabs = Tabs::new(screens)
-        .block(Block::default().borders(Borders::BOTTOM).title("Audio Ninja"))
+        .block(
+            Block::default()
+                .borders(Borders::BOTTOM)
+                .title("Audio Ninja"),
+        )
         .select(current)
         .style(Style::default().fg(Color::White))
         .highlight_style(

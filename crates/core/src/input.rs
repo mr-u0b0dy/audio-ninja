@@ -43,9 +43,7 @@ pub enum InputError {
 #[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
 pub enum InputSource {
     /// System audio loopback device (captures all system audio)
-    System {
-        device_name: String,
-    },
+    System { device_name: String },
 
     /// Application-specific audio routing (Phase 2)
     Application {

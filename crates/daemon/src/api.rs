@@ -272,8 +272,9 @@ pub async fn list_input_devices(State(state): State<AppState>) -> Json<Vec<Input
                 let parts: Vec<&str> = d.split(" (").collect();
                 InputDeviceInfo {
                     id: d.clone(),
-                    name: parts.get(0).map(|s| s.to_string()).unwrap_or_default(),
-                    device_type: parts.get(1)
+                    name: parts.first().map(|s| s.to_string()).unwrap_or_default(),
+                    device_type: parts
+                        .get(1)
                         .map(|s| s.trim_end_matches(')').to_string())
                         .unwrap_or_default(),
                     max_channels: 2,
@@ -298,8 +299,9 @@ pub async fn list_output_devices(State(state): State<AppState>) -> Json<Vec<Outp
                 let parts: Vec<&str> = d.split(" (").collect();
                 OutputDeviceInfo {
                     id: format!("output_{}", idx),
-                    name: parts.get(0).map(|s| s.to_string()).unwrap_or_default(),
-                    device_type: parts.get(1)
+                    name: parts.first().map(|s| s.to_string()).unwrap_or_default(),
+                    device_type: parts
+                        .get(1)
                         .map(|s| s.trim_end_matches(')').to_string())
                         .unwrap_or_default(),
                     max_channels: 2,

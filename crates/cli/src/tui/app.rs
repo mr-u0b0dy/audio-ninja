@@ -19,11 +19,13 @@ pub enum Screen {
 pub struct App {
     pub running: bool,
     pub current_screen: Screen,
+    #[allow(dead_code)]
     pub base_url: String,
     pub status: Option<Value>,
     pub speakers: Option<Value>,
     pub layout: Option<Value>,
     pub transport_status: Option<Value>,
+    #[allow(dead_code)]
     pub playback_status: Option<Value>,
     pub input_devices: Option<Value>,
     pub input_status: Option<Value>,
@@ -93,10 +95,12 @@ impl App {
         self.selected_index = self.selected_index.saturating_sub(1);
     }
 
+    #[allow(dead_code)]
     pub fn clear_error(&mut self) {
         self.error_message = None;
     }
 
+    #[allow(dead_code)]
     pub fn set_error(&mut self, error: String) {
         self.error_message = Some(error);
     }

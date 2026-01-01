@@ -252,9 +252,10 @@ impl OutputManager {
             .ok_or_else(|| OutputError::DeviceNotFound(device_id.to_string()))?;
 
         if !device.available {
-            return Err(OutputError::DeviceNotFound(
-                format!("Device {} is not available", device_id),
-            ));
+            return Err(OutputError::DeviceNotFound(format!(
+                "Device {} is not available",
+                device_id
+            )));
         }
 
         self.active_device = Some(device.clone());
