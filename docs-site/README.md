@@ -195,21 +195,22 @@ flowchart TD
 
 ### Color Palette
 
-Current palette (Indigo/Purple/Rose):
-- Primary (Indigo): #4F46E5
-- Accent (Purple): #9333EA
-- Highlight (Rose): #F43F5E
-- Ink: #0B1120
-- Surface: #E5E7EB
+Current palette (Dark Orange/Magma theme):
+- Void Black (Background): #050203
+- Deep Bronze (Cards/Sidebars): #26140D
+- Magma Orange (Primary): #E65100
+- Neon Amber (Accents): #FF8C00
+- Blade Glow (Highlights): #FFD580
+- Mist White (Text): #F5F5F5
 
 Update `src/.vuepress/config.ts` if you need to change it:
 
 ```typescript
 theme: hopeTheme({
   themeColor: {
-    "#4F46E5": "Indigo",
-    "#9333EA": "Purple",
-    "#F43F5E": "Rose",
+    "#E65100": "Magma Orange",
+    "#FF8C00": "Neon Amber",
+    "#FFD580": "Blade Glow",
   },
 })
 ```

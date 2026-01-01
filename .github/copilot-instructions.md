@@ -95,17 +95,18 @@ Example GitHub Actions cache:
   - `palette.scss` - Theme color variables
   - `index.scss` - Custom styles and CSS variables
 
-**Current Color Scheme** (Indigo/Purple/Rose):
-- **Primary (Indigo)**: #4F46E5 - Main theme color for links, buttons, interactive elements
-- **Accent (Purple)**: #9333EA - Sidebar highlights, badges, secondary accents
-- **Highlight (Rose)**: #F43F5E - Warning states, emphasis, accent highlights
-- **Ink**: #0B1120 - Text color for headings
-- **Surface**: #E5E7EB - Background surface color
+**Current Color Scheme** (Dark Orange/Magma Theme):
+- **Void Black** (#050203): Main page background
+- **Deep Bronze** (#26140D): Card backgrounds, footers, sidebars
+- **Magma Orange** (#E65100): Primary buttons, CTAs - Main theme color for links and interactive elements
+- **Neon Amber** (#FF8C00): Hover states, icons, gradients - Sidebar highlights, badges, secondary accents
+- **Blade Glow** (#FFD580): Text highlights, glowing borders - Accent highlights
+- **Mist White** (#F5F5F5): Primary body text and headings
 
 To change colors, update:
 1. `src/.vuepress/config.ts` - `themeColor` object for picker
 2. `src/.vuepress/styles/palette.scss` - SCSS `$theme-color`, `$sidebar-active-color`, `$badge-*` variables
-3. `src/.vuepress/styles/index.scss` - CSS custom properties `--brand-*`
+3. `src/.vuepress/styles/index.scss` - CSS custom properties `--accent-*` and `--bg-*`
 
 **Building Documentation**:
 ```bash
