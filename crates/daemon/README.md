@@ -177,6 +177,29 @@ curl -X POST http://127.0.0.1:8080/api/v1/speakers/discover
 curl http://127.0.0.1:8080/api/v1/speakers
 ```
 
+## Future Plans
+
+### Phase 2: GUI Enhancement (5 weeks)
+The daemon API is production-ready. Phase 2 focuses on expanding GUI capabilities:
+- I/O device selection and routing
+- Transport mode controls (file/stream/mixed)
+- Real-time stats dashboard
+- Layout visualization
+
+No daemon changes required for Phase 2 — all endpoints are functional.
+
+### Phase 3: Audio Backend Implementation (3-4 months)
+The daemon currently supports the architecture layer. Phase 3 adds real audio I/O backends:
+
+**ALSA** (Linux): Real PCM I/O via ALSA device drivers  
+**PulseAudio**: System audio routing and app-specific routing  
+**CoreAudio** (macOS): Native macOS audio system integration  
+**FFmpeg**: Multi-codec support (Opus, AAC, FLAC, AC-3, E-AC-3, TrueHD)  
+
+These bindings will connect to the existing `InputManager`/`OutputManager` traits in `crates/core/`.
+
+See [../../.github/copilot-instructions.md](../../.github/copilot-instructions.md#phase-3-backend-audio-io-implementation-production-ready) for detailed breakdown.
+
 ## License
 
 Apache-2.0

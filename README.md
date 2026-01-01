@@ -52,6 +52,31 @@ cargo run -p audio-ninja-cli --release -- status
 - Completed: IAMF pipeline, VBAP/HOA/HRTF, calibration + DSP, UDP/RTP transport, CLI/GUI clients
 - In progress: libiamf/AOM integration, FFmpeg bindings, expanded GUI features
 
+## Future Plans
+
+### Phase 2: GUI Refactoring & Branding (5 weeks, 40-50 hours)
+✅ **Architecture Complete & Production-Ready** — All backend dependencies ready for frontend work
+
+- **Logo & Theme**: Integrate professional logo (assets/logo.png) with Magma Orange color scheme
+- **I/O Controls**: Device selection panels, audio source routing
+- **Transport Panel**: File loading, play/pause/stop, mode selection (file/stream/mixed)
+- **Layout Visualization**: 3D speaker layout with preset configurations (2.0 → 9.1.6)
+- **Calibration UI**: Sweep controls, IR visualization, filter design preview
+- **Stats Dashboard**: Real-time metrics (latency, packet loss, sync error, CPU/memory)
+
+See [docs-site/GUI_PHASE2_TASKS.md](docs-site/GUI_PHASE2_TASKS.md) for 43 implementation tasks.
+
+### Phase 3: Backend Audio I/O Implementation (3-4 months, 95-135 hours)
+Production-ready trait-based abstraction ready for real audio backends
+
+- **ALSA Bindings** (Linux): PCM device I/O, device enumeration, format negotiation (20-30 hours)
+- **PulseAudio Bindings**: System audio routing, app-specific routing, fallback handling (15-20 hours)
+- **CoreAudio Bindings** (macOS): HAL device abstraction, device detection (20-30 hours)
+- **FFmpeg Codec Support**: Opus, AAC, FLAC, AC-3, E-AC-3, TrueHD decoding (25-35 hours)
+- **Testing & Optimization**: Unit/integration tests, latency profiling, cross-platform validation (15-20 hours)
+
+See [.github/copilot-instructions.md](.github/copilot-instructions.md#phase-3-backend-audio-io-implementation-production-ready) for detailed implementation plan.
+
 ## License
 
 Apache License 2.0. See LICENSE for details.

@@ -157,3 +157,26 @@ audio-ninja --help
 audio-ninja speaker --help
 audio-ninja transport --help
 ```
+
+## Future Plans
+
+### Phase 2: Enhanced TUI/Commands (5 weeks)
+Expanding CLI capabilities to match GUI feature set:
+
+- **I/O Management**: `audio-ninja input list/select`, `audio-ninja output list/select`
+- **Advanced Transport**: File loading, streaming mode selection, progress tracking
+- **Real-Time Stats**: Enhanced stats screen with latency, packet loss, sync metrics
+- **Layout Visualization**: ASCII art layout preview in TUI
+- **Calibration Control**: Sweep generation, IR analysis commands
+
+See [TUI_GUIDE.md](TUI_GUIDE.md) for interactive terminal UI design.
+
+### Phase 3: Audio Backend Commands (3-4 months)
+Phase 3 backend work will add new commands for:
+
+- Device capability reporting (formats, sample rates, latencies)
+- Backend selection (ALSA, PulseAudio, CoreAudio, etc.)
+- Real-time audio metrics (CPU usage, buffer underruns)
+- Codec/format testing and validation
+
+All new commands will follow the existing CLI pattern with JSON output for scripting.
