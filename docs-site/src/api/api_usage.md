@@ -687,5 +687,5 @@ done
 
 - [Daemon README](../crates/daemon/README.md) - Daemon overview and setup
 - [CLI README](../crates/cli/README.md) - Command-line interface usage
-- [API Reference](../crates/daemon/API.md) - Complete endpoint documentation
+- [API Reference](../api.md) - Complete endpoint documentation
 - [OpenAPI Spec](../crates/daemon/openapi.yaml) - Machine-readable API specification

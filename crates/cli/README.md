@@ -169,7 +169,7 @@ Expanding CLI capabilities to match GUI feature set:
 - **Layout Visualization**: ASCII art layout preview in TUI
 - **Calibration Control**: Sweep generation, IR analysis commands
 
-See [TUI_GUIDE.md](TUI_GUIDE.md) for interactive terminal UI design.
+See [tui-guide.md](../../docs-site/tui-guide.md) for interactive terminal UI design.
 
 ### Phase 3: Audio Backend Commands (3-4 months)
 Phase 3 backend work will add new commands for:
