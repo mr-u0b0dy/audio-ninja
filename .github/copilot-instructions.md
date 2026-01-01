@@ -105,19 +105,15 @@ Example GitHub Actions cache:
 
 **Setting Theme Colors** (VuePress Theme Hope):
 
-Theme color is defined in `src/.vuepress/styles/config.scss` using the `$theme-color` variable.
+The theme color is configured in `src/.vuepress/styles/config.scss` through the `$theme-color` variable. You can set it in various ways:
 
-Single color (simple):
+**Single color (default):**
 ```scss
 $theme-color: #E65100;
 ```
 
-Multiple colors (enables theme color picker):
-```scss
-$theme-color: #E65100, #FF8C00, #FFD580;
-```
-
-Light/dark mode support:
+**Light and dark mode support:**
+You can set different colors for light mode and dark mode:
 ```scss
 $theme-color: (
   light: #E65100,
@@ -125,7 +121,14 @@ $theme-color: (
 );
 ```
 
-Mixed multiple colors with light/dark modes:
+**Multiple colors (enables theme color picker):**
+If you set multiple theme colors, the first color becomes the default, and the theme provides a color picker:
+```scss
+$theme-color: #E65100, #FF8C00, #FFD580;
+```
+
+**Mixed multiple colors with light/dark modes:**
+You can explicitly specify colors for light and dark modes for one or more theme colors:
 ```scss
 $theme-color: (
   (
@@ -138,7 +141,7 @@ $theme-color: (
 ```
 
 **To change colors, update:**
-1. `src/.vuepress/styles/config.scss` - Set `$theme-color` variable (primary theme color)
+1. `src/.vuepress/styles/config.scss` - Set `$theme-color` variable (primary theme color, supports single, multiple, and light/dark modes)
 2. `src/.vuepress/styles/palette.scss` - Update `$sidebar-active-color`, `$badge-tip-color`, `$badge-warning-color`
 3. `src/.vuepress/styles/index.scss` - Update CSS custom properties `--accent-*`, `--bg-*`, `--text-*`
 4. `src/.vuepress/config.ts` - Update `themeColor` object labels for picker display
