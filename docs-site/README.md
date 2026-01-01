@@ -1,5 +1,11 @@
 # Audio Ninja Documentation Site (VuePress + Theme Hope)
 
+<div align="center">
+
+![Audio Ninja Logo](../assets/logo.png)
+
+</div>
+
 VuePress documentation site for Audio Ninja wireless immersive audio platform.
 
 ## Setup
