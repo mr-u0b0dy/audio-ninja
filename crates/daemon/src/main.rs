@@ -74,6 +74,16 @@ async fn main() -> Result<()> {
         .route("/api/v1/transport/pause", post(api::transport_pause))
         .route("/api/v1/transport/stop", post(api::transport_stop))
         .route("/api/v1/transport/status", get(api::transport_status))
+        .route("/api/v1/transport/load-file", post(api::load_audio_file))
+        .route("/api/v1/transport/mode", post(api::set_transport_mode))
+        .route("/api/v1/transport/playback-status", get(api::playback_status))
+        // Input/Output management
+        .route("/api/v1/input/devices", get(api::list_input_devices))
+        .route("/api/v1/input/select", post(api::select_input_source))
+        .route("/api/v1/input/status", get(api::input_status))
+        .route("/api/v1/output/devices", get(api::list_output_devices))
+        .route("/api/v1/output/select", post(api::select_output_device))
+        .route("/api/v1/output/status", get(api::output_status))
         // Calibration
         .route("/api/v1/calibration/start", post(api::calibration_start))
         .route("/api/v1/calibration/status", get(api::calibration_status))

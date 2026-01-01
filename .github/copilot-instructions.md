@@ -305,3 +305,28 @@ npm run docs:clean     # Clear cache
 17. **IAMF decoder**: Integrate libiamf/AOM reference implementation
 18. **ARM/embedded**: Configure cross-compilation targets
 19. **Demo applications**: Example projects using the daemon API
+
+### Audio I/O & Streaming (In Progress)
+- 🚧 **Local Audio Output**: ALSA/PulseAudio backend for speaker and headphone playback with device abstraction and format negotiation
+- 🚧 **Audio Input Capture**: Multi-source input with system audio loopback, application-specific routing, and external device support
+- 🚧 **Input Source Management**: Support for System Audio, Application Audio (app-specific routing with fallback to loopback), and External Devices (microphone, line-in, USB)
+- 🚧 **Input→Render→Output Pipeline**: Dual-direction I/O integration with capture thread pool, source routing, and per-frame latency compensation
+- 🚧 **File Playback + Live Streaming**: Daemon support for loading audio files and simultaneous live input capture with user-selectable mixing modes (file-only, stream-only, mixed)
+- 🚧 **REST API Extensions**: Input/output device enumeration, source selection, transport mode control, and real-time I/O status monitoring
+- 🚧 **CLI/TUI Input/Output Controls**: Device discovery commands, source selection UI, playback progress tracking, and input level meters
+- 🚧 **Latency Management**: Real-time capture→render→output with <50ms target latency, jitter buffer tuning, and documented latency specs
+- 🚧 **Spatial Audio Test Content**: Download reference IAMF/HOA test files for validation of binaural, VBAP, and multi-channel rendering
+
+**Architecture Details**:
+- **crates/core/src/output.rs**: Device abstraction with ALSA/PulseAudio backends, playback stream management, format negotiation
+- **crates/core/src/input.rs**: Input source enum (System/Application/External), capture callbacks, device enumeration, source routing
+- **crates/daemon/src/engine.rs**: PlaybackDevice, InputSource, and stream state management; capture thread pool integration
+- **crates/daemon/src/api.rs**: Endpoints for GET /api/v1/input/devices, POST /api/v1/input/select, GET /api/v1/output/devices, POST /api/v1/transport/load-file
+- **crates/cli/src/main.rs**: Commands for `audio-ninja input list`, `audio-ninja input select`, `audio-ninja output list`, `audio-ninja transport mode`
+- **crates/cli/src/tui/ui.rs**: Input/output device panels, source selection menu, playback progress bar, input level visualization
+
+**Further Considerations**:
+- **Mixing Strategy**: File playback pauses during live input capture (simplest) vs. automatic mixing at configurable levels vs. user-selectable mode toggle (implemented user-selectable)
+- **App-Level Routing**: Initial MVP targets loopback (system audio) + external devices; per-app routing deferred to Phase 2 with PulseAudio module scripting
+- **Latency Target**: Real-time streaming with <50ms capture→render→output latency; jitter buffer tuning required for variable network conditions
+- **Dependencies**: Add alsa-sys or pulse-binding for audio I/O; evaluate cpal for cross-platform abstraction (Linux/macOS/Windows support)

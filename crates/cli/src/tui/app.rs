@@ -10,6 +10,8 @@ pub enum Screen {
     Speakers,
     Layout,
     Transport,
+    Input,
+    Output,
     Calibration,
 }
 
@@ -22,6 +24,11 @@ pub struct App {
     pub speakers: Option<Value>,
     pub layout: Option<Value>,
     pub transport_status: Option<Value>,
+    pub playback_status: Option<Value>,
+    pub input_devices: Option<Value>,
+    pub input_status: Option<Value>,
+    pub output_devices: Option<Value>,
+    pub output_status: Option<Value>,
     pub calibration_status: Option<Value>,
     pub stats: Option<Value>,
     pub error_message: Option<String>,
@@ -38,6 +45,11 @@ impl App {
             speakers: None,
             layout: None,
             transport_status: None,
+            playback_status: None,
+            input_devices: None,
+            input_status: None,
+            output_devices: None,
+            output_status: None,
             calibration_status: None,
             stats: None,
             error_message: None,
@@ -54,7 +66,9 @@ impl App {
             Screen::Dashboard => Screen::Speakers,
             Screen::Speakers => Screen::Layout,
             Screen::Layout => Screen::Transport,
-            Screen::Transport => Screen::Calibration,
+            Screen::Transport => Screen::Input,
+            Screen::Input => Screen::Output,
+            Screen::Output => Screen::Calibration,
             Screen::Calibration => Screen::Dashboard,
         };
     }
@@ -65,7 +79,9 @@ impl App {
             Screen::Speakers => Screen::Dashboard,
             Screen::Layout => Screen::Speakers,
             Screen::Transport => Screen::Layout,
-            Screen::Calibration => Screen::Transport,
+            Screen::Input => Screen::Transport,
+            Screen::Output => Screen::Input,
+            Screen::Calibration => Screen::Output,
         };
     }
 

@@ -32,13 +32,15 @@ pub fn draw(f: &mut Frame, app: &App) {
 }
 
 fn draw_header(f: &mut Frame, area: Rect, app: &App) {
-    let screens = vec!["Dashboard", "Speakers", "Layout", "Transport", "Calibration"];
+    let screens = vec!["Dashboard", "Speakers", "Layout", "Transport", "Input", "Output", "Calibration"];
     let current = match app.current_screen {
         Screen::Dashboard => 0,
         Screen::Speakers => 1,
         Screen::Layout => 2,
         Screen::Transport => 3,
-        Screen::Calibration => 4,
+        Screen::Input => 4,
+        Screen::Output => 5,
+        Screen::Calibration => 6,
     };
 
     let tabs = Tabs::new(screens)
@@ -60,6 +62,8 @@ fn draw_content(f: &mut Frame, area: Rect, app: &App) {
         Screen::Speakers => draw_speakers(f, area, app),
         Screen::Layout => draw_layout(f, area, app),
         Screen::Transport => draw_transport(f, area, app),
+        Screen::Input => draw_input(f, area, app),
+        Screen::Output => draw_output(f, area, app),
         Screen::Calibration => draw_calibration(f, area, app),
     }
 }
@@ -280,4 +284,135 @@ fn draw_footer(f: &mut Frame, area: Rect, app: &App) {
         .alignment(Alignment::Left);
 
     f.render_widget(footer, area);
+}
+fn draw_input(f: &mut Frame, area: Rect, app: &App) {
+    let block = Block::default()
+        .title("Input Devices & Sources")
+        .borders(Borders::ALL)
+        .style(Style::default().fg(Color::Cyan));
+
+    let inner = block.inner(area);
+    f.render_widget(block, area);
+
+    let chunks = Layout::default()
+        .direction(Direction::Vertical)
+        .margin(1)
+        .constraints([Constraint::Percentage(50), Constraint::Percentage(50)].as_ref())
+        .split(inner);
+
+    // Input devices list
+    let mut devices_text = vec![Line::from(Span::styled(
+        "Available Input Devices",
+        Style::default()
+            .fg(Color::Green)
+            .add_modifier(Modifier::BOLD),
+    ))];
+
+    if let Some(devices) = &app.input_devices {
+        devices_text.push(Line::from(format!("{}", devices)));
+    } else {
+        devices_text.push(Line::from(Span::styled(
+            "System Audio Loopback (default)",
+            Style::default().fg(Color::Yellow),
+        )));
+        devices_text.push(Line::from(Span::styled(
+            "External Microphone",
+            Style::default().fg(Color::White),
+        )));
+    }
+
+    let devices_para = Paragraph::new(devices_text)
+        .block(Block::default().borders(Borders::LEFT))
+        .wrap(Wrap { trim: true });
+    f.render_widget(devices_para, chunks[0]);
+
+    // Current input status
+    let mut status_text = vec![Line::from(Span::styled(
+        "Current Input Source",
+        Style::default()
+            .fg(Color::Green)
+            .add_modifier(Modifier::BOLD),
+    ))];
+
+    if let Some(status) = &app.input_status {
+        status_text.push(Line::from(format!("{}", status)));
+    } else {
+        status_text.push(Line::from(Span::styled(
+            "No input source active",
+            Style::default().fg(Color::Yellow),
+        )));
+    }
+
+    let status_para = Paragraph::new(status_text)
+        .block(Block::default().borders(Borders::LEFT))
+        .wrap(Wrap { trim: true });
+    f.render_widget(status_para, chunks[1]);
+}
+
+fn draw_output(f: &mut Frame, area: Rect, app: &App) {
+    let block = Block::default()
+        .title("Output Devices")
+        .borders(Borders::ALL)
+        .style(Style::default().fg(Color::Cyan));
+
+    let inner = block.inner(area);
+    f.render_widget(block, area);
+
+    let chunks = Layout::default()
+        .direction(Direction::Vertical)
+        .margin(1)
+        .constraints([Constraint::Percentage(50), Constraint::Percentage(50)].as_ref())
+        .split(inner);
+
+    // Output devices list
+    let mut devices_text = vec![Line::from(Span::styled(
+        "Available Output Devices",
+        Style::default()
+            .fg(Color::Green)
+            .add_modifier(Modifier::BOLD),
+    ))];
+
+    if let Some(devices) = &app.output_devices {
+        devices_text.push(Line::from(format!("{}", devices)));
+    } else {
+        devices_text.push(Line::from(Span::styled(
+            "Built-in Speaker",
+            Style::default().fg(Color::Yellow),
+        )));
+        devices_text.push(Line::from(Span::styled(
+            "Headphones (3.5mm jack)",
+            Style::default().fg(Color::White),
+        )));
+        devices_text.push(Line::from(Span::styled(
+            "HDMI Audio",
+            Style::default().fg(Color::White),
+        )));
+    }
+
+    let devices_para = Paragraph::new(devices_text)
+        .block(Block::default().borders(Borders::LEFT))
+        .wrap(Wrap { trim: true });
+    f.render_widget(devices_para, chunks[0]);
+
+    // Current output status
+    let mut status_text = vec![Line::from(Span::styled(
+        "Current Output Device",
+        Style::default()
+            .fg(Color::Green)
+            .add_modifier(Modifier::BOLD),
+    ))];
+
+    if let Some(status) = &app.output_status {
+        status_text.push(Line::from(format!("{}", status)));
+    } else {
+        status_text.push(Line::from(Span::styled(
+            "Built-in Speaker",
+            Style::default().fg(Color::Yellow),
+        )));
+    }
+
+    let status_para = Paragraph::new(status_text)
+        .block(Block::default().borders(Borders::LEFT))
+        .wrap(Wrap { trim: true });
+    f.render_widget(status_para, chunks[1]);
 }

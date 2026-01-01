@@ -45,6 +45,14 @@ enum Commands {
     #[command(subcommand)]
     Transport(TransportCommands),
 
+    /// Input device management
+    #[command(subcommand)]
+    Input(InputCommands),
+
+    /// Output device management
+    #[command(subcommand)]
+    Output(OutputCommands),
+
     /// Calibration
     #[command(subcommand)]
     Calibration(CalibrationCommands),
@@ -104,6 +112,48 @@ enum TransportCommands {
     Stop,
 
     /// Show transport status
+    Status,
+
+    /// Load audio file for playback
+    LoadFile {
+        /// Path to audio file
+        file_path: String,
+    },
+
+    /// Set transport mode (file/stream/mixed)
+    Mode {
+        /// Transport mode: file (file playback only), stream (live input only), mixed (both)
+        mode: String,
+    },
+}
+
+#[derive(Subcommand, Debug)]
+enum InputCommands {
+    /// List all input devices
+    List,
+
+    /// Select input source (system audio or external device)
+    Select {
+        /// Source ID (system or device name)
+        source_id: String,
+    },
+
+    /// Show current input status
+    Status,
+}
+
+#[derive(Subcommand, Debug)]
+enum OutputCommands {
+    /// List all output devices
+    List,
+
+    /// Select output device (speaker or headphones)
+    Select {
+        /// Device ID
+        device_id: String,
+    },
+
+    /// Show current output status
     Status,
 }
 
@@ -261,6 +311,54 @@ async fn main() -> Result<()> {
 
             TransportCommands::Status => {
                 let status = client.get("/transport/status").await?;
+                println!("{}", serde_json::to_string_pretty(&status)?);
+            }
+
+            TransportCommands::LoadFile { file_path } => {
+                let body = serde_json::json!({ "file_path": file_path });
+                client.post("/transport/load-file", Some(body)).await?;
+                println!("Audio file loaded: {}", file_path);
+            }
+
+            TransportCommands::Mode { mode } => {
+                let body = serde_json::json!({ "mode": mode });
+                client.post("/transport/mode", Some(body)).await?;
+                println!("Transport mode set to: {}", mode);
+            }
+        },
+
+        Commands::Input(cmd) => match cmd {
+            InputCommands::List => {
+                let devices = client.get("/input/devices").await?;
+                println!("{}", serde_json::to_string_pretty(&devices)?);
+            }
+
+            InputCommands::Select { source_id } => {
+                let body = serde_json::json!({ "source_id": source_id });
+                client.post("/input/select", Some(body)).await?;
+                println!("Input source selected: {}", source_id);
+            }
+
+            InputCommands::Status => {
+                let status = client.get("/input/status").await?;
+                println!("{}", serde_json::to_string_pretty(&status)?);
+            }
+        },
+
+        Commands::Output(cmd) => match cmd {
+            OutputCommands::List => {
+                let devices = client.get("/output/devices").await?;
+                println!("{}", serde_json::to_string_pretty(&devices)?);
+            }
+
+            OutputCommands::Select { device_id } => {
+                let body = serde_json::json!({ "device_id": device_id });
+                client.post("/output/select", Some(body)).await?;
+                println!("Output device selected: {}", device_id);
+            }
+
+            OutputCommands::Status => {
+                let status = client.get("/output/status").await?;
                 println!("{}", serde_json::to_string_pretty(&status)?);
             }
         },
