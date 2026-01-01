@@ -7,7 +7,8 @@ use audio_ninja::{
     vbap::{Speaker3D, Vbap3D, Vec3},
     AudioBlock,
 };
-use criterion::{black_box, criterion_group, criterion_main, BenchmarkId, Criterion};
+use criterion::{criterion_group, criterion_main, BenchmarkId, Criterion};
+use std::hint::black_box;
 
 // VBAP Renderer Benchmarks
 fn bench_vbap_stereo_render(c: &mut Criterion) {
