@@ -287,13 +287,14 @@ npm run docs:clean     # Clear cache
 4. ✅ **Update repository metadata**: Updated GitHub URLs to mr-u0b0dy
 5. ✅ **Tag v0.1.0 release**: Tagged baseline version
 
-### Medium Priority (Do Next)
+### Medium Priority (In Progress 🚧)
 6. ✅ **Add API documentation**: OpenAPI/Swagger spec for REST API endpoints
 7. ✅ **Create integration tests**: End-to-end daemon ↔ CLI tests
 8. ✅ **Optimize build**: Added Cargo profiles, reduced binaries to ~2-6 MB
 9. ✅ **Add benchmarks**: Track VBAP, loudness, Vec3 performance with `cargo bench`
 10. ✅ **Developer tooling**: Makefile, setup script, VS Code configs
-11. **Design proper icons**: Replace placeholder blue circles with real branding
+11. 🚧 **Audio I/O Architecture**: Complete input/output abstraction with 3 source types, manager pattern, 7 REST API endpoints, 18 tests ✅
+12. 🚧 **GUI Refactoring Phase 2**: Logo design, Magma theme, I/O controls, transport panel, visualization, stats (see GUI section below)
 
 ### Low Priority (Later)
 11. ✅ **Fuzz testing**: Added `cargo-fuzz` for IAMF/RTP parsers
@@ -306,7 +307,44 @@ npm run docs:clean     # Clear cache
 18. **ARM/embedded**: Configure cross-compilation targets
 19. **Demo applications**: Example projects using the daemon API
 
-### Audio I/O & Streaming (In Progress)
+### GUI Enhancement (In Progress) 
+- 🚧 **Professional Logo**: Design and integrate brand logo into UI
+- 🚧 **Dark Orange/Magma Theme**: Redesign color scheme to match documentation site
+- 🚧 **Audio I/O Controls**: Input/output device selection, source routing UI
+- 🚧 **Transport Controls**: Play/pause/stop, file loading, progress tracking
+- 🚧 **Layout Visualization**: Real-time speaker layout visualization and editing
+- 🚧 **Calibration Panel**: Room calibration UI with measurement controls
+- 🚧 **Stats Dashboard**: Real-time monitoring of streams, speakers, latency
+- 🚧 **Navigation Improvements**: Tab/panel system for organized feature access
+- 🚧 **Responsive Design**: Optimize for various screen sizes (laptop to UHD)
+- 🚧 **Theme Toggle**: Light/dark mode with persistent user preference
+
+**GUI Architecture**:
+- **Framework**: Tauri 1.5 (lightweight, Rust backend + web frontend)
+- **Frontend**: Vanilla JavaScript (no dependencies), HTML5, CSS3
+- **Color Scheme**: Dark Orange/Magma theme (see below)
+- **Components**: Modular panels, reusable controls, real-time updates
+- **Backend Integration**: REST API calls to daemon on port 8080
+
+**Current GUI Features**:
+- ✅ DRC (Dynamic Range Control) with presets
+- ✅ Loudness normalization (ITU-R BS.1770)
+- ✅ Headroom protection with lookahead limiting
+- ✅ HRTF binaural rendering configuration
+- ✅ Real-time spatial visualization canvas
+- ✅ Status panel with live metrics
+
+**Pending GUI Features** (Priority Order):
+1. **Logo Integration**: Display professional Audio Ninja logo in header
+2. **Color Scheme Redesign**: Apply dark orange/magma theme from docs-site
+3. **Input/Output Controls**: Device enumeration, source selection dropdowns
+4. **Transport Panel**: File loading, play/pause/stop, progress bar
+5. **Layout Editor**: Visual speaker layout with drag-drop or angle input
+6. **Calibration UI**: Room mic input, sweep controls, filter visualization
+7. **Stats Dashboard**: Speaker list, packet loss, latency, sync status
+8. **Navigation**: Tab system for [Status|Config|Input/Output|Transport|Layout|Calibration]
+
+### Audio I/O & Streaming (Completed)
 - 🚧 **Local Audio Output**: ALSA/PulseAudio backend for speaker and headphone playback with device abstraction and format negotiation
 - 🚧 **Audio Input Capture**: Multi-source input with system audio loopback, application-specific routing, and external device support
 - 🚧 **Input Source Management**: Support for System Audio, Application Audio (app-specific routing with fallback to loopback), and External Devices (microphone, line-in, USB)
@@ -330,3 +368,143 @@ npm run docs:clean     # Clear cache
 - **App-Level Routing**: Initial MVP targets loopback (system audio) + external devices; per-app routing deferred to Phase 2 with PulseAudio module scripting
 - **Latency Target**: Real-time streaming with <50ms capture→render→output latency; jitter buffer tuning required for variable network conditions
 - **Dependencies**: Add alsa-sys or pulse-binding for audio I/O; evaluate cpal for cross-platform abstraction (Linux/macOS/Windows support)
+
+## GUI Refactoring & Branding (Phase 2)
+
+**Objective**: Transform GUI from functional prototype to professional, polished audio workstation with integrated I/O controls, real-time visualization, and unified dark orange/magma branding.
+
+**Design System** (Magma/Dark Orange Theme):
+- **Primary Color**: Magma Orange (#E65100) - CTA buttons, active tabs, logo accents
+- **Secondary Color**: Neon Amber (#FF8C00) - Hover states, active toggles, icon highlights
+- **Background**: Void Black (#050203) - Main canvas
+- **Panel Background**: Deep Bronze (#26140D) - Card surfaces, sidebars, modals
+- **Text**: Mist White (#F5F5F5) - Body text, labels, headings
+- **Accent**: Blade Glow (#FFD580) - Progress bars, active sliders, highlight borders
+- **Status Colors**: Success Green (#4CAF50), Warning Yellow (#FFC107), Error Red (#F44336), Info Blue (#2196F3)
+
+**Logo Design Specifications**:
+- **Style**: Geometric audio waveform + ninja silhouette fusion
+- **Format**: SVG (scalable), PNG (raster fallback at 256x256px, 512x512px)
+- **Colors**: Magma Orange (#E65100) primary, Neon Amber (#FF8C00) accent, Mist White (#F5F5F5) highlights
+- **Usage**: Window title bar, splash screen, button icons, about dialog, documentation header
+- **Variants**: Full logo (horizontal), icon-only (square), monochrome (for dark/light backgrounds)
+- **Placement**: `/crates/gui/icons/audio-ninja-logo.svg` (primary), `/crates/gui/icons/audio-ninja-logo.png` (fallback)
+- **Tauri Integration**: Update `tauri.conf.json` icon paths to point to new logo SVG
+
+**CSS Refactoring Plan**:
+- **File**: `/crates/gui/public/style.css`
+- **Steps**:
+  1. Define CSS custom properties for Magma theme colors at `:root`
+  2. Update button styling: `background: var(--magma-orange)`, hover to `var(--neon-amber)`
+  3. Refactor panel backgrounds: Deep Bronze (#26140D)
+  4. Update text colors to Mist White (#F5F5F5)
+  5. Add glow effects: Blade Glow accent for active elements
+  6. Refactor gradients: Orange-to-bronze progression instead of blue-to-cyan
+  7. Add smooth transitions: 200ms ease-in-out for state changes
+  8. Update shadows: Dark shadows with Magma orange tints for visual depth
+  9. Test contrast ratios: WCAG AA compliance (4.5:1 text-to-background)
+
+**HTML Structure Updates** (`/crates/gui/public/index.html`):
+1. **Header Logo**: Add logo image or SVG in header before app title
+2. **Tab Navigation**: Update tab styling with Magma theme, add icons for each section
+3. **New Panels**:
+   - **Input/Output Panel**: Device selection dropdowns, source type toggles
+   - **Transport Panel**: File loader, play/pause/stop buttons, progress slider, mode selector
+   - **Layout Panel**: Speaker visualization canvas with 3D layout preview
+   - **Calibration Panel**: Sweep controls, IR visualization, filter design UI
+   - **Stats Panel**: Real-time metrics (CPU, memory, latency, packet loss, sync error)
+4. **Status Bar**: Add footer with connection status, network latency, speaker count
+
+**JavaScript Event Handlers** (`/crates/gui/public/app.js`):
+1. **I/O Device Management**:
+   - Load input devices via GET `/api/v1/input/devices`
+   - Load output devices via GET `/api/v1/output/devices`
+   - Handle device selection POST `/api/v1/input/select`, `/api/v1/output/select`
+   - Display device info (channels, sample rates, capabilities)
+   - Monitor availability (grayed out if unavailable)
+
+2. **Transport Controls**:
+   - File picker integration with POST `/api/v1/transport/load-file`
+   - Play/pause/stop button handlers with POST `/api/v1/transport/play`, etc.
+   - Progress slider sync with GET `/api/v1/transport/playback-status`
+   - Mode selector (file-only, stream-only, mixed) with POST `/api/v1/transport/mode`
+   - Display current file, duration, sample rate
+
+3. **Layout Visualization**:
+   - Canvas-based 3D speaker layout renderer
+   - Support 2.0, 2.1, 3.1, 4.0, 5.1, 5.1.2, 7.1, 7.1.4, 9.1.6 presets
+   - Drag-to-reposition speakers, angle/distance input fields
+   - Real-time VBAP test signal routing display
+
+4. **Calibration Interface**:
+   - Sweep generation UI (start/stop, frequency range, duration)
+   - Microphone input device selector
+   - IR curve visualization (magnitude + phase)
+   - Filter design preview (FIR/IIR parameter adjustment)
+   - Export to CamillaDSP format preview
+
+5. **Real-Time Stats Dashboard**:
+   - Speaker status table (name, address, latency, packet loss %)
+   - Network bandwidth usage graph (sent/received kbps)
+   - Latency histogram (min/max/mean/stddev across speakers)
+   - CPU/memory usage (daemon process stats)
+   - Sync error visualization (phase alignment across speakers)
+   - Live audio level meters (input, output, per-speaker)
+
+**Implementation Phases**:
+
+**Phase 2a** (Logo & Color Scheme):
+- [x] Design professional Audio Ninja logo (geometric audio + ninja style)
+- [ ] Create logo variants (full, icon-only, monochrome)
+- [ ] Update `/crates/gui/public/style.css` with Magma theme CSS variables
+- [ ] Refactor all existing panels to match new color scheme
+- [ ] Add smooth transitions and hover effects
+- [ ] Test on light/dark OS themes
+- [ ] Update Tauri config with new logo paths
+
+**Phase 2b** (I/O & Transport Panel):
+- [ ] Add HTML sections for Input/Output device panels
+- [ ] Fetch and populate device lists on app startup
+- [ ] Implement device selection dropdowns with real-time updates
+- [ ] Add Transport Panel with file loader, playback controls
+- [ ] Wire up REST API calls for all I/O operations
+- [ ] Add error handling and user feedback (toasts/alerts)
+- [ ] Test with multiple device scenarios
+
+**Phase 2c** (Visualization & Calibration):
+- [ ] Implement 3D speaker layout canvas with layout presets
+- [ ] Add layout editor (drag speakers, adjust angles)
+- [ ] Build calibration UI with sweep controls
+- [ ] Create IR curve visualization component
+- [ ] Add filter design preview (FIR impulse response)
+- [ ] Implement VBAP test routing display
+
+**Phase 2d** (Stats & Polish):
+- [ ] Build real-time stats dashboard with metrics
+- [ ] Add speaker status table with live updates
+- [ ] Implement CPU/memory monitoring
+- [ ] Create audio level meters (input, output, per-speaker)
+- [ ] Add connection quality indicators
+- [ ] Polish transitions, animations, responsive layout
+- [ ] Accessibility audit (keyboard navigation, screen reader support)
+- [ ] Cross-platform testing (Linux, macOS, Windows)
+
+**Testing Checklist**:
+- [ ] Logo renders correctly in all GUI contexts
+- [ ] Color contrast meets WCAG AA standards
+- [ ] All buttons are clickable and responsive
+- [ ] Device lists populate and update dynamically
+- [ ] Transport controls respond to API calls
+- [ ] Layout visualization renders at multiple resolutions
+- [ ] Stats dashboard updates in real-time (refresh rate 100ms)
+- [ ] No console errors in Tauri DevTools
+- [ ] App works with 0-8 speakers connected
+- [ ] Touch/trackpad friendly on laptop
+- [ ] Performance: <5% CPU idle, <100ms UI response time
+
+**Dependencies**:
+- No new Rust dependencies required (uses existing Tauri + REST API)
+- CSS: Pure CSS3 (no framework)
+- JavaScript: Vanilla JS (no libraries)
+- Graphics: Canvas API for 3D visualization (could add Three.js in future)
+- Consider: Chart.js for stats graphs, Tone.js for audio visualization
