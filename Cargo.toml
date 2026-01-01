@@ -46,7 +46,7 @@ tauri = { version = "1.5", features = ["shell-open"] }
 tauri-build = "1.5"
 
 # Other
-bincode = "3.0"
+bincode = "1.3"
 rand = "0.9"
 
 [profile.release]
