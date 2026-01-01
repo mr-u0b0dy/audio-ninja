@@ -199,8 +199,8 @@ impl HoaDecoder {
     }
 
     /// Decode a buffer of ambisonic audio
-    /// Input: \[channel\]\[sample\]
-    /// Output: \[speaker\]\[sample\]
+    /// Input: [channel][sample]
+    /// Output: [speaker][sample]
     pub fn decode_buffer(&self, input: &[Vec<f32>]) -> Vec<Vec<f32>> {
         assert_eq!(
             input.len(),

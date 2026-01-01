@@ -19,7 +19,7 @@ fn run_cli(args: &[&str]) -> std::process::Output {
 #[test]
 fn test_cli_help() {
     let output = run_cli(&["--help"]);
-
+    
     assert!(output.status.success());
     let stdout = String::from_utf8_lossy(&output.stdout);
     assert!(stdout.contains("Audio Ninja command-line interface"));
@@ -35,7 +35,7 @@ fn test_cli_help() {
 #[test]
 fn test_cli_version() {
     let output = run_cli(&["--version"]);
-
+    
     assert!(output.status.success());
     let stdout = String::from_utf8_lossy(&output.stdout);
     assert!(stdout.contains("audio-ninja"));
@@ -44,7 +44,7 @@ fn test_cli_version() {
 #[test]
 fn test_speaker_help() {
     let output = run_cli(&["speaker", "--help"]);
-
+    
     assert!(output.status.success());
     let stdout = String::from_utf8_lossy(&output.stdout);
     assert!(stdout.contains("Speaker management"));
@@ -58,7 +58,7 @@ fn test_speaker_help() {
 #[test]
 fn test_layout_help() {
     let output = run_cli(&["layout", "--help"]);
-
+    
     assert!(output.status.success());
     let stdout = String::from_utf8_lossy(&output.stdout);
     assert!(stdout.contains("Layout configuration"));
@@ -69,7 +69,7 @@ fn test_layout_help() {
 #[test]
 fn test_transport_help() {
     let output = run_cli(&["transport", "--help"]);
-
+    
     assert!(output.status.success());
     let stdout = String::from_utf8_lossy(&output.stdout);
     assert!(stdout.contains("Transport control"));
@@ -82,7 +82,7 @@ fn test_transport_help() {
 #[test]
 fn test_calibration_help() {
     let output = run_cli(&["calibration", "--help"]);
-
+    
     assert!(output.status.success());
     let stdout = String::from_utf8_lossy(&output.stdout);
     assert!(stdout.contains("Calibration"));
@@ -95,7 +95,7 @@ fn test_calibration_help() {
 fn test_daemon_url_flag() {
     // Test with non-existent daemon - should fail to connect but parse args correctly
     let output = run_cli(&["--daemon", "http://localhost:9999", "status"]);
-
+    
     // Should fail because daemon isn't running
     assert!(!output.status.success());
     let stderr = String::from_utf8_lossy(&output.stderr);
@@ -106,7 +106,7 @@ fn test_daemon_url_flag() {
 #[test]
 fn test_invalid_command() {
     let output = run_cli(&["invalid-command"]);
-
+    
     assert!(!output.status.success());
     let stderr = String::from_utf8_lossy(&output.stderr);
     assert!(stderr.contains("unrecognized subcommand") || stderr.contains("error"));
@@ -115,7 +115,7 @@ fn test_invalid_command() {
 #[test]
 fn test_speaker_get_requires_uuid() {
     let output = run_cli(&["speaker", "get"]);
-
+    
     assert!(!output.status.success());
     let stderr = String::from_utf8_lossy(&output.stderr);
     assert!(stderr.contains("required") || stderr.contains("argument"));
@@ -124,7 +124,7 @@ fn test_speaker_get_requires_uuid() {
 #[test]
 fn test_layout_set_requires_preset() {
     let output = run_cli(&["layout", "set"]);
-
+    
     assert!(!output.status.success());
     let stderr = String::from_utf8_lossy(&output.stderr);
     assert!(stderr.contains("required") || stderr.contains("argument"));

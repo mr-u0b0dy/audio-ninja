@@ -464,12 +464,10 @@ mod tests {
 
     #[test]
     fn test_headphone_profile_variants() {
-        let profiles = [
-            HeadphoneProfile::Flat,
+        let profiles = [HeadphoneProfile::Flat,
             HeadphoneProfile::ClosedBack,
             HeadphoneProfile::OpenBack,
-            HeadphoneProfile::IEM,
-        ];
+            HeadphoneProfile::IEM];
         assert_eq!(profiles.len(), 4);
     }
 
