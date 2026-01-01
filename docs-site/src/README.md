@@ -2,7 +2,7 @@
 home: true
 icon: home
 title: Audio Ninja
-heroImage: /logo.svg
+heroImage: /logo.png
 heroAlt: Audio Ninja Logo
 heroText: Audio Ninja
 tagline: Wireless Immersive Audio Platform with IAMF Support

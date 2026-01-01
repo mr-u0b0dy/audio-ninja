@@ -9,8 +9,7 @@
 
 ## Reporting a Vulnerability
 
-We take the security of Audio Ninja seriously. If you believe you have found a security 
-vulnerability, please report it to us responsibly.
+We take the security of Audio Ninja seriously. If you believe you have found a security vulnerability, please report it to us responsibly.
 
 ### How to Report
 

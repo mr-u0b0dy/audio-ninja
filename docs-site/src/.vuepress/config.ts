@@ -16,7 +16,7 @@ export default defineUserConfig({
   
   theme: hopeTheme({
     themeColor: { "#F05A22": "Orange" },
-    logo: "/logo.svg",
+    logo: "/logo.png",
     repo: "mr-u0b0dy/audio-ninja",
     repoLabel: "GitHub",
     docsDir: "src",
