@@ -13,7 +13,7 @@ export default defineUserConfig({
     ["meta", { name: "apple-mobile-web-app-capable", content: "yes" }],
     ["meta", { name: "apple-mobile-web-app-status-bar-style", content: "black" }],
   ],
-  
+
   theme: hopeTheme({
     themeColor: {
       "#E65100": "Magma Orange",
@@ -27,7 +27,7 @@ export default defineUserConfig({
     docsBranch: "docs/vuepress-theme-hope",
     editLink: true,
     editLinkPattern: ":repo/edit/:branch/:path",
-    
+
     navbar: [
       "/",
       {
@@ -70,7 +70,7 @@ export default defineUserConfig({
         link: "/api/",
       },
     ],
-    
+
     sidebar: {
       "/guide/": [
         {
@@ -124,10 +124,10 @@ export default defineUserConfig({
         },
       ],
     },
-    
+
     displayFooter: true,
     footer: "Apache 2.0 Licensed | Copyright © 2024-2025 Audio Ninja Contributors",
-    
+
     plugins: {
       shiki: {
         lineNumbers: false,

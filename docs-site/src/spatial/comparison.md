@@ -4,17 +4,17 @@ Comprehensive comparison of Audio Ninja's three spatial rendering algorithms.
 
 ## Feature Comparison
 
-| Feature | VBAP | HOA | HRTF |
-|---------|------|-----|------|
-| **Best For** | Localized objects | Ambient soundfields | Headphone listening |
-| **Representation** | Vector panning | Spherical harmonics | Head transfer function |
-| **Source Type** | Object-based | Scene-based | Binaural stereo |
-| **Speaker Count** | 3+ (any config) | 5+ (recommended) | 2 (stereo) |
-| **Localization** | Sharp, precise | Smooth, natural | 3D via headphones |
-| **CPU Cost** | Low | Medium | Medium |
-| **Latency** | Very low | Low | Low |
-| **Elevation Support** | Yes | Yes | Yes |
-| **Arbitrary Layouts** | Yes | Yes | N/A |
+| Feature               | VBAP              | HOA                 | HRTF                   |
+| --------------------- | ----------------- | ------------------- | ---------------------- |
+| **Best For**          | Localized objects | Ambient soundfields | Headphone listening    |
+| **Representation**    | Vector panning    | Spherical harmonics | Head transfer function |
+| **Source Type**       | Object-based      | Scene-based         | Binaural stereo        |
+| **Speaker Count**     | 3+ (any config)   | 5+ (recommended)    | 2 (stereo)             |
+| **Localization**      | Sharp, precise    | Smooth, natural     | 3D via headphones      |
+| **CPU Cost**          | Low               | Medium              | Medium                 |
+| **Latency**           | Very low          | Low                 | Low                    |
+| **Elevation Support** | Yes               | Yes                 | Yes                    |
+| **Arbitrary Layouts** | Yes               | Yes                 | N/A                    |
 
 ## When to Use Each
 

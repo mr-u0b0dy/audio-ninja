@@ -20,10 +20,10 @@ Audio Ninja is an IAMF-first wireless immersive audio platform with a daemon-fir
 ## Architecture
 ```mermaid
 flowchart LR
-  Clients[GUI / CLI / HTTP] --> Daemon[audio-ninja-daemon (REST 8080)]
-  Daemon --> Core[audio-ninja core (IAMF, render, DSP)]
-  Core --> Transport[UDP/RTP transport \n clock sync + FEC + jitter buffer]
-  Transport --> Speakers[Speakers / Headphones]
+  Clients[GUI / CLI / HTTP] --> Daemon[audio-ninja-daemon<br/>REST 8080]
+  Daemon --> Core[audio-ninja core<br/>IAMF, render, DSP]
+  Core --> Transport[UDP/RTP transport<br/>clock sync + FEC]
+  Transport --> Speakers[Speakers /<br/>Headphones]
 ```
 
 ## Quick Start
