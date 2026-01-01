@@ -1,23 +1,23 @@
 :root {
-  --brand-orange: #F05A22;
-  --brand-orange-dark: #C04010;
-  --brand-black: #0A0A0A;
-  --brand-gray-dark: #1A1A1A;
-  --brand-gray-light: #E0E0E0;
+  --brand-primary: #0F766E;
+  --brand-primary-accent: #14B8A6;
+  --brand-highlight: #F59E0B;
+  --brand-ink: #0B1120;
+  --brand-surface: #E5E7EB;
 }
 
-/* Gentle link accent */
+/* Primary accent for links */
 a {
-  color: var(--brand-orange);
+  color: var(--brand-primary);
 }
 
-/* Highlight selections and code accents lightly */
+/* Highlight selections and code accents */
 ::selection {
-  background: rgba(240, 90, 34, 0.25);
+  background: rgba(20, 184, 166, 0.2);
 }
 
-/* Optional hero/title accents */
+/* Heading emphasis */
 .theme-hope-content h1,
 .theme-hope-content h2 {
-  color: var(--brand-gray-light);
+  color: var(--brand-ink);
 }

@@ -217,52 +217,43 @@ impl FirmwareUpdatePacket {
 
 ### Automatic Update Check
 
-```
-1. Daemon starts periodic update check (daily)
-   └─→ Query repository API: GET /api/releases/latest
-   
-2. Compare versions
-   └─→ If newer found: notify user/UI
-   
-3. On user confirmation (or auto-update policy)
-   └─→ Download firmware binary
-   └─→ Verify SHA256 checksum
-   
-4. Prepare update manifest
-   └─→ List affected devices
-   └─→ Generate staging directory
-   
-5. Push update to speakers via network
-   └─→ Send binary in chunks
-   └─→ Each device verifies chunks
-   └─→ Each device installs and reboots
-   
-6. Monitor update progress
-   └─→ Poll device status
-   └─→ Handle retries on failure
-   └─→ Log results
+```mermaid
+flowchart TD
+  start[Daemon starts periodic update check (daily)] --> repo[Query repository API: GET /api/releases/latest]
+  repo --> compare[Compare versions]
+  compare --> newer{Newer version available?}
+  newer -->|No| stop[No update]
+  newer -->|Yes| notify[Notify user/UI]
+  notify --> confirm[User confirmation or auto-update policy]
+  confirm --> download[Download firmware binary]
+  download --> verify[Verify SHA256 checksum]
+  verify --> manifest[Prepare update manifest]
+  manifest --> list[List affected devices]
+  list --> staging[Generate staging directory]
+  staging --> push[Push update to speakers]
+  push --> chunks[Send binary in chunks]
+  chunks --> deviceCheck[Devices verify chunks]
+  deviceCheck --> install[Devices install and reboot]
+  install --> monitor[Monitor update progress]
+  monitor --> poll[Poll device status]
+  poll --> retry[Handle retries on failure]
+  retry --> log[Log results]
 ```
 
 ### Device-Initiated Update
 
-```
-1. Device (speaker) boots
-   └─→ Query daemon: GET /api/devices/{id}/version
-   
-2. Daemon responds with latest version
-   └─→ Device compares with local firmware
-   
-3. If update needed
-   └─→ Device requests firmware: POST /api/devices/{id}/firmware?version=X.Y.Z
-   └─→ Daemon streams firmware binary
-   
-4. Device writes to staging partition
-   └─→ Verifies CRC/SHA256
-   └─→ Updates bootloader
-   └─→ Reboots
-   
-5. After reboot
-   └─→ Device reports new version
+```mermaid
+flowchart TD
+  boot[Device boots] --> query[Query daemon: GET /api/devices/{id}/version]
+  query --> respond[Daemon responds with latest version]
+  respond --> compare[Device compares with local firmware]
+  compare --> needed{Update needed?}
+  needed -->|No| idle[Continue running current firmware]
+  needed -->|Yes| request[Request firmware: POST /api/devices/{id}/firmware?version=X.Y.Z]
+  request --> stream[Daemon streams firmware binary]
+  stream --> write[Write to staging partition]
+  write --> verify[Verify CRC/SHA256]
+  verify --> ready[Ready to reboot/apply]
 ```
 
 ## File Structure

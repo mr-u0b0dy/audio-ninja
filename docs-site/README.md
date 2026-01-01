@@ -193,14 +193,23 @@ flowchart TD
 2. Add to navbar/sidebar config if needed
 3. Build and deploy
 
-### Changing Theme Colors
+### Color Palette
 
-Edit `src/.vuepress/config.ts`:
+Current palette:
+- Primary (Teal): #0F766E
+- Accent (Mint): #14B8A6
+- Highlight (Amber): #F59E0B
+- Ink: #0B1120
+- Surface: #E5E7EB
+
+Update `src/.vuepress/config.ts` if you need to change it:
 
 ```typescript
 theme: hopeTheme({
   themeColor: {
-    blue: "#3eaf7c",
+    "#0F766E": "Teal",
+    "#14B8A6": "Mint",
+    "#F59E0B": "Amber",
   },
 })
 ```

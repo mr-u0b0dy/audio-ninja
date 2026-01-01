@@ -16,6 +16,41 @@ env:
   CARGO_INCREMENTAL: 0
 
 jobs:
+  changes:
+    name: Detect Changes
+    runs-on: ubuntu-latest
+    outputs:
+      docs_only: ${{ steps.compute.outputs.docs_only }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+
+      - name: Filter paths
+        id: filter
+        uses: dorny/paths-filter@v3
+        with:
+          filters: |
+            docs:
+              - 'docs-site/**'
+              - 'docs/**'
+              - '*.md'
+            non_docs:
+              - '**'
+              - '!docs-site/**'
+              - '!docs/**'
+              - '!*.md'
+
+      - name: Compute docs-only flag
+        id: compute
+        run: |
+          if [ "${{ steps.filter.outputs.docs }}" = "true" ] && [ "${{ steps.filter.outputs.non_docs }}" = "false" ]; then
+            echo "docs_only=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "docs_only=false" >> "$GITHUB_OUTPUT"
+          fi
+
   fmt:
     name: Format Check
     runs-on: ubuntu-latest
@@ -327,7 +362,8 @@ jobs:
   docs-build:
     name: Build Documentation Site
     runs-on: ubuntu-latest
-    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    needs: changes
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main' && needs.changes.outputs.docs_only == 'true'
     steps:
       - uses: actions/checkout@v4
 

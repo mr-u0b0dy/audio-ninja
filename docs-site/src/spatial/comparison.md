@@ -67,11 +67,17 @@ Comprehensive comparison of Audio Ninja's three spatial rendering algorithms.
 
 Audio Ninja supports using multiple algorithms simultaneously:
 
-```
-IAMF Stream
-├─ Object-based elements → VBAP → Speaker output
-├─ Scene-based elements → HOA → Speaker output
-└─ Binaural render → HRTF → Headphone output
+```mermaid
+flowchart TD
+	stream[IAMF Stream] --> object[Object-based elements]
+	object --> vbap[VBAP]
+	vbap --> speakers[Speaker output]
+	stream --> scene[Scene-based elements]
+	scene --> hoa[HOA]
+	hoa --> speakers
+	stream --> binaural[Binaural render]
+	binaural --> hrtf[HRTF]
+	hrtf --> headphones[Headphone output]
 ```
 
 ## Algorithm Details

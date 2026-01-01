@@ -9,13 +9,17 @@ export default defineUserConfig({
   title: "Audio Ninja",
   description: "Wireless Immersive Audio Platform with IAMF Support",
   head: [
-    ["meta", { name: "theme-color", content: "#F05A22" }],
+    ["meta", { name: "theme-color", content: "#0F766E" }],
     ["meta", { name: "apple-mobile-web-app-capable", content: "yes" }],
     ["meta", { name: "apple-mobile-web-app-status-bar-style", content: "black" }],
   ],
   
   theme: hopeTheme({
-    themeColor: { "#F05A22": "Orange" },
+    themeColor: {
+      "#0F766E": "Teal",
+      "#14B8A6": "Mint",
+      "#F59E0B": "Amber",
+    },
     logo: "/logo.png",
     repo: "mr-u0b0dy/audio-ninja",
     repoLabel: "GitHub",
