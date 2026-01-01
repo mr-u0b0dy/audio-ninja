@@ -84,6 +84,45 @@ Example GitHub Actions cache:
 - Keep new files small and purposeful; avoid large auto-generated blobs.
 - Document new public APIs with brief Rust doc comments.
 
+## Documentation Site (VuePress Theme Hope)
+
+**Location**: `docs-site/` with VuePress Theme Hope 2.x
+
+**Theme Configuration**:
+- **Config file**: `src/.vuepress/config.ts` - Main VuePress and theme configuration
+- **Styles**: `src/.vuepress/styles/` - SCSS and CSS customizations
+  - `config.scss` - SCSS variable definitions
+  - `palette.scss` - Theme color variables
+  - `index.scss` - Custom styles and CSS variables
+
+**Current Color Scheme** (Indigo/Purple/Rose):
+- **Primary (Indigo)**: #4F46E5 - Main theme color for links, buttons, interactive elements
+- **Accent (Purple)**: #9333EA - Sidebar highlights, badges, secondary accents
+- **Highlight (Rose)**: #F43F5E - Warning states, emphasis, accent highlights
+- **Ink**: #0B1120 - Text color for headings
+- **Surface**: #E5E7EB - Background surface color
+
+To change colors, update:
+1. `src/.vuepress/config.ts` - `themeColor` object for picker
+2. `src/.vuepress/styles/palette.scss` - SCSS `$theme-color`, `$sidebar-active-color`, `$badge-*` variables
+3. `src/.vuepress/styles/index.scss` - CSS custom properties `--brand-*`
+
+**Building Documentation**:
+```bash
+cd docs-site
+npm install
+npm run docs:build     # Production build
+npm run docs:dev       # Development server (localhost:8080)
+npm run docs:clean     # Clear cache
+```
+
+**Features**:
+- Markdown-based content with theme support for callouts, code blocks, mermaid diagrams
+- Automatic deployment to GitHub Pages on main branch push
+- Theme color picker for visitor customization
+- Responsive design for mobile/tablet/desktop
+- Search functionality built-in
+
 ## Backlog (working TODO)
 
 ### Infrastructure (Completed)

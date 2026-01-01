@@ -195,10 +195,10 @@ flowchart TD
 
 ### Color Palette
 
-Current palette:
-- Primary (Teal): #0F766E
-- Accent (Mint): #14B8A6
-- Highlight (Amber): #F59E0B
+Current palette (Indigo/Purple/Rose):
+- Primary (Indigo): #4F46E5
+- Accent (Purple): #9333EA
+- Highlight (Rose): #F43F5E
 - Ink: #0B1120
 - Surface: #E5E7EB
 
@@ -207,9 +207,9 @@ Update `src/.vuepress/config.ts` if you need to change it:
 ```typescript
 theme: hopeTheme({
   themeColor: {
-    "#0F766E": "Teal",
-    "#14B8A6": "Mint",
-    "#F59E0B": "Amber",
+    "#4F46E5": "Indigo",
+    "#9333EA": "Purple",
+    "#F43F5E": "Rose",
   },
 })
 ```
