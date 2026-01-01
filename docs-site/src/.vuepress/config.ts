@@ -40,6 +40,18 @@ export default defineUserConfig({
           "installation.md",
           "configuration.md",
           "cli-tui.md",
+          "tui.md",
+          "gui-quick-reference.md",
+        ],
+      },
+      {
+        text: "GUI Design",
+        icon: "palette",
+        prefix: "/design/",
+        children: [
+          "README.md",
+          "design-system.md",
+          "phase2-tasks.md",
         ],
       },
       {
@@ -51,6 +63,7 @@ export default defineUserConfig({
           "vbap.md",
           "hoa.md",
           "hrtf.md",
+          "comparison.md",
         ],
       },
       {
@@ -62,6 +75,7 @@ export default defineUserConfig({
           "drc.md",
           "calibration.md",
           "codecs.md",
+          "codec_integration.md",
           "firmware_update.md",
         ],
       },
@@ -83,6 +97,19 @@ export default defineUserConfig({
             "installation.md",
             "configuration.md",
             "cli-tui.md",
+            "tui.md",
+            "gui-quick-reference.md",
+          ],
+        },
+      ],
+      "/design/": [
+        {
+          text: "GUI Design & Implementation",
+          icon: "palette",
+          children: [
+            "README.md",
+            "design-system.md",
+            "phase2-tasks.md",
           ],
         },
       ],
@@ -119,6 +146,7 @@ export default defineUserConfig({
           icon: "code",
           children: [
             "README.md",
+            "reference.md",
             "api_usage.md",
             "daemon_workflow.md",
             "release.md",

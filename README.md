@@ -75,7 +75,7 @@ Production-ready trait-based abstraction ready for real audio backends
 - **FFmpeg Codec Support**: Opus, AAC, FLAC, AC-3, E-AC-3, TrueHD decoding (25-35 hours)
 - **Testing & Optimization**: Unit/integration tests, latency profiling, cross-platform validation (15-20 hours)
 
-See [.github/copilot-instructions.md](.github/copilot-instructions.md#phase-3-backend-audio-io-implementation-production-ready) for detailed implementation plan.
+See [.github/copilot-instructions.md](.github/copilot-instructions.md#phase-3-backend-audio-io-implementation-production-ready-backend-audio-io-implementation-production-ready) for detailed implementation plan.
 
 ## License
 

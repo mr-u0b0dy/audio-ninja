@@ -51,13 +51,39 @@ Output is in `src/.vuepress/dist/`
 npm run docs:clean
 ```
 
-## Structure
+## Documentation Structure
 
 ```
-docs-site/
-├── package.json              # NPM configuration
-├── .nojekyll                 # Tells GitHub Pages to use static output
-└── src/
+docs-site/src/
+├── api/                      # API reference and workflow guides
+│   ├── reference.md          # REST API endpoint reference
+│   ├── api_usage.md          # API usage examples (curl, Python, JS, Rust)
+│   ├── daemon_workflow.md    # Daemon deployment and integration guide
+│   └── release.md            # Release process documentation
+├── guide/                    # Getting started and user guides
+│   ├── quick-start.md        # Quick start guide
+│   ├── installation.md       # Installation instructions
+│   ├── configuration.md      # Daemon configuration guide
+│   ├── cli-tui.md            # CLI and TUI usage guide
+│   ├── tui.md                # Terminal UI detailed guide
+│   └── gui-quick-reference.md # GUI quick reference
+├── design/                   # GUI design and implementation
+│   ├── design-system.md      # Magma Orange design system
+│   └── phase2-tasks.md       # 43 Phase 2 implementation tasks
+├── spatial/                  # Spatial audio processing
+│   ├── overview.md           # 3D spatial audio overview
+│   ├── vbap.md               # VBAP (Vector Base Amplitude Panning)
+│   ├── hoa.md                # HOA (Higher-Order Ambisonics)
+│   ├── hrtf.md               # HRTF (Head-Related Transfer Function)
+│   └── comparison.md         # Spatial rendering comparison
+└── processing/               # DSP and audio processing
+    ├── calibration.md        # Room calibration workflow
+    ├── loudness.md           # Loudness normalization (ITU-R BS.1770)
+    ├── drc.md                # Dynamic Range Control
+    ├── codecs.md             # Codec support and formats
+    ├── codec_integration.md  # FFmpeg and codec integration guide
+    └── firmware_update.md    # Firmware update mechanism
+```
     ├── README.md             # Home page
     ├── guide/                # Getting Started section
     │   ├── README.md
