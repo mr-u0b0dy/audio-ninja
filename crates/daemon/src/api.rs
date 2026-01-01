@@ -10,7 +10,10 @@ use axum::{
 use serde::{Deserialize, Serialize};
 use uuid::Uuid;
 
-use crate::{AppState, engine::{SpeakerInfo, SpeakerStats}};
+use crate::{
+    engine::{SpeakerInfo, SpeakerStats},
+    AppState,
+};
 use audio_ninja::SpeakerLayout;
 
 #[derive(Serialize)]
@@ -101,10 +104,7 @@ pub async fn get_speaker(
 }
 
 /// DELETE /api/v1/speakers/:id
-pub async fn remove_speaker(
-    State(state): State<AppState>,
-    Path(id): Path<Uuid>,
-) -> StatusCode {
+pub async fn remove_speaker(State(state): State<AppState>, Path(id): Path<Uuid>) -> StatusCode {
     let mut engine = state.engine.write().await;
     if engine.remove_speaker(&id).is_some() {
         StatusCode::NO_CONTENT
@@ -116,11 +116,7 @@ pub async fn remove_speaker(
 /// GET /api/v1/layout
 pub async fn get_layout(State(state): State<AppState>) -> Result<Json<SpeakerLayout>, StatusCode> {
     let engine = state.engine.read().await;
-    engine
-        .layout
-        .clone()
-        .map(Json)
-        .ok_or(StatusCode::NOT_FOUND)
+    engine.layout.clone().map(Json).ok_or(StatusCode::NOT_FOUND)
 }
 
 /// POST /api/v1/layout
@@ -129,7 +125,7 @@ pub async fn set_layout(
     Json(request): Json<LayoutRequest>,
 ) -> StatusCode {
     let mut engine = state.engine.write().await;
-    
+
     // Create layout from preset or custom positions
     let layout = if let Some(preset) = request.preset {
         match preset.as_str() {
@@ -141,7 +137,7 @@ pub async fn set_layout(
         // Custom layout from speaker positions
         return StatusCode::NOT_IMPLEMENTED;
     };
-    
+
     engine.set_layout(layout);
     StatusCode::OK
 }
@@ -203,7 +199,7 @@ pub async fn stats(State(state): State<AppState>) -> Json<serde_json::Value> {
     let engine = state.engine.read().await;
     let total_speakers = engine.speakers.len();
     let online_speakers = engine.speakers.values().filter(|s| s.online).count();
-    
+
     Json(serde_json::json!({
         "total_speakers": total_speakers,
         "online_speakers": online_speakers,

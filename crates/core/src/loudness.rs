@@ -160,8 +160,8 @@ impl HeadroomManager {
 
     /// Set lookahead time in milliseconds
     pub fn set_lookahead_ms(&mut self, sample_rate: u32, lookahead_ms: f32) {
-        self.lookahead_samples = ((sample_rate as f32 * lookahead_ms.max(0.0)) / 1000.0)
-            .max(1.0) as usize;
+        self.lookahead_samples =
+            ((sample_rate as f32 * lookahead_ms.max(0.0)) / 1000.0).max(1.0) as usize;
     }
 
     /// Apply headroom management with soft limiting
@@ -289,7 +289,8 @@ impl DynamicRangeControl {
                     self.current_gain = gain_reduction;
                 } else {
                     // Smoothed release towards unity
-                    self.current_gain = self.current_gain * (1.0 - release_coeff) + gain_reduction * release_coeff;
+                    self.current_gain =
+                        self.current_gain * (1.0 - release_coeff) + gain_reduction * release_coeff;
                 }
 
                 *sample *= self.current_gain * makeup_gain;
