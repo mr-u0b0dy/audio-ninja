@@ -59,12 +59,6 @@ export default defineUserConfig({
         icon: "list",
         link: "/todo/",
       },
-        children: [
-          "README.md",
-          "design-system.md",
-          "phase2-tasks.md",
-        ],
-      },
       {
         text: "Spatial Audio",
         icon: "headphones",
