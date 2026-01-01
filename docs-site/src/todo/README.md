@@ -1,27 +1,47 @@
-# Project Roadmap & Todos
+# Project Roadmap
 
-This section tracks the Audio Ninja project roadmap with tasks organized by phase and priority.
+**Last Updated**: January 1, 2026
 
-## Contents
+Audio Ninja is a wireless immersive audio platform with IAMF support. This roadmap tracks development progress across three major phases.
 
-- **[Project Roadmap](#phase-1-audio-io-architecture--complete)** - Overview of all phases with milestones
-- **[GUI Phase 2 Tasks](gui-phase2-tasks.md)** - Detailed 43-task breakdown for GUI refactoring and branding
+## Quick Navigation
 
-## Legend
+- [Current Status](#current-status)
+- [Phase 1: Foundation](#phase-1-audio-io-architecture--complete) (✅ Complete)
+- [Phase 2: GUI Enhancement](#phase-2-gui-refactoring--branding--in-progress) (🚧 In Progress)
+- [Phase 3: Backend Implementation](#phase-3-backend-audio-io-implementation--planned) (⏳ Planned)
+- [Future Work](#future-work)
+- [Timeline](#timeline)
 
-- ✅ **Completed**: Task is done and deployed
-- 🚧 **In Progress**: Currently being worked on
-- ⏳ **Pending**: Ready to start, waiting for dependencies
-- 🔄 **Blocked**: Waiting for external dependencies or decisions
-- 📋 **Backlog**: Future work, lower priority
+---
+
+## Current Status
+
+| Component | Status | Progress | Next Milestone |
+|-----------|--------|----------|----------------|
+| **Core Architecture** | ✅ Complete | 100% | Phase 2 GUI |
+| **REST API** | ✅ Complete | 100% | Integration |
+| **CLI/TUI** | ✅ Complete | 100% | Maintenance |
+| **GUI** | 🚧 In Progress | 30% | Phase 2a |
+| **Audio Backends** | ⏳ Planned | 0% | Phase 3 |
+
+**Recent Achievements**:
+- ✅ Fixed all CI/CD pipeline issues
+- ✅ Documentation site deployed
+- ✅ GUI Phase 2 planning complete
+- ✅ 276 tests passing, 80%+ coverage
 
 ---
 
 ## Phase 1: Audio I/O Architecture ✅ COMPLETE
 
-**Timeline**: 8 weeks | **Effort**: 80 hours | **Status**: Production-Ready
+**Duration**: 8 weeks | **Effort**: 80 hours | **Completed**: December 2025
 
-### Core Implementation
+### Deliverables
+
+<details>
+<summary><strong>Core Implementation</strong> (10 items)</summary>
+
 - ✅ Input source enumeration (System/App/External)
 - ✅ Output device abstraction (Speaker/Headphones/USB/HDMI)
 - ✅ InputManager with device selection
@@ -32,255 +52,251 @@ This section tracks the Audio Ninja project roadmap with tasks organized by phas
 - ✅ CLI commands (input/output/transport)
 - ✅ TUI screens with device panels
 - ✅ Unit tests (18 tests)
-- ✅ Integration tests (end-to-end daemon ↔ CLI)
 
-### Testing & Quality
+</details>
+
+<details>
+<summary><strong>Quality Metrics</strong></summary>
+
 - ✅ 276 tests passing
 - ✅ 80%+ code coverage
 - ✅ Clippy: 0 warnings
-- ✅ All major modules tested
+- ✅ Rustdoc: 0 errors
+- ✅ CI/CD: All checks passing
 
-**Status**: ✅ **COMPLETE - Ready for Phase 2**
+</details>
+
+**Outcome**: Production-ready architecture with complete test coverage and documentation.
 
 ---
 
 ## Phase 2: GUI Refactoring & Branding 🚧 IN PROGRESS
 
-**Timeline**: 5 weeks | **Effort**: 40-50 hours | **Status**: Planning & Design Complete
+**Duration**: 5 weeks | **Effort**: 40-50 hours | **Status**: Ready to Start
 
-### Phase 2a: Logo & Color Scheme (1 week)
+### Overview
+
+Transform the GUI from functional prototype to professional audio workstation with:
+- ✨ Magma Orange branding and professional logo
+- 🎛️ Complete audio I/O controls
+- 📊 Real-time visualization and stats
+- 🎨 Responsive design and accessibility
+
+### Sub-Phases
+
+#### Phase 2a: Logo & Color Scheme 
+**Priority**: 🔴 HIGH | **Effort**: 5-7 hours | **Week**: 1
+
 - ✅ Logo design complete (assets/logo.png)
 - ✅ Magma Orange theme designed (WCAG AA verified)
 - ✅ CSS component templates created
-- 🚧 Copy logo to /crates/gui/icons/
-- 🚧 Implement CSS variables for colors
-- 🚧 Update button styling
-- 🚧 Refactor panel backgrounds
-- 🚧 Test contrast ratios
+- 🚧 Implement CSS theme variables
+- 🚧 Update all UI components
+- 🚧 Logo integration in header
 
-**Priority**: 🔴 **HIGH** | **Est. Hours**: 5-7 | **Blocker**: None
+**Details**: [GUI Phase 2 Tasks - Section 2a](gui-phase2-tasks.md#phase-2a-logo--color-scheme-priority-1)
 
-### Phase 2b: I/O & Transport Panel (2 weeks)
-- ✅ API endpoints documented
-- ✅ REST API ready for integration
-- 🚧 Add I/O device panels to HTML
-- 🚧 Fetch devices from REST API
-- 🚧 Implement device selection UI
-- 🚧 Add file picker integration
-- 🚧 Implement transport controls (play/pause/stop)
-- 🚧 Add mode selector (file/stream/mixed)
-- 🚧 Error handling & user feedback
+#### Phase 2b: I/O & Transport Panel
+**Priority**: 🔴 HIGH | **Effort**: 8-10 hours | **Week**: 2
 
-**Priority**: 🔴 **HIGH** | **Est. Hours**: 8-10 | **Blocker**: Phase 2a
+- ✅ REST API endpoints ready
+- 🚧 Device selection dropdowns
+- 🚧 Audio source routing interface
+- 🚧 File loader and playback controls
+- 🚧 Transport mode selector
+- 🚧 Error handling & feedback
 
-### Phase 2c: Visualization & Calibration (2 weeks)
-- ✅ Calibration architecture documented
-- 🚧 Set up Canvas for layout visualization
-- 🚧 Implement speaker positioning
-- 🚧 Add layout preset configurations
-- 🚧 Create calibration UI
+**Details**: [GUI Phase 2 Tasks - Section 2b](gui-phase2-tasks.md#phase-2b-io--transport-panel-priority-1)
+
+#### Phase 2c: Visualization & Calibration
+**Priority**: 🟡 MEDIUM | **Effort**: 8-10 hours | **Week**: 3
+
+- 🚧 3D speaker layout canvas
+- 🚧 Layout editor (drag-drop)
+- 🚧 Calibration sweep controls
 - 🚧 IR curve visualization
-- 🚧 Filter design preview (FIR/IIR)
-- 🚧 VBAP test routing display
+- 🚧 Filter design preview
 
-**Priority**: 🟡 **MEDIUM** | **Est. Hours**: 8-10 | **Blocker**: Phase 2b
+**Details**: [GUI Phase 2 Tasks - Section 2c](gui-phase2-tasks.md#phase-2c-visualization--calibration-priority-2)
 
-### Phase 2d: Stats Dashboard & Polish (2 weeks)
-- 🚧 Build real-time stats dashboard
-- 🚧 Create speaker status table
-- 🚧 Network bandwidth monitoring
-- 🚧 CPU/memory usage graphs
-- 🚧 Sync error visualization
+#### Phase 2d: Stats Dashboard & Polish
+**Priority**: 🟡 MEDIUM | **Effort**: 10-12 hours | **Week**: 4-5
+
+- 🚧 Real-time metrics dashboard
+- 🚧 Speaker status monitoring
+- 🚧 Network bandwidth graphs
 - 🚧 Performance profiling
-- 🚧 Cross-platform testing (Linux, macOS, Windows)
+- 🚧 Cross-platform testing
 - 🚧 Responsive design optimization
 
-**Priority**: 🟡 **MEDIUM** | **Est. Hours**: 10-12 | **Blocker**: Phase 2c
+**Details**: [GUI Phase 2 Tasks - Section 2d](gui-phase2-tasks.md#phase-2d-stats-dashboard--polish-priority-2)
 
-**Overall Phase 2 Status**: 🚧 **Ready to Start - All Dependencies Satisfied**
+### Success Criteria
+
+- [ ] WCAG AA accessibility compliance
+- [ ] <2 second startup time
+- [ ] <100ms UI response time
+- [ ] Works on Linux, macOS, Windows
+- [ ] 50+ end-to-end tests
+- [ ] Complete feature parity with CLI
 
 ---
 
 ## Phase 3: Backend Audio I/O Implementation ⏳ PLANNED
 
-**Timeline**: 3-4 months | **Effort**: 95-135 hours | **Status**: Detailed Planning Complete
+**Duration**: 3-4 months | **Effort**: 95-135 hours | **Start**: February 2026
 
-### ALSA Bindings (Linux)
-- ⏳ Implement ALSA PCM device I/O
-- ⏳ Device enumeration via mixer/control
-- ⏳ Format negotiation (sample rates, channels, bit depths)
-- ⏳ Unit tests for ALSA backend
-- ⏳ Integration tests with real devices
+### Overview
 
-**Priority**: 🔴 **HIGH** | **Est. Hours**: 20-30 | **Blocker**: None
+Implement real audio I/O with platform-specific backends and codec support.
 
-### PulseAudio Bindings (System Audio Routing)
-- ⏳ Implement PulseAudio sink/source abstractions
-- ⏳ App-specific routing with module-loopback
-- ⏳ Default device fallback mechanism
-- ⏳ Unit tests for PulseAudio backend
+### Components
+
+#### 3.1 ALSA Bindings (Linux)
+**Priority**: 🔴 HIGH | **Effort**: 20-30 hours
+
+- ⏳ ALSA PCM device I/O
+- ⏳ Device enumeration
+- ⏳ Format negotiation
 - ⏳ Integration tests
 
-**Priority**: 🟡 **MEDIUM** | **Est. Hours**: 15-20 | **Blocker**: ALSA (can work in parallel)
+#### 3.2 PulseAudio Bindings
+**Priority**: 🟡 MEDIUM | **Effort**: 15-20 hours
 
-### CoreAudio Bindings (macOS)
-- ⏳ Implement HAL device abstractions
-- ⏳ Input/output device enumeration
-- ⏳ Support headphone and speaker detection
-- ⏳ Unit tests for CoreAudio backend
-- ⏳ macOS-specific testing
+- ⏳ Sink/source abstractions
+- ⏳ App-specific routing
+- ⏳ Default device fallback
+- ⏳ Integration tests
 
-**Priority**: 🟡 **MEDIUM** | **Est. Hours**: 20-30 | **Blocker**: None (parallel)
+#### 3.3 CoreAudio Bindings (macOS)
+**Priority**: 🟡 MEDIUM | **Effort**: 20-30 hours
 
-### FFmpeg Codec Support
-- ⏳ Add FFmpeg bindings (opus, aac, flac, ac-3, e-ac-3, truehd)
-- ⏳ Streaming demux/decode with frame accuracy
-- ⏳ Format auto-detection and negotiation
-- ⏳ Codec integration tests
+- ⏳ HAL device abstractions
+- ⏳ Device enumeration
+- ⏳ Headphone/speaker detection
+- ⏳ macOS testing
+
+#### 3.4 FFmpeg Codec Support
+**Priority**: 🟡 MEDIUM | **Effort**: 25-35 hours
+
+- ⏳ Codec bindings (Opus, AAC, FLAC, AC-3, E-AC-3, TrueHD)
+- ⏳ Streaming demux/decode
+- ⏳ Format auto-detection
 - ⏳ Performance profiling
 
-**Priority**: 🟡 **MEDIUM** | **Est. Hours**: 25-35 | **Blocker**: None (parallel)
+#### 3.5 Testing & Optimization
+**Priority**: 🟡 MEDIUM | **Effort**: 15-20 hours
 
-### Phase 3 Testing & Optimization
-- ⏳ Unit tests per backend (ALSA, PulseAudio, CoreAudio)
-- ⏳ Integration tests with real devices
-- ⏳ Latency profiling and optimization
-- ⏳ Cross-platform validation (Linux, macOS, Windows)
-- ⏳ Performance targets: <50ms latency, 99% reliability
+- ⏳ Backend-specific unit tests
+- ⏳ Real device integration tests
+- ⏳ Latency profiling (<50ms target)
+- ⏳ Cross-platform validation
+- ⏳ 99% reliability verification
 
-**Priority**: 🟡 **MEDIUM** | **Est. Hours**: 15-20 | **Blocker**: All backends
+### Success Criteria
 
-**Overall Phase 3 Status**: ⏳ **Planned - Ready to Start After Phase 2**
+- [ ] All 4 backends functional (ALSA, PulseAudio, CoreAudio, FFmpeg)
+- [ ] <50ms end-to-end latency
+- [ ] 99% packet delivery reliability
+- [ ] Support major audio formats
+- [ ] Cross-platform tests on 3+ platforms
+- [ ] Performance benchmarks documented
 
 ---
 
-## Backlog & Future Work 📋
+## Future Work
 
-### Format Support & Codecs
-- 📋 Integrate libiamf/AOM reference decoder (replace stubs)
-- 📋 Dolby Atmos metadata parser for object positioning
-- 📋 Support for additional codecs beyond current list
-- 📋 Bitstream validation and conformance tests
-
-### Extended Features
+### High Priority (Post-Phase 3)
+- 📋 libiamf/AOM reference decoder integration
+- 📋 Dolby Atmos metadata parser
 - 📋 WiFi Direct peer-to-peer mode
+- 📋 Sample-accurate sync (±1ms)
+
+### Medium Priority
 - 📋 RTSP session management
-- 📋 Sample-accurate sync across speakers (±1ms target)
-- 📋 Adaptive bitrate for varying network conditions
-- 📋 Firmware update mechanism with rollback
-- 📋 Advanced calibration verification loop
+- 📋 Adaptive bitrate streaming
+- 📋 Firmware update mechanism
+- 📋 Advanced calibration verification
 
-### SDK & Integration
+### Community & Ecosystem
 - 📋 C API for embedded integration
-- 📋 Python bindings for scripting
-- 📋 Example applications (CLI player, GUI controller)
-- 📋 Language-specific SDKs (Go, Ruby, PHP)
-
-### Documentation
-- 📋 Architecture decision records (ADRs)
-- 📋 Performance benchmarking suite
+- 📋 Python bindings
+- 📋 Example applications
 - 📋 Video tutorials
 - 📋 Community contribution guide
-- 📋 Deployment best practices
-
----
-
-## Priority Matrix
-
-| Phase | Component | Priority | Effort | Status |
-|-------|-----------|----------|--------|--------|
-| 2 | Logo & Theme | 🔴 HIGH | 5-7h | 🚧 Ready |
-| 2 | I/O Controls | 🔴 HIGH | 8-10h | 🚧 Ready |
-| 2 | Visualization | 🟡 MEDIUM | 8-10h | 🚧 Ready |
-| 2 | Stats Dashboard | 🟡 MEDIUM | 10-12h | 🚧 Ready |
-| 3 | ALSA | 🔴 HIGH | 20-30h | ⏳ Planned |
-| 3 | PulseAudio | 🟡 MEDIUM | 15-20h | ⏳ Planned |
-| 3 | CoreAudio | 🟡 MEDIUM | 20-30h | ⏳ Planned |
-| 3 | FFmpeg | 🟡 MEDIUM | 25-35h | ⏳ Planned |
 
 ---
 
 ## Timeline
 
 ```
-Jan 2026:
-  Week 1-2: Phase 2a (Logo & Theme)
-  Week 2-3: Phase 2b (I/O & Transport)
-  Week 3-4: Phase 2c (Visualization)
-  Week 4-5: Phase 2d (Stats & Polish)
+January 2026:
+  ├─ Week 1-2: Phase 2a (Logo & Theme) [5-7h]
+  ├─ Week 2-3: Phase 2b (I/O Controls) [8-10h]
+  ├─ Week 3-4: Phase 2c (Visualization) [8-10h]
+  └─ Week 4-5: Phase 2d (Stats & Polish) [10-12h]
 
-Feb-Mar 2026:
-  Phase 3a: ALSA + PulseAudio (parallel)
-  Phase 3b: CoreAudio + FFmpeg (parallel)
-  Phase 3c: Testing & Optimization
+February-March 2026:
+  ├─ Phase 3.1: ALSA Bindings [20-30h]
+  ├─ Phase 3.2: PulseAudio [15-20h] (parallel)
+  ├─ Phase 3.3: CoreAudio [20-30h] (parallel)
+  └─ Phase 3.4: FFmpeg [25-35h] (parallel)
 
-Apr 2026+:
-  Extended features & backlog items
+April 2026:
+  └─ Phase 3.5: Testing & Optimization [15-20h]
+
+May 2026+:
+  └─ Future work & backlog items
 ```
 
 ---
 
 ## Dependencies & Blockers
 
-### Phase 2 Dependencies
-- ✅ REST API (Phase 1) - **READY**
-- ✅ Design system & colors - **READY**
-- ✅ Logo design - **READY**
-- ✅ Daemon integration - **READY**
+### Phase 2 (Current)
+**Dependencies**: ✅ All satisfied
+- ✅ REST API complete
+- ✅ Design system ready
+- ✅ Logo designed
+- ✅ Daemon integration working
 
-**Blockers**: None - Phase 2 can begin immediately
+**Blockers**: None
 
-### Phase 3 Dependencies
-- ✅ Phase 2 completion (can start in parallel)
-- ✅ Core architecture (Phase 1) - **READY**
-- ✅ Trait abstractions - **READY**
-- 🚧 Platform-specific build tools (ALSA-dev, PulseAudio-dev)
+### Phase 3 (Upcoming)
+**Dependencies**: 
+- 🚧 Phase 2 completion (optional, can start in parallel)
+- ✅ Core architecture ready
+- ✅ Trait abstractions defined
 
-**Blockers**: Build environment setup per platform
-
----
-
-## Success Criteria
-
-### Phase 2
-- [ ] All 4 sub-phases (2a-2d) completed on schedule
-- [ ] 100% feature parity with CLI
-- [ ] WCAG AA accessibility achieved
-- [ ] <2 second startup time
-- [ ] <100ms UI response time
-- [ ] Works on Linux, macOS, Windows
-- [ ] 50+ end-to-end tests passing
-
-### Phase 3
-- [ ] All 4 backends (ALSA, PulseAudio, CoreAudio, FFmpeg) working
-- [ ] <50ms end-to-end latency
-- [ ] 99% packet delivery reliability
-- [ ] Support all major audio formats
-- [ ] Cross-platform tests on 3+ platforms
-- [ ] Performance benchmarks documented
+**Blockers**: 
+- ⏳ Platform-specific build tools (alsa-dev, pulseaudio-dev, xcode)
 
 ---
 
-## Resources & References
+## Resources
 
-- **Phase 2 Details**: [GUI Phase 2 Tasks](../design/phase2-tasks.md)
-- **Design System**: [Design System Guide](../design/design-system.md)
-- **API Reference**: [REST API Reference](../api/reference.md)
-- **Backend Planning**: [Copilot Instructions](https://github.com/mr-u0b0dy/audio-ninja/blob/main/.github/copilot-instructions.md#phase-3-backend-audio-io-implementation-production-ready)
+- **Detailed Tasks**: [GUI Phase 2 Tasks](gui-phase2-tasks.md)
+- **Design System**: [Design Guide](../design/design-system.md)
+- **API Reference**: [REST API Docs](../api/reference.md)
+- **Backend Guide**: [Copilot Instructions](../../.github/copilot-instructions.md#phase-3-backend-audio-io-implementation-production-ready)
 
 ---
 
 ## Contributing
 
-To help with any of these tasks:
+**Want to help?** Follow these steps:
 
-1. **Choose a task** from the roadmap above
-2. **Check dependencies** to ensure it's unblocked
-3. **Create an issue** on GitHub for tracking
-4. **Start implementation** with focus on testing
-5. **Submit PR** with comprehensive tests and documentation
+1. Choose a task from the roadmap
+2. Check dependencies are satisfied
+3. Create a GitHub issue for tracking
+4. Implement with comprehensive tests
+5. Submit PR with documentation
 
-See [CONTRIBUTING.md](../../CONTRIBUTING.md) for contribution guidelines.
+See [CONTRIBUTING.md](../../CONTRIBUTING.md) for detailed guidelines.
+
+---
+
+**Legend**: ✅ Complete | 🚧 In Progress | ⏳ Planned | 📋 Backlog | 🔴 High Priority | 🟡 Medium Priority
 
 ---
 
