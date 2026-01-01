@@ -91,8 +91,8 @@ Example GitHub Actions cache:
 **Theme Configuration**:
 - **Config file**: `src/.vuepress/config.ts` - Main VuePress and theme configuration
 - **Styles**: `src/.vuepress/styles/` - SCSS and CSS customizations
-  - `config.scss` - SCSS variable definitions
-  - `palette.scss` - Theme color variables
+  - `config.scss` - SCSS variable definitions for `$theme-color`
+  - `palette.scss` - Theme color variables (`$sidebar-active-color`, `$badge-*`)
   - `index.scss` - Custom styles and CSS variables
 
 **Current Color Scheme** (Dark Orange/Magma Theme):
@@ -103,10 +103,45 @@ Example GitHub Actions cache:
 - **Blade Glow** (#FFD580): Text highlights, glowing borders - Accent highlights
 - **Mist White** (#F5F5F5): Primary body text and headings
 
-To change colors, update:
-1. `src/.vuepress/config.ts` - `themeColor` object for picker
-2. `src/.vuepress/styles/palette.scss` - SCSS `$theme-color`, `$sidebar-active-color`, `$badge-*` variables
-3. `src/.vuepress/styles/index.scss` - CSS custom properties `--accent-*` and `--bg-*`
+**Setting Theme Colors** (VuePress Theme Hope):
+
+Theme color is defined in `src/.vuepress/styles/config.scss` using the `$theme-color` variable.
+
+Single color (simple):
+```scss
+$theme-color: #E65100;
+```
+
+Multiple colors (enables theme color picker):
+```scss
+$theme-color: #E65100, #FF8C00, #FFD580;
+```
+
+Light/dark mode support:
+```scss
+$theme-color: (
+  light: #E65100,
+  dark: #FF8C00,
+);
+```
+
+Mixed multiple colors with light/dark modes:
+```scss
+$theme-color: (
+  (
+    light: #E65100,
+    dark: #FFD580,
+  ),
+  #FF8C00,
+  #FFD580,
+);
+```
+
+**To change colors, update:**
+1. `src/.vuepress/styles/config.scss` - Set `$theme-color` variable (primary theme color)
+2. `src/.vuepress/styles/palette.scss` - Update `$sidebar-active-color`, `$badge-tip-color`, `$badge-warning-color`
+3. `src/.vuepress/styles/index.scss` - Update CSS custom properties `--accent-*`, `--bg-*`, `--text-*`
+4. `src/.vuepress/config.ts` - Update `themeColor` object labels for picker display
 
 **Building Documentation**:
 ```bash
@@ -120,9 +155,10 @@ npm run docs:clean     # Clear cache
 **Features**:
 - Markdown-based content with theme support for callouts, code blocks, mermaid diagrams
 - Automatic deployment to GitHub Pages on main branch push
-- Theme color picker for visitor customization
+- Theme color picker for visitor customization (when multiple colors defined)
 - Responsive design for mobile/tablet/desktop
 - Search functionality built-in
+- Reference: https://theme-hope.vuejs.press/guide/interface/theme-color.html
 
 ## Backlog (working TODO)
 
