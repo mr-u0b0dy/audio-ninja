@@ -1,11 +1,11 @@
 # GUI Design & Implementation
 
-This section covers the Audio Ninja GUI design system and Phase 2 implementation roadmap.
+This section covers the Audio Ninja GUI design system and implementation guides.
 
 ## Contents
 
 - **[Design System](design-system.md)** - Magma Orange color scheme, CSS components, responsive design, and accessibility standards
-- **[Phase 2 Tasks](phase2-tasks.md)** - 43 implementation tasks for GUI refactoring (5 weeks, 40-50 hours)
+- **[GUI Phase 2 Tasks](../todo/gui-phase2-tasks.md)** - Detailed implementation roadmap (see Roadmap section)
 
 ## Quick Facts
 

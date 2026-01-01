@@ -51,7 +51,6 @@ export default defineUserConfig({
         children: [
           "README.md",
           "design-system.md",
-          "phase2-tasks.md",
         ],
       },
       {
@@ -114,7 +113,6 @@ export default defineUserConfig({
           children: [
             "README.md",
             "design-system.md",
-            "phase2-tasks.md",
           ],
         },
       ],
@@ -164,6 +162,7 @@ export default defineUserConfig({
           icon: "list",
           children: [
             "README.md",
+            "gui-phase2-tasks.md",
           ],
         },
       ],

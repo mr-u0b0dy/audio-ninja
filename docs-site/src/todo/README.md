@@ -2,6 +2,11 @@
 
 This section tracks the Audio Ninja project roadmap with tasks organized by phase and priority.
 
+## Contents
+
+- **[Project Roadmap](#phase-1-audio-io-architecture--complete)** - Overview of all phases with milestones
+- **[GUI Phase 2 Tasks](gui-phase2-tasks.md)** - Detailed 43-task breakdown for GUI refactoring and branding
+
 ## Legend
 
 - ✅ **Completed**: Task is done and deployed
