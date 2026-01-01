@@ -2,8 +2,7 @@
   // Rust configuration
   "rust-analyzer.cargo.allTargets": true,
   "rust-analyzer.cargo.features": "all",
-  "rust-analyzer.checkOnSave.command": "clippy",
-  "rust-analyzer.checkOnSave.allTargets": true,
+  "rust-analyzer.checkOnSave": true,
   // Format on save
   "editor.formatOnSave": true,
   "[rust]": {

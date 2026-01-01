@@ -32,57 +32,6 @@ This repo is an OSS wireless immersive audio platform (IAMF-first) with flexible
 - Prefer property/fuzz tests for parsers
 - Add integration tests for daemon API endpoints
 - Target 80%+ coverage for core library
-- **Pre-commit validation**: Use VS Code task "Pre-Commit: Full Validation" (Ctrl+Shift+P → Tasks: Run Task) or run `cargo fmt --check && cargo clippy --workspace -- -D warnings && cargo test --workspace -- --skip e2e_`
-
-## VS Code Workflow
-
-### Pre-Commit Testing (Recommended)
-Before committing changes, run comprehensive validation:
-- **Method 1**: Press `Ctrl+Shift+P` → "Tasks: Run Task" → "Pre-Commit: Full Validation"
-- **Method 2**: Press `Ctrl+Shift+B` (default test task)
-- **Method 3**: From VS Code menu: Terminal → Run Task → "Pre-Commit: Full Validation"
-
-This runs:
-1. Format check (`cargo fmt --check`)
-2. Clippy with warnings as errors (`cargo clippy -- -D warnings`)
-3. All tests except E2E (`cargo test -- --skip e2e_`)
-4. Documentation build (`cargo doc`)
-
-### Quick Pre-Commit Check
-For faster iteration during development:
-- Run task "Pre-Commit: Quick Check" (format + clippy + lib tests only)
-
-### Available VS Code Tasks
-- **Build Workspace**: Standard debug build
-- **Build Release**: Optimized release build
-- **Test Workspace**: Run all tests
-- **Clippy**: Lint checks
-- **Format Code**: Auto-format with rustfmt
-- **Run Daemon**: Start daemon in background
-- **Run GUI**: Launch desktop GUI
-- **Check All**: Format check + clippy + tests
-- **Pre-Commit: Full Validation**: Comprehensive pre-commit checks (default test task)
-- **Pre-Commit: Quick Check**: Fast pre-commit validation
-
-### Git Pre-Commit Hooks
-Automated validation on every commit (optional but recommended):
-
-**Install hooks:**
-```bash
-git config core.hooksPath .githooks
-# Or run: ./scripts/dev-setup.sh
-```
-
-**What runs:**
-- Format check
-- Clippy lints
-- Tests (except E2E)
-- Documentation build
-
-**Skip when needed:**
-```bash
-git commit --no-verify -m "message"
-```
 
 ## Workspace Commands
 ```bash
@@ -135,37 +84,6 @@ Example GitHub Actions cache:
 - Keep new files small and purposeful; avoid large auto-generated blobs.
 - Document new public APIs with brief Rust doc comments.
 
-## Documentation
-- All user-facing documentation lives in `docs-site/` (VuePress site)
-- Published at: https://mr-u0b0dy.github.io/audio-ninja/
-- Structure:
-  - `docs-site/src/guide/` - Getting started, installation, configuration
-  - `docs-site/src/spatial/` - VBAP, HOA, HRTF spatial rendering
-  - `docs-site/src/processing/` - Calibration, codecs, loudness, DRC, firmware updates
-  - `docs-site/src/api/` - REST API reference, daemon workflow, release process
-- Update docs-site when adding features or changing APIs
-- Run `cd docs-site && npm run dev` to preview documentation locally
-- Deployment: Auto-deploys to GitHub Pages on push to main (docs-site/ changes)
-
-## Branding & Colors
-- Palette (hex):
-  - Orange (Glow & Highlights): `#F05A22`
-  - Dark Orange (Shadows & Edges): `#C04010`
-  - Black (Background): `#0A0A0A`
-  - Dark Grey (Silhouette & Elements): `#1A1A1A`
-  - Light Grey/White (Text Highlights): `#E0E0E0`
-- Docs site usage (VuePress Theme Hope):
-  - Primary accent via `docs-site/src/.vuepress/styles/palette.scss`: set `$theme-color: #F05A22;`
-  - Global brand variables in `docs-site/src/.vuepress/styles/index.scss`:
-    - `--brand-orange`, `--brand-orange-dark`, `--brand-black`, `--brand-gray-dark`, `--brand-gray-light`
-  - Keep backgrounds readable; avoid forcing dark background globally. Prefer accents for links, selections, badges.
-- GUI (Tauri) usage:
-  - Define the same CSS variables in `gui/public/` styles and use for accents, focus rings, and active states.
-  - Reserve `#0A0A0A` / `#1A1A1A` for dark theme surfaces; ensure text contrast with `#E0E0E0`.
-- Icons/branding:
-  - Use `#F05A22` for glow/highlights, `#C04010` for shadow edges.
-  - Maintain high contrast on dark backgrounds; check accessibility (AA) when using greys.
-
 ## Backlog (working TODO)
 
 ### Infrastructure (Completed)
@@ -175,7 +93,6 @@ Example GitHub Actions cache:
 - ✅ Systemd service file for Linux deployment
 - ✅ GitHub Actions CI: fmt, clippy, build, test, benchmarks, doc
 - ✅ GitHub Actions Release: automated binary builds (x86_64/aarch64 Linux)
-- ✅ Documentation site deployed to GitHub Pages (https://mr-u0b0dy.github.io/audio-ninja/)
 
 ### Core Modules (Completed)
 - ✅ iamf-core: parse/render with element types (channel/object/scene), metadata, mix presentations
@@ -309,9 +226,3 @@ Example GitHub Actions cache:
 17. **IAMF decoder**: Integrate libiamf/AOM reference implementation
 18. **ARM/embedded**: Configure cross-compilation targets
 19. **Demo applications**: Example projects using the daemon API
-
-## Temporary Summaries
-- Store ephemeral Copilot session summaries in an ignored directory to avoid CI/lint noise.
-- Preferred location: `target/tmp/` (ignored via `.gitignore`).
-- Filename convention: `copilot-session-summary-YYYY-MM-DD.md`.
-- Do not commit or move these into tracked docs; keep them isolated from CI.

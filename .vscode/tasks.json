@@ -6,36 +6,28 @@
       "type": "shell",
       "command": "cargo build --workspace",
       "group": "build",
-      "problemMatcher": [
-        "$rustc"
-      ]
+      "problemMatcher": ["$rustc"]
     },
     {
       "label": "Build Release",
       "type": "shell",
       "command": "cargo build --workspace --release",
       "group": "build",
-      "problemMatcher": [
-        "$rustc"
-      ]
+      "problemMatcher": ["$rustc"]
     },
     {
       "label": "Test Workspace",
       "type": "shell",
       "command": "cargo test --workspace",
       "group": "test",
-      "problemMatcher": [
-        "$rustc"
-      ]
+      "problemMatcher": ["$rustc"]
     },
     {
       "label": "Clippy",
       "type": "shell",
       "command": "cargo clippy --workspace --all-targets",
       "group": "test",
-      "problemMatcher": [
-        "$rustc"
-      ]
+      "problemMatcher": ["$rustc"]
     },
     {
       "label": "Format Code",
@@ -68,47 +60,14 @@
       "type": "shell",
       "command": "cargo run -p audio-ninja-gui",
       "isBackground": false,
-      "problemMatcher": [
-        "$rustc"
-      ]
+      "problemMatcher": ["$rustc"]
     },
     {
       "label": "Check All",
       "type": "shell",
       "command": "cargo fmt --all -- --check && cargo clippy --workspace --all-targets && cargo test --workspace",
       "group": "test",
-      "problemMatcher": [
-        "$rustc"
-      ]
-    },
-    {
-      "label": "Pre-Commit: Full Validation",
-      "type": "shell",
-      "command": "echo '🔍 Running pre-commit validation...' && cargo fmt --all -- --check && echo '✅ Format check passed' && cargo clippy --workspace --all-targets --all-features -- -D warnings && echo '✅ Clippy passed' && cargo test --workspace -- --skip e2e_ && echo '✅ Tests passed' && cargo doc --workspace --no-deps --all-features && echo '✅ Documentation built' && echo '✅ All pre-commit checks passed!'",
-      "group": {
-        "kind": "test",
-        "isDefault": true
-      },
-      "problemMatcher": [
-        "$rustc"
-      ],
-      "presentation": {
-        "echo": true,
-        "reveal": "always",
-        "focus": false,
-        "panel": "shared",
-        "showReuseMessage": true,
-        "clear": true
-      }
-    },
-    {
-      "label": "Pre-Commit: Quick Check",
-      "type": "shell",
-      "command": "echo '⚡ Running quick pre-commit check...' && cargo fmt --all -- --check && cargo clippy --workspace --all-targets -- -D warnings && cargo test --workspace --lib && echo '✅ Quick checks passed!'",
-      "group": "test",
-      "problemMatcher": [
-        "$rustc"
-      ]
+      "problemMatcher": ["$rustc"]
     }
   ]
 }
