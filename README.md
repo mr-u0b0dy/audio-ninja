@@ -1,6 +1,6 @@
 # Audio Ninja 🥷
 
-![Audio Ninja Logo](assets/logo.png)
+![Audio Ninja Banner](assets/github/banner.png)
 
 [![License](https://img.shields.io/badge/license-Apache%202.0-blue.svg)](LICENSE)
 [![Rust](https://img.shields.io/badge/rust-1.70%2B-orange.svg)](https://www.rust-lang.org/)
