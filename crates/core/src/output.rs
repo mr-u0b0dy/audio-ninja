@@ -133,7 +133,7 @@ impl OutputDevice {
     }
 }
 
-/// Playback callback type: requests PCM frames [channel][sample]
+/// Playback callback type: requests PCM frames \[channel\]\[sample\]
 pub type PlaybackCallback = Arc<dyn Fn(u32) -> Vec<Vec<f32>> + Send + Sync>;
 
 /// Trait for audio playback implementations (ALSA, PulseAudio backends)
@@ -156,7 +156,7 @@ pub trait PlaybackStream: Send + Sync {
     /// Get latency in milliseconds
     fn latency_ms(&self) -> f32;
 
-    /// Write audio frames to device [channel][sample]
+    /// Write audio frames to device \[channel\]\[sample\]
     fn write(&mut self, data: &[Vec<f32>]) -> Result<(), OutputError>;
 }
 

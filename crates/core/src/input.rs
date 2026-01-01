@@ -121,7 +121,7 @@ impl InputDevice {
     }
 }
 
-/// Audio capture callback type: receives PCM frames [channel][sample]
+/// Audio capture callback type: receives PCM frames \[channel\]\[sample\]
 pub type CaptureCallback = Arc<dyn Fn(&[Vec<f32>]) + Send + Sync>;
 
 /// Trait for audio capture implementations (ALSA, PulseAudio backends)
