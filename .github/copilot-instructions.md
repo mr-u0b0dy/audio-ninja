@@ -89,6 +89,12 @@ Example GitHub Actions cache:
 
 **Location**: `docs-site/` with VuePress Theme Hope 2.x
 
+**Docs & Roadmap Locations**
+- Primary roadmap: docs-site/src/todo/README.md
+- GUI Phase 2 task list: docs-site/src/todo/gui-phase2-tasks.md
+- Design landing links to roadmap: docs-site/src/design/README.md
+- Navbar/sidebar wiring: docs-site/src/.vuepress/config.ts
+
 **Theme Configuration**:
 - **Config file**: `src/.vuepress/config.ts` - Main VuePress and theme configuration
 - **Styles**: `src/.vuepress/styles/` - SCSS and CSS customizations
