@@ -24,17 +24,6 @@ jobs:
         id: get_version
         run: echo "version=${GITHUB_REF#refs/tags/v}" >> $GITHUB_OUTPUT
 
-      - name: Create Release
-        id: create_release
-        uses: actions/create-release@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          tag_name: ${{ github.ref }}
-          release_name: Release ${{ github.ref }}
-          draft: false
-          prerelease: false
-
   build-binaries:
     name: Build ${{ matrix.target }}
     needs: create-release
@@ -95,7 +84,7 @@ jobs:
           brew install gtk4 libsoup webkit2gtk
 
       - name: Cache cargo
-        uses: actions/cache@v5
+        uses: actions/cache@v4
         with:
           path: |
             ~/.cargo/registry
@@ -144,66 +133,48 @@ jobs:
           }
           Compress-Archive @compress
 
-      - name: Upload daemon binary
-        uses: actions/upload-release-asset@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          upload_url: ${{ needs.create-release.outputs.upload_url }}
-          asset_path: target/${{ matrix.target }}/release/audio-ninja-daemon-${{ matrix.asset_name }}${{ runner.os == 'Windows' && '.exe' || '' }}
-          asset_name: audio-ninja-daemon-${{ matrix.asset_name }}${{ runner.os == 'Windows' && '.exe' || '' }}
-          asset_content_type: application/octet-stream
+      - name: Create artifact directory
+        run: |
+          mkdir -p artifacts
+          if [ "${{ runner.os }}" == "Windows" ]; then
+            cp "target/${{ matrix.target }}/release/audio-ninja-daemon-${{ matrix.asset_name }}.exe" artifacts/
+            cp "target/${{ matrix.target }}/release/audio-ninja-cli-${{ matrix.asset_name }}.exe" artifacts/
+            [ -f "target/${{ matrix.target }}/release/${{ matrix.asset_name }}.zip" ] && cp "target/${{ matrix.target }}/release/${{ matrix.asset_name }}.zip" artifacts/
+          else
+            cp "target/${{ matrix.target }}/release/audio-ninja-daemon-${{ matrix.asset_name }}" artifacts/
+            cp "target/${{ matrix.target }}/release/audio-ninja-cli-${{ matrix.asset_name }}" artifacts/
+            [ -f "target/${{ matrix.target }}/release/${{ matrix.asset_name }}.tar.gz" ] && cp "target/${{ matrix.target }}/release/${{ matrix.asset_name }}.tar.gz" artifacts/
+          fi
+        shell: bash
 
-      - name: Upload CLI binary
-        uses: actions/upload-release-asset@v1
+      - name: Upload Release Artifacts
+        uses: softprops/action-gh-release@v2
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          upload_url: ${{ needs.create-release.outputs.upload_url }}
-          asset_path: target/${{ matrix.target }}/release/audio-ninja-cli-${{ matrix.asset_name }}${{ runner.os == 'Windows' && '.exe' || '' }}
-          asset_name: audio-ninja-cli-${{ matrix.asset_name }}${{ runner.os == 'Windows' && '.exe' || '' }}
-          asset_content_type: application/octet-stream
-
-      - name: Upload archive (tar.gz for Linux/macOS)
-        if: runner.os != 'Windows'
-        uses: actions/upload-release-asset@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          upload_url: ${{ needs.create-release.outputs.upload_url }}
-          asset_path: target/${{ matrix.target }}/release/${{ matrix.asset_name }}.tar.gz
-          asset_name: ${{ matrix.asset_name }}-${{ needs.create-release.outputs.version }}.tar.gz
-          asset_content_type: application/gzip
-
-      - name: Upload archive (zip for Windows)
-        if: runner.os == 'Windows'
-        uses: actions/upload-release-asset@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          upload_url: ${{ needs.create-release.outputs.upload_url }}
-          asset_path: target/${{ matrix.target }}/release/${{ matrix.asset_name }}.zip
-          asset_name: ${{ matrix.asset_name }}-${{ needs.create-release.outputs.version }}.zip
-          asset_content_type: application/zip
+          tag_name: ${{ github.ref }}
+          files: artifacts/*
 
   checksums:
     name: Generate Checksums
     needs: [create-release, build-binaries]
     runs-on: ubuntu-latest
     steps:
-      - name: Download all artifacts
-        uses: actions/download-artifact@v7
+      - name: Checkout code
+        uses: actions/checkout@v6
 
-      - name: Generate checksums
+      - name: Generate checksums from release
         run: |
-          sha256sum audio-ninja-* > checksums.txt
+          gh release download ${{ needs.create-release.outputs.version }} -D artifacts --pattern '*'
+          cd artifacts
+          sha256sum * > checksums.txt
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Upload checksums
-        uses: actions/upload-release-asset@v1
+      - name: Upload checksums to release
+        uses: softprops/action-gh-release@v2
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          upload_url: ${{ needs.create-release.outputs.upload_url }}
-          asset_path: checksums.txt
-          asset_name: checksums.txt
-          asset_content_type: text/plain
+          tag_name: ${{ github.ref }}
+          files: artifacts/checksums.txt
