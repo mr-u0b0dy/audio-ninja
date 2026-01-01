@@ -17,3 +17,5 @@ serde_json.workspace = true
 anyhow.workspace = true
 clap.workspace = true
 uuid.workspace = true
+ratatui = "0.28"
+crossterm = { version = "0.28", features = ["events"] }

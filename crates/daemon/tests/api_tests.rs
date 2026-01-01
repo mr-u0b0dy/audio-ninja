@@ -37,11 +37,11 @@ fn create_test_app() -> Router {
             post(audio_ninja_daemon::api::discover_speakers),
         )
         .route(
-            "/api/v1/speakers/:id",
+            "/api/v1/speakers/{id}",
             get(audio_ninja_daemon::api::get_speaker),
         )
         .route(
-            "/api/v1/speakers/:id",
+            "/api/v1/speakers/{id}",
             delete(audio_ninja_daemon::api::remove_speaker),
         )
         .route("/api/v1/layout", get(audio_ninja_daemon::api::get_layout))
@@ -76,7 +76,7 @@ fn create_test_app() -> Router {
         )
         .route("/api/v1/stats", get(audio_ninja_daemon::api::stats))
         .route(
-            "/api/v1/speakers/:id/stats",
+            "/api/v1/speakers/{id}/stats",
             get(audio_ninja_daemon::api::speaker_stats),
         )
         .with_state(app_state)

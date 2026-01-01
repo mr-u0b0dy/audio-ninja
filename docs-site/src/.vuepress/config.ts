@@ -39,6 +39,7 @@ export default defineUserConfig({
           "quick-start.md",
           "installation.md",
           "configuration.md",
+          "cli-tui.md",
         ],
       },
       {
@@ -81,6 +82,7 @@ export default defineUserConfig({
             "quick-start.md",
             "installation.md",
             "configuration.md",
+            "cli-tui.md",
           ],
         },
       ],

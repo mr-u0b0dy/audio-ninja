@@ -2,6 +2,8 @@
 
 //! Audio Ninja CLI - Command-line interface for daemon control
 
+mod tui;
+
 use anyhow::{Context, Result};
 use clap::{Parser, Subcommand};
 use serde_json::Value;
@@ -27,6 +29,9 @@ enum Commands {
 
     /// Show daemon information
     Info,
+
+    /// Interactive terminal UI dashboard
+    Tui,
 
     /// Speaker management
     #[command(subcommand)]
@@ -181,9 +186,13 @@ impl ApiClient {
 #[tokio::main]
 async fn main() -> Result<()> {
     let args = Args::parse();
-    let client = ApiClient::new(args.daemon);
+    let client = ApiClient::new(args.daemon.clone());
 
     match args.command {
+        Commands::Tui => {
+            run_tui(args.daemon).await?;
+        }
+
         Commands::Status => {
             let status = client.get("/status").await?;
             println!("{}", serde_json::to_string_pretty(&status)?);
@@ -281,3 +290,65 @@ async fn main() -> Result<()> {
 
     Ok(())
 }
+
+async fn run_tui(base_url: String) -> Result<()> {
+    use crossterm::{
+        execute,
+        terminal::{disable_raw_mode, enable_raw_mode, EnterAlternateScreen, LeaveAlternateScreen},
+    };
+    use ratatui::prelude::*;
+
+    let mut stdout = std::io::stdout();
+    enable_raw_mode()?;
+    execute!(stdout, EnterAlternateScreen)?;
+
+    let backend = CrosstermBackend::new(stdout);
+    let mut terminal = Terminal::new(backend)?;
+
+    let client = ApiClient::new(base_url.clone());
+    let mut app = tui::App::new(base_url);
+
+    // Initial data load
+    if let Ok(status) = client.get("/status").await {
+        app.status = Some(status);
+    }
+    if let Ok(speakers) = client.get("/speakers").await {
+        app.speakers = Some(speakers);
+    }
+    if let Ok(layout) = client.get("/layout").await {
+        app.layout = Some(layout);
+    }
+    if let Ok(transport) = client.get("/transport/status").await {
+        app.transport_status = Some(transport);
+    }
+    if let Ok(calibration) = client.get("/calibration/status").await {
+        app.calibration_status = Some(calibration);
+    }
+    if let Ok(stats) = client.get("/stats").await {
+        app.stats = Some(stats);
+    }
+
+    let result = loop {
+        terminal.draw(|f| {
+            tui::ui::draw(f, &app);
+        })?;
+
+        if tui::handler::handle_input(&mut app).await {
+            break Ok::<(), anyhow::Error>(());
+        }
+
+        if !app.running {
+            break Ok(());
+        }
+    };
+
+    disable_raw_mode()?;
+    execute!(
+        terminal.backend_mut(),
+        LeaveAlternateScreen
+    )?;
+    terminal.show_cursor()?;
+
+    result
+}
+
