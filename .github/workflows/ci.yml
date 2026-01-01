@@ -36,11 +36,13 @@ jobs:
               - 'docs-site/**'
               - 'docs/**'
               - '*.md'
+              - '.github/copilot-instructions.md'
             non_docs:
               - '**'
               - '!docs-site/**'
               - '!docs/**'
               - '!*.md'
+              - '!.github/copilot-instructions.md'
 
       - name: Compute docs-only flag
         id: compute
