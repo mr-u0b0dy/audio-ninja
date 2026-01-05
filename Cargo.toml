@@ -40,7 +40,7 @@ crossterm = { version = "0.28", features = ["events"] }
 
 # GUI
 tauri = { version = "1.5", features = ["shell-open"] }
-tauri-build = "1.5"
+tauri-build = "2.5"
 
 # Other
 bincode = "1.3"
