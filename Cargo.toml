@@ -39,7 +39,7 @@ ratatui = "0.28"
 crossterm = { version = "0.28", features = ["events"] }
 
 # GUI
-tauri = { version = "1.5", features = ["shell-open"] }
+tauri = { version = "1.5", features = ["shell-open", "dialog-open"] }
 tauri-build = "1.5"
 
 # Other
