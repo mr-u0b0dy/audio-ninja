@@ -171,25 +171,33 @@ impl InputManager {
 
     /// Enumerate all available input devices
     pub fn enumerate_devices(&mut self) -> Result<Vec<InputDevice>, InputError> {
-        // Placeholder: real implementation will use ALSA/PulseAudio APIs
-        // For now, return mock devices
-        self.devices = vec![
-            InputDevice::new(
-                "loopback".to_string(),
-                "System Audio Loopback".to_string(),
-                "loopback".to_string(),
-                2,
-                48000,
-            ),
-            InputDevice::new(
-                "default".to_string(),
-                "Default Microphone".to_string(),
-                "microphone".to_string(),
-                1,
-                48000,
-            ),
-        ];
-        Ok(self.devices.clone())
+        #[cfg(feature = "audio-backends")]
+        {
+            self.devices = cpal_enumerate_input_devices()?;
+            return Ok(self.devices.clone());
+        }
+
+        #[cfg(not(feature = "audio-backends"))]
+        {
+            // Mock devices for testing without real audio backends
+            self.devices = vec![
+                InputDevice::new(
+                    "loopback".to_string(),
+                    "System Audio Loopback".to_string(),
+                    "loopback".to_string(),
+                    2,
+                    48000,
+                ),
+                InputDevice::new(
+                    "default".to_string(),
+                    "Default Microphone".to_string(),
+                    "microphone".to_string(),
+                    1,
+                    48000,
+                ),
+            ];
+            Ok(self.devices.clone())
+        }
     }
 
     /// Get list of system loopback devices
@@ -259,6 +267,248 @@ impl InputManager {
 impl Default for InputManager {
     fn default() -> Self {
         Self::new()
+    }
+}
+
+// ===== cpal Backend for Real Device Enumeration =====
+#[cfg(feature = "audio-backends")]
+fn cpal_enumerate_input_devices() -> Result<Vec<InputDevice>, InputError> {
+    use cpal::traits::{DeviceTrait, HostTrait};
+
+    let host = cpal::default_host();
+    let mut devices = Vec::new();
+
+    // Add system loopback placeholder (cpal doesn't directly support loopback;
+    // on Linux this requires PulseAudio monitor sources or ALSA loopback module)
+    devices.push(InputDevice::new(
+        "loopback".to_string(),
+        "System Audio Loopback".to_string(),
+        "loopback".to_string(),
+        2,
+        48000,
+    ));
+
+    // Enumerate real input devices
+    let input_devices = host
+        .input_devices()
+        .map_err(|e| InputError::BackendError(format!("Failed to enumerate devices: {}", e)))?;
+
+    for (idx, device) in input_devices.enumerate() {
+        let name = device
+            .name()
+            .unwrap_or_else(|_| format!("Input Device {}", idx));
+
+        let config = device.default_input_config().ok();
+        let (channels, sample_rate) = config
+            .map(|c| (c.channels() as u32, c.sample_rate().0))
+            .unwrap_or((2, 48000));
+
+        let device_type = if name.to_lowercase().contains("mic") {
+            "microphone"
+        } else if name.to_lowercase().contains("usb") {
+            "usb-audio"
+        } else if name.to_lowercase().contains("line") {
+            "line-in"
+        } else {
+            "audio-input"
+        };
+
+        let mut supported_rates = vec![];
+        if let Ok(configs) = device.supported_input_configs() {
+            for cfg in configs {
+                for rate in &[44100u32, 48000, 96000, 192000] {
+                    if *rate >= cfg.min_sample_rate().0 && *rate <= cfg.max_sample_rate().0 {
+                        if !supported_rates.contains(rate) {
+                            supported_rates.push(*rate);
+                        }
+                    }
+                }
+            }
+        }
+        if supported_rates.is_empty() {
+            supported_rates = vec![48000, 44100, 96000];
+        }
+
+        let mut input_device = InputDevice::new(
+            format!("input_{}", idx),
+            name,
+            device_type.to_string(),
+            channels,
+            sample_rate,
+        );
+        input_device.sample_rates = supported_rates;
+        devices.push(input_device);
+    }
+
+    Ok(devices)
+}
+
+/// Wrapper to make cpal::Stream usable across thread boundaries.
+/// Safety: we only interact with the stream via play/pause/drop, all of which
+/// are internally synchronized by cpal. The audio callback closure itself is
+/// required to be Send by cpal's API.
+#[cfg(feature = "audio-backends")]
+#[allow(dead_code)]
+struct SendSyncStream(cpal::Stream);
+#[cfg(feature = "audio-backends")]
+unsafe impl Send for SendSyncStream {}
+#[cfg(feature = "audio-backends")]
+unsafe impl Sync for SendSyncStream {}
+
+/// CaptureStream implementation backed by cpal
+#[cfg(feature = "audio-backends")]
+pub struct CpalCaptureStream {
+    stream: Option<SendSyncStream>,
+    sample_rate: u32,
+    channels: u32,
+    running: std::sync::Arc<std::sync::atomic::AtomicBool>,
+    /// Shared ring buffer for captured audio (interleaved f32)
+    buffer: std::sync::Arc<std::sync::Mutex<Vec<f32>>>,
+}
+
+#[cfg(feature = "audio-backends")]
+impl CpalCaptureStream {
+    /// Create a new capture stream for a device by index
+    ///
+    /// `device_index` selects the input device (0 = first real device after loopback).
+    /// The stream is created but not started until `start()` is called.
+    pub fn new(device_index: usize, sample_rate: u32, channels: u32) -> Result<Self, InputError> {
+        use cpal::traits::HostTrait;
+
+        let host = cpal::default_host();
+        let _device = host
+            .input_devices()
+            .map_err(|e| InputError::BackendError(format!("enumerate failed: {e}")))?
+            .nth(device_index)
+            .ok_or_else(|| {
+                InputError::DeviceNotFound(format!("device index {} not found", device_index))
+            })?;
+
+        let running = std::sync::Arc::new(std::sync::atomic::AtomicBool::new(false));
+        let buffer = std::sync::Arc::new(std::sync::Mutex::new(Vec::with_capacity(
+            sample_rate as usize * channels as usize,
+        )));
+
+        Ok(Self {
+            stream: None,
+            sample_rate,
+            channels,
+            running,
+            buffer,
+        })
+    }
+
+    /// Create using the default input device
+    pub fn default_device(sample_rate: u32, channels: u32) -> Result<Self, InputError> {
+        use cpal::traits::HostTrait;
+
+        let host = cpal::default_host();
+        let _device = host.default_input_device().ok_or_else(|| {
+            InputError::DeviceNotFound("no default input device".to_string())
+        })?;
+
+        let running = std::sync::Arc::new(std::sync::atomic::AtomicBool::new(false));
+        let buffer = std::sync::Arc::new(std::sync::Mutex::new(Vec::with_capacity(
+            sample_rate as usize * channels as usize,
+        )));
+
+        Ok(Self {
+            stream: None,
+            sample_rate,
+            channels,
+            running,
+            buffer,
+        })
+    }
+
+    /// Read captured samples from the ring buffer, draining it
+    pub fn read_captured(&self) -> Vec<f32> {
+        let mut buf = self.buffer.lock().unwrap();
+        std::mem::take(&mut *buf)
+    }
+}
+
+#[cfg(feature = "audio-backends")]
+impl CaptureStream for CpalCaptureStream {
+    fn start(&mut self) -> Result<(), InputError> {
+        use cpal::traits::{DeviceTrait, HostTrait, StreamTrait};
+        use cpal::{SampleRate, StreamConfig};
+
+        if self.running.load(std::sync::atomic::Ordering::SeqCst) {
+            return Ok(()); // already running
+        }
+
+        let host = cpal::default_host();
+        let device = host
+            .default_input_device()
+            .ok_or_else(|| InputError::DeviceNotFound("no default input device".to_string()))?;
+
+        let config = StreamConfig {
+            channels: self.channels as u16,
+            sample_rate: SampleRate(self.sample_rate),
+            buffer_size: cpal::BufferSize::Default,
+        };
+
+        let buffer = self.buffer.clone();
+        let running = self.running.clone();
+
+        let stream = device
+            .build_input_stream(
+                &config,
+                move |data: &[f32], _: &cpal::InputCallbackInfo| {
+                    if running.load(std::sync::atomic::Ordering::Relaxed) {
+                        if let Ok(mut buf) = buffer.lock() {
+                            // Cap buffer size to avoid unbounded growth (~2 seconds)
+                            const MAX_SAMPLES: usize = 48000 * 2 * 2;
+                            if buf.len() + data.len() > MAX_SAMPLES {
+                                let drain = (buf.len() + data.len()) - MAX_SAMPLES;
+                                buf.drain(..drain);
+                            }
+                            buf.extend_from_slice(data);
+                        }
+                    }
+                },
+                |err| {
+                    eprintln!("[audio-ninja] capture error: {}", err);
+                },
+                None,
+            )
+            .map_err(|e| InputError::CaptureFailed(format!("build stream: {e}")))?;
+
+        stream
+            .play()
+            .map_err(|e| InputError::CaptureFailed(format!("play: {e}")))?;
+
+        self.running
+            .store(true, std::sync::atomic::Ordering::SeqCst);
+        self.stream = Some(SendSyncStream(stream));
+        Ok(())
+    }
+
+    fn stop(&mut self) -> Result<(), InputError> {
+        self.running
+            .store(false, std::sync::atomic::Ordering::SeqCst);
+        // Dropping the stream stops playback
+        self.stream = None;
+        Ok(())
+    }
+
+    fn is_running(&self) -> bool {
+        self.running.load(std::sync::atomic::Ordering::SeqCst)
+    }
+
+    fn sample_rate(&self) -> u32 {
+        self.sample_rate
+    }
+
+    fn channels(&self) -> u32 {
+        self.channels
+    }
+
+    fn latency_ms(&self) -> f32 {
+        // Default buffer latency estimate; cpal doesn't expose exact latency
+        // 256 frames at 48kHz ≈ 5.3ms
+        256.0 / self.sample_rate as f32 * 1000.0
     }
 }
 

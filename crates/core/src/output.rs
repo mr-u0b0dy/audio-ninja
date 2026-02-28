@@ -186,35 +186,42 @@ impl OutputManager {
 
     /// Enumerate all available output devices
     pub fn enumerate_devices(&mut self) -> Result<Vec<OutputDevice>, OutputError> {
-        // Placeholder: real implementation will use ALSA/PulseAudio APIs
-        // For now, return mock devices
-        let devices = vec![
-            OutputDevice::new(
-                "speaker".to_string(),
-                "Built-in Speaker".to_string(),
-                DeviceType::Speaker,
-                2,
-                48000,
-            )
-            .with_default(true),
-            OutputDevice::new(
-                "headphones".to_string(),
-                "Headphone Jack".to_string(),
-                DeviceType::Headphones,
-                2,
-                48000,
-            ),
-            OutputDevice::new(
-                "hdmi".to_string(),
-                "HDMI Audio".to_string(),
-                DeviceType::Hdmi,
-                8,
-                48000,
-            ),
-        ];
+        #[cfg(feature = "audio-backends")]
+        {
+            self.devices = cpal_enumerate_output_devices()?;
+            return Ok(self.devices.clone());
+        }
+        #[cfg(not(feature = "audio-backends"))]
+        {
+            // Mock devices for testing and CI builds
+            let devices = vec![
+                OutputDevice::new(
+                    "speaker".to_string(),
+                    "Built-in Speaker".to_string(),
+                    DeviceType::Speaker,
+                    2,
+                    48000,
+                )
+                .with_default(true),
+                OutputDevice::new(
+                    "headphones".to_string(),
+                    "Headphone Jack".to_string(),
+                    DeviceType::Headphones,
+                    2,
+                    48000,
+                ),
+                OutputDevice::new(
+                    "hdmi".to_string(),
+                    "HDMI Audio".to_string(),
+                    DeviceType::Hdmi,
+                    8,
+                    48000,
+                ),
+            ];
 
-        self.devices = devices;
-        Ok(self.devices.clone())
+            self.devices = devices;
+            Ok(self.devices.clone())
+        }
     }
 
     /// Get devices of a specific type
@@ -290,6 +297,287 @@ impl OutputManager {
 impl Default for OutputManager {
     fn default() -> Self {
         Self::new()
+    }
+}
+
+// ===== cpal Backend for Real Device Enumeration =====
+#[cfg(feature = "audio-backends")]
+fn cpal_enumerate_output_devices() -> Result<Vec<OutputDevice>, OutputError> {
+    use cpal::traits::{DeviceTrait, HostTrait};
+
+    let host = cpal::default_host();
+    let mut devices = Vec::new();
+
+    // Try to identify the default output device
+    let default_name = host
+        .default_output_device()
+        .and_then(|d| d.name().ok())
+        .unwrap_or_default();
+
+    let output_devices = host
+        .output_devices()
+        .map_err(|e| OutputError::BackendError(format!("Failed to enumerate devices: {}", e)))?;
+
+    for (idx, device) in output_devices.enumerate() {
+        let name = device
+            .name()
+            .unwrap_or_else(|_| format!("Output Device {}", idx));
+
+        let config = device.default_output_config().ok();
+        let (channels, sample_rate) = config
+            .map(|c| (c.channels() as u32, c.sample_rate().0))
+            .unwrap_or((2, 48000));
+
+        let name_lower = name.to_lowercase();
+        let device_type = if name_lower.contains("hdmi") {
+            DeviceType::Hdmi
+        } else if name_lower.contains("headphone") || name_lower.contains("headset") {
+            DeviceType::Headphones
+        } else if name_lower.contains("usb") {
+            DeviceType::Usb
+        } else if name_lower.contains("line") {
+            DeviceType::LineOut
+        } else if name_lower.contains("speaker") || name_lower.contains("analog") {
+            DeviceType::Speaker
+        } else {
+            DeviceType::Other
+        };
+
+        let is_default = name == default_name;
+
+        let mut supported_rates = vec![];
+        if let Ok(configs) = device.supported_output_configs() {
+            for cfg in configs {
+                for rate in &[44100u32, 48000, 96000, 192000] {
+                    if *rate >= cfg.min_sample_rate().0 && *rate <= cfg.max_sample_rate().0 {
+                        if !supported_rates.contains(rate) {
+                            supported_rates.push(*rate);
+                        }
+                    }
+                }
+            }
+        }
+        if supported_rates.is_empty() {
+            supported_rates = vec![48000, 44100, 96000];
+        }
+
+        let mut output_device = OutputDevice::new(
+            format!("output_{}", idx),
+            name,
+            device_type,
+            channels,
+            sample_rate,
+        )
+        .with_default(is_default);
+        output_device.sample_rates = supported_rates;
+        devices.push(output_device);
+    }
+
+    // If no device was marked as default, mark the first one
+    if !devices.is_empty() && !devices.iter().any(|d| d.is_default) {
+        devices[0].is_default = true;
+    }
+
+    Ok(devices)
+}
+
+/// Wrapper to make cpal::Stream usable across thread boundaries.
+/// Safety: we only interact with the stream via play/pause/drop, all of which
+/// are internally synchronized by cpal.
+#[cfg(feature = "audio-backends")]
+#[allow(dead_code)]
+struct SendSyncStream(cpal::Stream);
+#[cfg(feature = "audio-backends")]
+unsafe impl Send for SendSyncStream {}
+#[cfg(feature = "audio-backends")]
+unsafe impl Sync for SendSyncStream {}
+
+/// PlaybackStream implementation backed by cpal
+#[cfg(feature = "audio-backends")]
+pub struct CpalPlaybackStream {
+    stream: Option<SendSyncStream>,
+    sample_rate: u32,
+    channels: u32,
+    running: std::sync::Arc<std::sync::atomic::AtomicBool>,
+    /// Ring buffer that `write()` pushes into and the audio callback drains
+    ring: std::sync::Arc<std::sync::Mutex<std::collections::VecDeque<f32>>>,
+    latency_ms: f32,
+}
+
+#[cfg(feature = "audio-backends")]
+impl CpalPlaybackStream {
+    /// Create a playback stream for the default output device
+    pub fn new(sample_rate: u32, channels: u32) -> Result<Self, OutputError> {
+        use cpal::traits::HostTrait;
+
+        let host = cpal::default_host();
+        let _device = host.default_output_device().ok_or_else(|| {
+            OutputError::DeviceNotFound("no default output device".to_string())
+        })?;
+
+        let running = std::sync::Arc::new(std::sync::atomic::AtomicBool::new(false));
+        let ring = std::sync::Arc::new(std::sync::Mutex::new(
+            std::collections::VecDeque::with_capacity(sample_rate as usize * channels as usize),
+        ));
+
+        Ok(Self {
+            stream: None,
+            sample_rate,
+            channels,
+            running,
+            ring,
+            latency_ms: 256.0 / sample_rate as f32 * 1000.0,
+        })
+    }
+
+    /// Create a playback stream for a specific device by index
+    pub fn for_device(
+        device_index: usize,
+        sample_rate: u32,
+        channels: u32,
+    ) -> Result<Self, OutputError> {
+        use cpal::traits::HostTrait;
+
+        let host = cpal::default_host();
+        let _device = host
+            .output_devices()
+            .map_err(|e| OutputError::BackendError(format!("enumerate: {e}")))?
+            .nth(device_index)
+            .ok_or_else(|| {
+                OutputError::DeviceNotFound(format!("device index {} not found", device_index))
+            })?;
+
+        let running = std::sync::Arc::new(std::sync::atomic::AtomicBool::new(false));
+        let ring = std::sync::Arc::new(std::sync::Mutex::new(
+            std::collections::VecDeque::with_capacity(sample_rate as usize * channels as usize),
+        ));
+
+        Ok(Self {
+            stream: None,
+            sample_rate,
+            channels,
+            running,
+            ring,
+            latency_ms: 256.0 / sample_rate as f32 * 1000.0,
+        })
+    }
+}
+
+#[cfg(feature = "audio-backends")]
+impl PlaybackStream for CpalPlaybackStream {
+    fn start(&mut self) -> Result<(), OutputError> {
+        use cpal::traits::{DeviceTrait, HostTrait, StreamTrait};
+        use cpal::{SampleRate, StreamConfig};
+
+        if self.running.load(std::sync::atomic::Ordering::SeqCst) {
+            return Ok(());
+        }
+
+        let host = cpal::default_host();
+        let device = host
+            .default_output_device()
+            .ok_or_else(|| OutputError::DeviceNotFound("no default output device".to_string()))?;
+
+        let config = StreamConfig {
+            channels: self.channels as u16,
+            sample_rate: SampleRate(self.sample_rate),
+            buffer_size: cpal::BufferSize::Default,
+        };
+
+        let ring = self.ring.clone();
+        let running = self.running.clone();
+
+        let stream = device
+            .build_output_stream(
+                &config,
+                move |data: &mut [f32], _: &cpal::OutputCallbackInfo| {
+                    if !running.load(std::sync::atomic::Ordering::Relaxed) {
+                        // Fill with silence when not running
+                        for sample in data.iter_mut() {
+                            *sample = 0.0;
+                        }
+                        return;
+                    }
+
+                    if let Ok(mut buf) = ring.lock() {
+                        for sample in data.iter_mut() {
+                            *sample = buf.pop_front().unwrap_or(0.0);
+                        }
+                    } else {
+                        for sample in data.iter_mut() {
+                            *sample = 0.0;
+                        }
+                    }
+                },
+                |err| {
+                    eprintln!("[audio-ninja] playback error: {}", err);
+                },
+                None,
+            )
+            .map_err(|e| OutputError::PlaybackFailed(format!("build stream: {e}")))?;
+
+        stream
+            .play()
+            .map_err(|e| OutputError::PlaybackFailed(format!("play: {e}")))?;
+
+        self.running
+            .store(true, std::sync::atomic::Ordering::SeqCst);
+        self.stream = Some(SendSyncStream(stream));
+        Ok(())
+    }
+
+    fn stop(&mut self) -> Result<(), OutputError> {
+        self.running
+            .store(false, std::sync::atomic::Ordering::SeqCst);
+        self.stream = None;
+        Ok(())
+    }
+
+    fn is_running(&self) -> bool {
+        self.running.load(std::sync::atomic::Ordering::SeqCst)
+    }
+
+    fn sample_rate(&self) -> u32 {
+        self.sample_rate
+    }
+
+    fn channels(&self) -> u32 {
+        self.channels
+    }
+
+    fn latency_ms(&self) -> f32 {
+        self.latency_ms
+    }
+
+    fn write(&mut self, data: &[Vec<f32>]) -> Result<(), OutputError> {
+        if data.is_empty() {
+            return Ok(());
+        }
+
+        let frame_count = data[0].len();
+        let ch_count = data.len();
+
+        // Interleave channels into the ring buffer
+        let mut ring = self
+            .ring
+            .lock()
+            .map_err(|_| OutputError::PlaybackFailed("lock poisoned".to_string()))?;
+
+        // Cap ring buffer to ~1 second to avoid unbounded growth
+        let max_samples = self.sample_rate as usize * self.channels as usize;
+        let incoming = frame_count * ch_count;
+        if ring.len() + incoming > max_samples {
+            let drain = (ring.len() + incoming) - max_samples;
+            ring.drain(..drain);
+        }
+
+        for frame in 0..frame_count {
+            for ch in 0..ch_count {
+                ring.push_back(data[ch].get(frame).copied().unwrap_or(0.0));
+            }
+        }
+
+        Ok(())
     }
 }
 

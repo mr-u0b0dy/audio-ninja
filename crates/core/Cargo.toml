@@ -9,6 +9,11 @@ repository = "https://github.com/mr-u0b0dy/audio-ninja"
 homepage = "https://github.com/mr-u0b0dy/audio-ninja"
 documentation = "https://docs.rs/audio-ninja"
 readme = "README.md"
+
+[features]
+default = []
+audio-backends = ["cpal"]
+
 [dev-dependencies]
 criterion = { version = "0.8", features = ["html_reports"] }
 
@@ -25,3 +30,4 @@ rand = "0.9"
 tokio = { version = "1.42", features = ["net", "sync", "time", "rt", "macros"] }
 mdns-sd = "0.11"
 uuid = { version = "1.11", features = ["v4", "serde"] }
+cpal = { version = "0.15", optional = true }
