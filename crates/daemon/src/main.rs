@@ -94,6 +94,14 @@ async fn main() -> Result<()> {
         .route("/api/v1/calibration/apply", post(api::calibration_apply))
         // Statistics and monitoring
         .route("/api/v1/stats", get(api::stats))
+        .route("/api/v1/stats/network", get(api::stats_network))
+        .route("/api/v1/stats/latency", get(api::stats_latency))
+        .route("/api/v1/stats/daemon", get(api::stats_daemon))
+        .route("/api/v1/stats/sync", get(api::stats_sync))
+        .route(
+            "/api/v1/stats/audio-levels",
+            get(api::stats_audio_levels),
+        )
         .route("/api/v1/speakers/{id}/stats", get(api::speaker_stats))
         // Add CORS middleware
         .layer(

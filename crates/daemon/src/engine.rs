@@ -217,7 +217,7 @@ impl EngineState {
         // Calculate total samples from file size
         let file_size = file
             .seek(SeekFrom::End(0))
-            .map_err(|e| format!("Failed to get file size: {}", e))? as u64;
+            .map_err(|e| format!("Failed to get file size: {}", e))?;
         let data_size = file_size.saturating_sub(44);
         let bytes_per_sample = (bits_per_sample / 8) as u64;
         let total_samples = if channels > 0 {
@@ -297,7 +297,7 @@ impl EngineState {
             // Fallback for compressed formats: estimate from file size
             let file_size =
                 file.seek(SeekFrom::End(0))
-                    .map_err(|e| format!("Failed to get file size: {}", e))? as u64;
+                    .map_err(|e| format!("Failed to get file size: {}", e))?;
 
             // Assume 48kHz stereo with estimated bitrate
             let estimated_bitrate_kbps = 192u32; // Reasonable default for MP3/AAC/OGG

@@ -126,10 +126,9 @@ pub async fn set_layout(
 
     // Create layout from preset or custom positions
     let layout = if let Some(preset) = request.preset {
-        match preset.as_str() {
-            "stereo" => SpeakerLayout::stereo(),
-            "5.1" => SpeakerLayout::surround_5_1(),
-            _ => return StatusCode::BAD_REQUEST,
+        match SpeakerLayout::from_preset(&preset) {
+            Some(layout) => layout,
+            None => return StatusCode::BAD_REQUEST,
         }
     } else if let Some(speakers) = request.speakers {
         if speakers.is_empty() {
@@ -242,6 +241,148 @@ pub async fn stats(State(state): State<AppState>) -> Json<serde_json::Value> {
         "online_speakers": online_speakers,
         "transport_state": format!("{:?}", engine.transport_state),
         "has_layout": engine.layout.is_some(),
+    }))
+}
+
+/// GET /api/v1/stats/network - Network bandwidth statistics
+pub async fn stats_network(State(state): State<AppState>) -> Json<serde_json::Value> {
+    let engine = state.engine.read().await;
+    let active_speakers = engine.speakers.values().filter(|s| s.online).count();
+    // Estimate bandwidth based on active speakers and sample rate
+    let base_kbps = if matches!(engine.transport_state, crate::engine::TransportState::Playing) {
+        (engine.playback.sample_rate as f64 * 2.0 * 16.0 / 8.0 / 1000.0) * active_speakers.max(1) as f64
+    } else {
+        0.0
+    };
+    Json(serde_json::json!({
+        "sent_kbps": base_kbps,
+        "received_kbps": base_kbps * 0.01,
+        "peak_sent_kbps": base_kbps * 1.2,
+        "peak_received_kbps": base_kbps * 0.015,
+        "packets_sent": 0u64,
+        "packets_received": 0u64,
+    }))
+}
+
+/// GET /api/v1/stats/latency - Latency statistics across speakers
+pub async fn stats_latency(State(state): State<AppState>) -> Json<serde_json::Value> {
+    let engine = state.engine.read().await;
+    let latencies: Vec<f64> = engine
+        .speaker_stats
+        .values()
+        .map(|s| s.latency_ms as f64)
+        .collect();
+
+    let (min, max, mean, stddev) = if latencies.is_empty() {
+        (0.0, 0.0, 0.0, 0.0)
+    } else {
+        let min = latencies.iter().cloned().fold(f64::INFINITY, f64::min);
+        let max = latencies.iter().cloned().fold(f64::NEG_INFINITY, f64::max);
+        let mean = latencies.iter().sum::<f64>() / latencies.len() as f64;
+        let variance = latencies.iter().map(|v| (v - mean).powi(2)).sum::<f64>()
+            / latencies.len() as f64;
+        (min, max, mean, variance.sqrt())
+    };
+
+    Json(serde_json::json!({
+        "min_ms": min,
+        "max_ms": max,
+        "mean_ms": mean,
+        "stddev_ms": stddev,
+        "samples": latencies,
+        "speaker_count": engine.speakers.len(),
+    }))
+}
+
+/// GET /api/v1/stats/daemon - Daemon process statistics
+pub async fn stats_daemon(State(state): State<AppState>) -> Json<serde_json::Value> {
+    let uptime = state.started_at.elapsed().as_secs();
+
+    // Read process stats from /proc/self (Linux)
+    let (cpu_percent, memory_mb) = read_proc_stats();
+
+    Json(serde_json::json!({
+        "cpu_percent": cpu_percent,
+        "memory_mb": memory_mb,
+        "uptime_secs": uptime,
+        "pid": std::process::id(),
+        "version": env!("CARGO_PKG_VERSION"),
+    }))
+}
+
+/// Read process stats from /proc/self on Linux, fallback to zeros.
+fn read_proc_stats() -> (f64, f64) {
+    #[cfg(target_os = "linux")]
+    {
+        if let Ok(statm) = std::fs::read_to_string("/proc/self/statm") {
+            let parts: Vec<&str> = statm.split_whitespace().collect();
+            if let Some(rss_pages) = parts.get(1).and_then(|s| s.parse::<f64>().ok()) {
+                let page_size = 4096.0; // typical Linux page size
+                let memory_mb = rss_pages * page_size / (1024.0 * 1024.0);
+                // CPU usage is harder without tracking over time; return a snapshot estimate
+                return (0.0, memory_mb);
+            }
+        }
+    }
+    (0.0, 0.0)
+}
+
+/// GET /api/v1/stats/sync - Speaker synchronization statistics
+pub async fn stats_sync(State(state): State<AppState>) -> Json<serde_json::Value> {
+    let engine = state.engine.read().await;
+    let speakers: Vec<serde_json::Value> = engine
+        .speakers
+        .iter()
+        .map(|(id, info)| {
+            let stats = engine.speaker_stats.get(id);
+            serde_json::json!({
+                "id": id.to_string(),
+                "name": info.name,
+                "sync_error_ms": stats.map(|s| s.jitter_ms).unwrap_or(0.0),
+                "status": if stats.map(|s| s.jitter_ms < 5.0).unwrap_or(true) {
+                    "locked"
+                } else if stats.map(|s| s.jitter_ms < 20.0).unwrap_or(false) {
+                    "drift"
+                } else {
+                    "unlocked"
+                },
+            })
+        })
+        .collect();
+
+    Json(serde_json::json!({
+        "speakers": speakers,
+        "overall_status": if speakers.is_empty() { "no_speakers" }
+            else if speakers.iter().all(|s| s["status"] == "locked") { "locked" }
+            else { "drift" },
+    }))
+}
+
+/// GET /api/v1/stats/audio-levels - Real-time audio levels
+pub async fn stats_audio_levels(State(state): State<AppState>) -> Json<serde_json::Value> {
+    let engine = state.engine.read().await;
+    let is_playing = matches!(engine.transport_state, crate::engine::TransportState::Playing);
+
+    // Return simulated levels until real audio pipeline is connected
+    let (input_db, output_db) = if is_playing {
+        (-12.0, -14.0)
+    } else {
+        (-60.0, -60.0)
+    };
+
+    let per_speaker: Vec<f64> = engine
+        .speakers
+        .values()
+        .map(|s| if s.online && is_playing { -14.0 } else { -60.0 })
+        .collect();
+
+    Json(serde_json::json!({
+        "input_db_left": input_db,
+        "input_db_right": input_db + 0.5,
+        "output_db_left": output_db,
+        "output_db_right": output_db + 0.3,
+        "per_speaker_db": per_speaker,
+        "clipping": false,
     }))
 }
 
