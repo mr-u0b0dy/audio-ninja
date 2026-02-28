@@ -16,239 +16,611 @@
             </div>
         </header>
 
+        <!-- Tab Navigation -->
+        <nav class="tab-nav" role="tablist" aria-label="Main navigation">
+            <button class="tab-btn active" data-tab="status" role="tab" aria-selected="true" aria-controls="tab-status">Status <span class="shortcut-hint">[1]</span></button>
+            <button class="tab-btn" data-tab="config" role="tab" aria-selected="false" aria-controls="tab-config">Config <span class="shortcut-hint">[2]</span></button>
+            <button class="tab-btn" data-tab="io" role="tab" aria-selected="false" aria-controls="tab-io">I/O <span class="shortcut-hint">[3]</span></button>
+            <button class="tab-btn" data-tab="transport" role="tab" aria-selected="false" aria-controls="tab-transport">Transport <span class="shortcut-hint">[4]</span></button>
+            <button class="tab-btn" data-tab="layout" role="tab" aria-selected="false" aria-controls="tab-layout">Layout <span class="shortcut-hint">[5]</span></button>
+            <button class="tab-btn" data-tab="calibration" role="tab" aria-selected="false" aria-controls="tab-calibration">Calibration <span class="shortcut-hint">[6]</span></button>
+            <button class="tab-btn" data-tab="stats" role="tab" aria-selected="false" aria-controls="tab-stats">Stats <span class="shortcut-hint">[7]</span></button>
+        </nav>
+
         <main class="main-content">
-            <!-- Status Panel -->
-            <section class="panel status-panel">
-                <h2>Status</h2>
-                <div class="status-grid">
-                    <div class="status-item">
-                        <span class="label">Sample Rate:</span>
-                        <span id="statusSampleRate" class="value">48000 Hz</span>
-                    </div>
-                    <div class="status-item">
-                        <span class="label">DRC:</span>
-                        <span id="statusDRC" class="value status-off">Inactive</span>
-                    </div>
-                    <div class="status-item">
-                        <span class="label">Loudness:</span>
-                        <span id="statusLoudness" class="value status-off">Inactive</span>
-                    </div>
-                    <div class="status-item">
-                        <span class="label">Binaural:</span>
-                        <span id="statusBinaural" class="value status-off">Inactive</span>
-                    </div>
-                </div>
-            </section>
-
-            <div class="config-grid">
-                <!-- DRC Panel -->
-                <section class="panel config-panel">
-                    <h2>🎚️ DRC (Dynamic Range Control)</h2>
-                    <div class="control-group">
-                        <label for="drcPreset">Preset:</label>
-                        <select id="drcPreset">
-                            <option value="">None</option>
-                            <option value="Speech">Speech (3:1, -16dB)</option>
-                            <option value="Music" selected>Music (4:1, -18dB)</option>
-                            <option value="Cinema">Cinema (2:1, -14dB)</option>
-                        </select>
-                    </div>
-                    <div class="preset-info" id="drcInfo">
-                        Music: 4:1 ratio, -18dB threshold, 10ms/100ms attack/release
-                    </div>
-                </section>
-
-                <!-- Loudness Panel -->
-                <section class="panel config-panel">
-                    <h2>📊 Loudness (ITU-R BS.1770)</h2>
-                    <div class="control-group">
-                        <label for="loudnessTarget">Target:</label>
-                        <select id="loudnessTarget">
-                            <option value="">None</option>
-                            <option value="Television">Television (-23 LUFS)</option>
-                            <option value="StreamingMusic" selected>Streaming Music (-14 LUFS)</option>
-                            <option value="FilmTheatrical">Film Theatrical (-27 LUFS)</option>
-                            <option value="FilmHome">Film Home (-20 LUFS)</option>
-                        </select>
-                    </div>
-                    <div class="preset-info" id="loudnessInfo">
-                        Streaming Music: Standard for music streaming platforms
-                    </div>
-                </section>
-
-                <!-- Headroom Panel -->
-                <section class="panel config-panel">
-                    <h2>🔊 Headroom Protection</h2>
-                    <div class="control-group">
-                        <label for="headroomDb">Threshold (dB):</label>
-                        <input type="range" id="headroomDb" min="1" max="6" value="3" step="0.5">
-                        <span id="headroomDbValue">3.0</span>
-                    </div>
-                    <div class="control-group">
-                        <label for="headroomLookahead">Lookahead (ms):</label>
-                        <input type="range" id="headroomLookahead" min="0" max="10" value="3" step="0.5">
-                        <span id="headroomLookaheadValue">3.0</span>
-                    </div>
-                </section>
-
-                <!-- Binaural Panel -->
-                <section class="panel config-panel">
-                    <h2>🎧 Binaural Rendering</h2>
-                    <div class="control-group">
-                        <input type="checkbox" id="binauralEnabled">
-                        <label for="binauralEnabled">Enable Binaural for Headphones</label>
-                    </div>
-
-                    <div id="binauralControls" class="binaural-controls hidden">
-                        <div class="control-group">
-                            <label for="binauralProfile">Headphone Profile:</label>
-                            <select id="binauralProfile">
-                                <option value="Flat">Flat (Reference)</option>
-                                <option value="ClosedBack" selected>ClosedBack (Most common)</option>
-                                <option value="OpenBack">OpenBack (Spacious)</option>
-                                <option value="IEM">IEM (In-ear)</option>
-                            </select>
+            <!-- ===== STATUS TAB ===== -->
+            <div class="tab-content active" id="tab-status" role="tabpanel" aria-labelledby="tab-status">
+                <section class="panel status-panel">
+                    <h2>System Status</h2>
+                    <div class="status-grid">
+                        <div class="status-item">
+                            <span class="label">Daemon:</span>
+                            <span id="statusDaemon" class="value status-off">Disconnected</span>
                         </div>
-
-                        <div class="control-group">
-                            <label for="binauralAzimuth">Azimuth (°):</label>
-                            <input type="range" id="binauralAzimuth" min="-180" max="180" value="0" step="15">
-                            <span id="binauralAzimuthValue">0°</span>
-                            <div class="help-text">0° = Front, -90° = Left, 90° = Right</div>
+                        <div class="status-item">
+                            <span class="label">Sample Rate:</span>
+                            <span id="statusSampleRate" class="value">48000 Hz</span>
                         </div>
-
-                        <div class="control-group">
-                            <label for="binauralElevation">Elevation (°):</label>
-                            <input type="range" id="binauralElevation" min="-90" max="90" value="0" step="15">
-                            <span id="binauralElevationValue">0°</span>
-                            <div class="help-text">0° = Ear level, 45° = Above, -45° = Below</div>
+                        <div class="status-item">
+                            <span class="label">DRC:</span>
+                            <span id="statusDRC" class="value status-off">Inactive</span>
                         </div>
-
-                        <div class="control-group">
-                            <label for="binauralDistance">Distance (m):</label>
-                            <input type="range" id="binauralDistance" min="0.5" max="3" value="1" step="0.1">
-                            <span id="binauralDistanceValue">1.0</span>
-                            <div class="help-text">0.5m = Close, 1.0m = Normal, 2.0m = Far</div>
+                        <div class="status-item">
+                            <span class="label">Loudness:</span>
+                            <span id="statusLoudness" class="value status-off">Inactive</span>
                         </div>
-
-                        <div class="spatial-viz">
-                            <svg width="200" height="200" viewBox="0 0 200 200">
-                                <!-- Circle representing head -->
-                                <circle cx="100" cy="100" r="30" fill="none" stroke="#666" stroke-width="2"/>
-                                <!-- Ears -->
-                                <circle cx="70" cy="100" r="5" fill="#999"/>
-                                <circle cx="130" cy="100" r="5" fill="#999"/>
-                                <!-- Sound source indicator -->
-                                <circle id="soundSource" cx="100" cy="70" r="8" fill="#ff6b6b"/>
-                                <!-- Grid -->
-                                <line x1="0" y1="100" x2="200" y2="100" stroke="#ddd" stroke-width="1" stroke-dasharray="5,5"/>
-                                <line x1="100" y1="0" x2="100" y2="200" stroke="#ddd" stroke-width="1" stroke-dasharray="5,5"/>
-                            </svg>
-                            <p class="help-text">Sound source position</p>
+                        <div class="status-item">
+                            <span class="label">Binaural:</span>
+                            <span id="statusBinaural" class="value status-off">Inactive</span>
+                        </div>
+                        <div class="status-item">
+                            <span class="label">Speakers:</span>
+                            <span id="statusSpeakers" class="value">0</span>
+                        </div>
+                        <div class="status-item">
+                            <span class="label">Transport:</span>
+                            <span id="statusTransport" class="value status-off">Stopped</span>
+                        </div>
+                        <div class="status-item">
+                            <span class="label">Uptime:</span>
+                            <span id="statusUptime" class="value">-</span>
                         </div>
                     </div>
                 </section>
 
-                <!-- Input/Output Panel -->
-                <section class="panel config-panel">
-                    <h2>🎙️ Audio I/O</h2>
-                    <div class="control-group">
-                        <label for="inputDevice">Input Device:</label>
-                        <select id="inputDevice">
-                            <option value="">Loading devices...</option>
-                        </select>
-                        <div class="help-text">Select audio input source</div>
+                <!-- Audio Level Meters -->
+                <section class="panel">
+                    <h2>Audio Levels</h2>
+                    <div class="level-meters">
+                        <div class="meter-group">
+                            <span class="meter-label">Input L</span>
+                            <div class="meter-bar"><div class="meter-fill" id="meterInputL" style="width: 0%"></div></div>
+                            <span class="meter-db" id="meterInputLDb">-inf</span>
+                        </div>
+                        <div class="meter-group">
+                            <span class="meter-label">Input R</span>
+                            <div class="meter-bar"><div class="meter-fill" id="meterInputR" style="width: 0%"></div></div>
+                            <span class="meter-db" id="meterInputRDb">-inf</span>
+                        </div>
+                        <div class="meter-group">
+                            <span class="meter-label">Output L</span>
+                            <div class="meter-bar"><div class="meter-fill meter-fill-output" id="meterOutputL" style="width: 0%"></div></div>
+                            <span class="meter-db" id="meterOutputLDb">-inf</span>
+                        </div>
+                        <div class="meter-group">
+                            <span class="meter-label">Output R</span>
+                            <div class="meter-bar"><div class="meter-fill meter-fill-output" id="meterOutputR" style="width: 0%"></div></div>
+                            <span class="meter-db" id="meterOutputRDb">-inf</span>
+                        </div>
                     </div>
+                </section>
 
-                    <div class="control-group">
-                        <label for="inputSource">Input Source Type:</label>
-                        <select id="inputSource">
-                            <option value="SystemAudio">System Audio (Loopback)</option>
-                            <option value="ExternalDevice">External Device</option>
-                        </select>
-                        <div class="help-text">Choose between system audio capture or external device</div>
-                    </div>
-
-                    <div class="control-group">
-                        <label for="outputDevice">Output Device:</label>
-                        <select id="outputDevice">
-                            <option value="">Loading devices...</option>
-                        </select>
-                        <div class="help-text">Select audio output device</div>
-                    </div>
-
-                    <div class="button-group">
-                        <button id="refreshDevicesBtn" class="btn btn-secondary">🔄 Refresh Devices</button>
+                <!-- Results Panel -->
+                <section class="panel results-panel">
+                    <h2>Results</h2>
+                    <div id="resultsContent" class="results-content">
+                        <p class="placeholder">Configure and apply settings to see results</p>
                     </div>
                 </section>
             </div>
 
-            <!-- Transport Control Panel -->
-            <section class="panel control-panel">
-                <h2>🎵 Transport & Playback</h2>
-                <div class="control-group">
-                    <label for="audioFile">Audio File:</label>
-                    <div style="display: flex; gap: 10px;">
-                        <input type="text" id="audioFile" placeholder="/path/to/audio.wav" readonly style="flex: 1;">
-                        <button id="selectFileBtn" class="btn btn-secondary">Browse...</button>
+            <!-- ===== CONFIG TAB ===== -->
+            <div class="tab-content" id="tab-config" role="tabpanel" aria-labelledby="tab-config">
+                <div class="config-grid">
+                    <!-- DRC Panel -->
+                    <section class="panel config-panel">
+                        <h2>DRC (Dynamic Range Control)</h2>
+                        <div class="control-group">
+                            <label for="drcPreset">Preset:</label>
+                            <select id="drcPreset">
+                                <option value="">None</option>
+                                <option value="Speech">Speech (3:1, -16dB)</option>
+                                <option value="Music" selected>Music (4:1, -18dB)</option>
+                                <option value="Cinema">Cinema (2:1, -14dB)</option>
+                            </select>
+                        </div>
+                        <div class="preset-info" id="drcInfo">
+                            Music: 4:1 ratio, -18dB threshold, 10ms/100ms attack/release
+                        </div>
+                    </section>
+
+                    <!-- Loudness Panel -->
+                    <section class="panel config-panel">
+                        <h2>Loudness (ITU-R BS.1770)</h2>
+                        <div class="control-group">
+                            <label for="loudnessTarget">Target:</label>
+                            <select id="loudnessTarget">
+                                <option value="">None</option>
+                                <option value="Television">Television (-23 LUFS)</option>
+                                <option value="StreamingMusic" selected>Streaming Music (-14 LUFS)</option>
+                                <option value="FilmTheatrical">Film Theatrical (-27 LUFS)</option>
+                                <option value="FilmHome">Film Home (-20 LUFS)</option>
+                            </select>
+                        </div>
+                        <div class="preset-info" id="loudnessInfo">
+                            Streaming Music: Standard for music streaming platforms
+                        </div>
+                    </section>
+
+                    <!-- Headroom Panel -->
+                    <section class="panel config-panel">
+                        <h2>Headroom Protection</h2>
+                        <div class="control-group">
+                            <label for="headroomDb">Threshold (dB):</label>
+                            <input type="range" id="headroomDb" min="1" max="6" value="3" step="0.5">
+                            <span id="headroomDbValue">3.0</span>
+                        </div>
+                        <div class="control-group">
+                            <label for="headroomLookahead">Lookahead (ms):</label>
+                            <input type="range" id="headroomLookahead" min="0" max="10" value="3" step="0.5">
+                            <span id="headroomLookaheadValue">3.0</span>
+                        </div>
+                    </section>
+
+                    <!-- Binaural Panel -->
+                    <section class="panel config-panel">
+                        <h2>Binaural Rendering</h2>
+                        <div class="control-group">
+                            <input type="checkbox" id="binauralEnabled">
+                            <label for="binauralEnabled" class="inline-label">Enable Binaural for Headphones</label>
+                        </div>
+
+                        <div id="binauralControls" class="binaural-controls hidden">
+                            <div class="control-group">
+                                <label for="binauralProfile">Headphone Profile:</label>
+                                <select id="binauralProfile">
+                                    <option value="Flat">Flat (Reference)</option>
+                                    <option value="ClosedBack" selected>ClosedBack (Most common)</option>
+                                    <option value="OpenBack">OpenBack (Spacious)</option>
+                                    <option value="IEM">IEM (In-ear)</option>
+                                </select>
+                            </div>
+
+                            <div class="control-group">
+                                <label for="binauralAzimuth">Azimuth:</label>
+                                <input type="range" id="binauralAzimuth" min="-180" max="180" value="0" step="15">
+                                <span id="binauralAzimuthValue">0&deg;</span>
+                                <div class="help-text">0&deg; = Front, -90&deg; = Left, 90&deg; = Right</div>
+                            </div>
+
+                            <div class="control-group">
+                                <label for="binauralElevation">Elevation:</label>
+                                <input type="range" id="binauralElevation" min="-90" max="90" value="0" step="15">
+                                <span id="binauralElevationValue">0&deg;</span>
+                                <div class="help-text">0&deg; = Ear level, 45&deg; = Above, -45&deg; = Below</div>
+                            </div>
+
+                            <div class="control-group">
+                                <label for="binauralDistance">Distance (m):</label>
+                                <input type="range" id="binauralDistance" min="0.5" max="3" value="1" step="0.1">
+                                <span id="binauralDistanceValue">1.0</span>
+                                <div class="help-text">0.5m = Close, 1.0m = Normal, 2.0m = Far</div>
+                            </div>
+
+                            <div class="spatial-viz">
+                                <svg width="200" height="200" viewBox="0 0 200 200">
+                                    <circle cx="100" cy="100" r="30" fill="none" stroke="#666" stroke-width="2"/>
+                                    <circle cx="70" cy="100" r="5" fill="#999"/>
+                                    <circle cx="130" cy="100" r="5" fill="#999"/>
+                                    <circle id="soundSource" cx="100" cy="70" r="8" fill="var(--magma-orange)"/>
+                                    <line x1="0" y1="100" x2="200" y2="100" stroke="rgba(255,140,0,0.3)" stroke-width="1" stroke-dasharray="5,5"/>
+                                    <line x1="100" y1="0" x2="100" y2="200" stroke="rgba(255,140,0,0.3)" stroke-width="1" stroke-dasharray="5,5"/>
+                                </svg>
+                                <p class="help-text">Sound source position</p>
+                            </div>
+                        </div>
+                    </section>
+                </div>
+
+                <!-- Control Buttons -->
+                <section class="panel control-panel">
+                    <h2>Controls</h2>
+                    <div class="button-group">
+                        <button id="applyConfigBtn" class="btn btn-primary">Apply Configuration</button>
+                        <button id="processAudioBtn" class="btn btn-success">Process Audio</button>
+                        <button id="resetBtn" class="btn btn-secondary">Reset to Defaults</button>
                     </div>
-                    <div class="help-text">Currently loaded: <span id="currentFile">None</span></div>
+                </section>
+            </div>
+
+            <!-- ===== I/O TAB ===== -->
+            <div class="tab-content" id="tab-io" role="tabpanel" aria-labelledby="tab-io">
+                <div class="config-grid">
+                    <section class="panel config-panel">
+                        <h2>Input Device</h2>
+                        <div class="control-group">
+                            <label for="inputDevice">Device:</label>
+                            <select id="inputDevice">
+                                <option value="">Loading devices...</option>
+                            </select>
+                            <div class="help-text">Select audio input source</div>
+                        </div>
+                        <div class="control-group">
+                            <label for="inputSource">Source Type:</label>
+                            <select id="inputSource">
+                                <option value="SystemAudio">System Audio (Loopback)</option>
+                                <option value="ExternalDevice">External Device</option>
+                            </select>
+                            <div class="help-text">System audio capture or external device</div>
+                        </div>
+                        <div class="io-status">
+                            <span class="label">Status:</span>
+                            <span id="inputStatus" class="value status-off">No input selected</span>
+                        </div>
+                    </section>
+
+                    <section class="panel config-panel">
+                        <h2>Output Device</h2>
+                        <div class="control-group">
+                            <label for="outputDevice">Device:</label>
+                            <select id="outputDevice">
+                                <option value="">Loading devices...</option>
+                            </select>
+                            <div class="help-text">Select audio output device</div>
+                        </div>
+                        <div class="io-status">
+                            <span class="label">Status:</span>
+                            <span id="outputStatus" class="value status-off">No output selected</span>
+                        </div>
+                    </section>
                 </div>
 
-                <div class="control-group">
-                    <label for="transportMode">Transport Mode:</label>
-                    <select id="transportMode">
-                        <option value="FileOnly">File Playback Only</option>
-                        <option value="StreamOnly">Live Stream Only</option>
-                        <option value="Mixed">Mixed (File + Stream)</option>
-                    </select>
-                    <div class="help-text">Choose playback mode</div>
-                </div>
-
-                <div class="button-group">
-                    <button id="playBtn" class="btn btn-success">▶️ Play</button>
-                    <button id="pauseBtn" class="btn btn-secondary">⏸️ Pause</button>
-                    <button id="stopBtn" class="btn btn-secondary">⏹️ Stop</button>
-                </div>
-
-                <div class="control-group" style="margin-top: 20px;">
-                    <label>Playback Status:</label>
-                    <div class="status-item">
-                        <span class="label">State:</span>
-                        <span id="playbackState" class="value">Idle</span>
+                <section class="panel control-panel">
+                    <div class="button-group">
+                        <button id="refreshDevicesBtn" class="btn btn-primary">Refresh Devices</button>
                     </div>
-                    <div class="status-item" style="margin-top: 10px;">
-                        <span class="label">Sample Rate:</span>
-                        <span id="playbackSampleRate" class="value">-</span>
-                    </div>
-                    <div class="status-item" style="margin-top: 10px;">
-                        <span class="label">Duration:</span>
-                        <span id="playbackDuration" class="value">-</span>
-                    </div>
-                </div>
-            </section>
+                </section>
+            </div>
 
-            <!-- Control Panel -->
-            <section class="panel control-panel">
-                <h2>Controls</h2>
-                <div class="button-group">
-                    <button id="applyConfigBtn" class="btn btn-primary">Apply Configuration</button>
-                    <button id="processAudioBtn" class="btn btn-success">Process Audio</button>
-                    <button id="resetBtn" class="btn btn-secondary">Reset to Defaults</button>
-                </div>
-            </section>
+            <!-- ===== TRANSPORT TAB ===== -->
+            <div class="tab-content" id="tab-transport" role="tabpanel" aria-labelledby="tab-transport">
+                <section class="panel">
+                    <h2>File Playback</h2>
+                    <div class="control-group">
+                        <label for="audioFile">Audio File:</label>
+                        <div class="file-input-row">
+                            <input type="text" id="audioFile" placeholder="/path/to/audio.wav" readonly>
+                            <button id="selectFileBtn" class="btn btn-secondary">Browse</button>
+                        </div>
+                        <div class="help-text">Loaded: <span id="currentFile">None</span></div>
+                    </div>
 
-            <!-- Results Panel -->
-            <section class="panel results-panel">
-                <h2>Results</h2>
-                <div id="resultsContent" class="results-content">
-                    <p class="placeholder">Configure and apply settings to see results</p>
-                </div>
-            </section>
+                    <div class="control-group">
+                        <label for="transportMode">Transport Mode:</label>
+                        <select id="transportMode">
+                            <option value="FileOnly">File Playback Only</option>
+                            <option value="StreamOnly">Live Stream Only</option>
+                            <option value="Mixed">Mixed (File + Stream)</option>
+                        </select>
+                    </div>
+                </section>
+
+                <section class="panel">
+                    <h2>Playback Controls</h2>
+                    <div class="transport-controls">
+                        <button id="playBtn" class="btn btn-success transport-btn" aria-label="Play (Space)">&#9654; Play</button>
+                        <button id="pauseBtn" class="btn btn-secondary transport-btn" aria-label="Pause (Space)">&#10074;&#10074; Pause</button>
+                        <button id="stopBtn" class="btn btn-danger transport-btn" aria-label="Stop (Escape)">&#9632; Stop</button>
+                    </div>
+
+                    <div class="progress-bar-container">
+                        <div class="progress-bar">
+                            <div class="progress-fill" id="playbackProgress" style="width: 0%"></div>
+                        </div>
+                        <div class="progress-labels">
+                            <span id="playbackPosition">0:00</span>
+                            <span id="playbackDuration">0:00</span>
+                        </div>
+                    </div>
+
+                    <div class="status-grid" style="margin-top: 15px;">
+                        <div class="status-item">
+                            <span class="label">State:</span>
+                            <span id="playbackState" class="value">Idle</span>
+                        </div>
+                        <div class="status-item">
+                            <span class="label">Sample Rate:</span>
+                            <span id="playbackSampleRate" class="value">-</span>
+                        </div>
+                        <div class="status-item">
+                            <span class="label">Mode:</span>
+                            <span id="playbackMode" class="value">File</span>
+                        </div>
+                    </div>
+                </section>
+            </div>
+
+            <!-- ===== LAYOUT TAB ===== -->
+            <div class="tab-content" id="tab-layout" role="tabpanel" aria-labelledby="tab-layout">
+                <section class="panel">
+                    <h2>Speaker Layout</h2>
+                    <div class="control-group">
+                        <label for="layoutPreset">Layout Preset:</label>
+                        <select id="layoutPreset">
+                            <option value="stereo">2.0 Stereo</option>
+                            <option value="2.1">2.1</option>
+                            <option value="3.1">3.1</option>
+                            <option value="quad">4.0 Quad</option>
+                            <option value="5.1" selected>5.1 Surround</option>
+                            <option value="5.1.2">5.1.2</option>
+                            <option value="7.1">7.1 Surround</option>
+                            <option value="7.1.4">7.1.4 Atmos</option>
+                            <option value="9.1.6">9.1.6 Immersive</option>
+                            <option value="custom">Custom</option>
+                        </select>
+                    </div>
+
+                    <div class="layout-canvas-container">
+                        <canvas id="layoutCanvas" width="500" height="500" aria-label="Speaker layout visualization"></canvas>
+                    </div>
+
+                    <div class="layout-info">
+                        <div class="status-grid">
+                            <div class="status-item">
+                                <span class="label">Speakers:</span>
+                                <span id="layoutSpeakerCount" class="value">6</span>
+                            </div>
+                            <div class="status-item">
+                                <span class="label">Layout:</span>
+                                <span id="layoutName" class="value">5.1 Surround</span>
+                            </div>
+                            <div class="status-item">
+                                <span class="label">LFE:</span>
+                                <span id="layoutLFE" class="value status-on">Yes</span>
+                            </div>
+                            <div class="status-item">
+                                <span class="label">Height:</span>
+                                <span id="layoutHeight" class="value status-off">No</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="button-group" style="margin-top: 15px;">
+                        <button id="applyLayoutBtn" class="btn btn-primary">Apply Layout</button>
+                        <button id="testVBAPBtn" class="btn btn-secondary">Test VBAP Signal</button>
+                    </div>
+                </section>
+
+                <!-- Speaker List -->
+                <section class="panel">
+                    <h2>Speaker Positions</h2>
+                    <div class="speaker-table-container">
+                        <table class="speaker-table" id="speakerTable">
+                            <thead>
+                                <tr>
+                                    <th>Name</th>
+                                    <th>Azimuth</th>
+                                    <th>Elevation</th>
+                                    <th>Distance</th>
+                                    <th>Role</th>
+                                </tr>
+                            </thead>
+                            <tbody id="speakerTableBody">
+                            </tbody>
+                        </table>
+                    </div>
+                </section>
+            </div>
+
+            <!-- ===== CALIBRATION TAB ===== -->
+            <div class="tab-content" id="tab-calibration" role="tabpanel" aria-labelledby="tab-calibration">
+                <section class="panel">
+                    <h2>Room Calibration</h2>
+                    <div class="config-grid">
+                        <div class="panel config-panel">
+                            <h2>Sweep Settings</h2>
+                            <div class="control-group">
+                                <label for="sweepType">Sweep Type:</label>
+                                <select id="sweepType">
+                                    <option value="log" selected>Log Sweep (Recommended)</option>
+                                    <option value="mls">MLS (Maximum Length Sequence)</option>
+                                    <option value="linear">Linear Sweep</option>
+                                </select>
+                            </div>
+                            <div class="control-group">
+                                <label for="sweepStartFreq">Start Frequency (Hz):</label>
+                                <input type="number" id="sweepStartFreq" value="20" min="10" max="200">
+                            </div>
+                            <div class="control-group">
+                                <label for="sweepEndFreq">End Frequency (Hz):</label>
+                                <input type="number" id="sweepEndFreq" value="20000" min="1000" max="24000">
+                            </div>
+                            <div class="control-group">
+                                <label for="sweepDuration">Duration (seconds):</label>
+                                <input type="range" id="sweepDuration" min="1" max="10" value="3" step="0.5">
+                                <span id="sweepDurationValue">3.0s</span>
+                            </div>
+                        </div>
+
+                        <div class="panel config-panel">
+                            <h2>Measurement</h2>
+                            <div class="control-group">
+                                <label for="calMicDevice">Microphone:</label>
+                                <select id="calMicDevice">
+                                    <option value="">Select measurement mic...</option>
+                                </select>
+                            </div>
+                            <div class="control-group">
+                                <label for="calTargetCurve">Target Curve:</label>
+                                <select id="calTargetCurve">
+                                    <option value="flat" selected>Flat Response</option>
+                                    <option value="harman">Harman Target</option>
+                                    <option value="bk">B&K House Curve</option>
+                                    <option value="custom">Custom</option>
+                                </select>
+                            </div>
+                            <div class="cal-status">
+                                <span class="label">Status:</span>
+                                <span id="calStatus" class="value status-off">Ready</span>
+                            </div>
+                            <div class="cal-progress-container">
+                                <div class="progress-bar">
+                                    <div class="progress-fill cal-progress" id="calProgress" style="width: 0%"></div>
+                                </div>
+                                <span id="calProgressText" class="help-text">0% complete</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="button-group" style="margin-top: 15px;">
+                        <button id="startCalBtn" class="btn btn-primary">Start Measurement</button>
+                        <button id="stopCalBtn" class="btn btn-danger" disabled>Stop</button>
+                        <button id="applyCalBtn" class="btn btn-success" disabled>Apply Filters</button>
+                    </div>
+                </section>
+
+                <!-- IR Visualization -->
+                <section class="panel">
+                    <h2>Impulse Response</h2>
+                    <div class="ir-canvas-container">
+                        <canvas id="irCanvas" width="700" height="250" aria-label="Impulse response visualization"></canvas>
+                    </div>
+                    <div class="status-grid" style="margin-top: 10px;">
+                        <div class="status-item">
+                            <span class="label">Peak Delay:</span>
+                            <span id="irDelay" class="value">-</span>
+                        </div>
+                        <div class="status-item">
+                            <span class="label">RT60:</span>
+                            <span id="irRT60" class="value">-</span>
+                        </div>
+                        <div class="status-item">
+                            <span class="label">Measurements:</span>
+                            <span id="irMeasurements" class="value">0</span>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Filter Design -->
+                <section class="panel">
+                    <h2>Filter Design</h2>
+                    <div class="config-grid">
+                        <div>
+                            <div class="control-group">
+                                <label for="filterType">Filter Type:</label>
+                                <select id="filterType">
+                                    <option value="fir">FIR (Linear Phase)</option>
+                                    <option value="iir" selected>IIR Biquad Cascade</option>
+                                </select>
+                            </div>
+                            <div class="control-group">
+                                <label for="filterTaps">Filter Taps/Order:</label>
+                                <input type="range" id="filterTaps" min="64" max="4096" value="512" step="64">
+                                <span id="filterTapsValue">512</span>
+                            </div>
+                            <div class="control-group">
+                                <label for="exportFormat">Export Format:</label>
+                                <select id="exportFormat">
+                                    <option value="camilla" selected>CamillaDSP</option>
+                                    <option value="brutefir">BruteFIR</option>
+                                    <option value="json">JSON</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div>
+                            <div class="ir-canvas-container">
+                                <canvas id="filterCanvas" width="350" height="200" aria-label="Filter response visualization"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="button-group" style="margin-top: 15px;">
+                        <button id="designFilterBtn" class="btn btn-primary" disabled>Design Filter</button>
+                        <button id="exportFilterBtn" class="btn btn-secondary" disabled>Export Config</button>
+                    </div>
+                </section>
+            </div>
+
+            <!-- ===== STATS TAB ===== -->
+            <div class="tab-content" id="tab-stats" role="tabpanel" aria-labelledby="tab-stats">
+                <section class="panel">
+                    <h2>System Metrics</h2>
+                    <div class="status-grid stats-overview">
+                        <div class="status-item">
+                            <span class="label">CPU Usage:</span>
+                            <span id="statsCPU" class="value">-%</span>
+                        </div>
+                        <div class="status-item">
+                            <span class="label">Memory:</span>
+                            <span id="statsMemory" class="value">- MB</span>
+                        </div>
+                        <div class="status-item">
+                            <span class="label">Latency (avg):</span>
+                            <span id="statsLatency" class="value">- ms</span>
+                        </div>
+                        <div class="status-item">
+                            <span class="label">Packet Loss:</span>
+                            <span id="statsPacketLoss" class="value">-%</span>
+                        </div>
+                        <div class="status-item">
+                            <span class="label">Bandwidth:</span>
+                            <span id="statsBandwidth" class="value">- kbps</span>
+                        </div>
+                        <div class="status-item">
+                            <span class="label">Buffer Fill:</span>
+                            <span id="statsBuffer" class="value">-%</span>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Latency Graph -->
+                <section class="panel">
+                    <h2>Latency History</h2>
+                    <div class="ir-canvas-container">
+                        <canvas id="latencyCanvas" width="700" height="200" aria-label="Latency history graph"></canvas>
+                    </div>
+                </section>
+
+                <!-- Speaker Stats Table -->
+                <section class="panel">
+                    <h2>Speaker Status</h2>
+                    <div class="speaker-table-container">
+                        <table class="speaker-table" id="speakerStatsTable">
+                            <thead>
+                                <tr>
+                                    <th>Speaker</th>
+                                    <th>Status</th>
+                                    <th>Latency</th>
+                                    <th>Jitter</th>
+                                    <th>Packets Sent</th>
+                                    <th>Packet Loss</th>
+                                    <th>Buffer</th>
+                                </tr>
+                            </thead>
+                            <tbody id="speakerStatsBody">
+                                <tr>
+                                    <td colspan="7" class="placeholder">No speakers connected</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </section>
+
+                <!-- Network Graph -->
+                <section class="panel">
+                    <h2>Network Bandwidth</h2>
+                    <div class="ir-canvas-container">
+                        <canvas id="bandwidthCanvas" width="700" height="200" aria-label="Bandwidth usage graph"></canvas>
+                    </div>
+                    <div class="status-grid" style="margin-top: 10px;">
+                        <div class="status-item">
+                            <span class="label">Sent:</span>
+                            <span id="netSent" class="value">0 kbps</span>
+                        </div>
+                        <div class="status-item">
+                            <span class="label">Received:</span>
+                            <span id="netReceived" class="value">0 kbps</span>
+                        </div>
+                        <div class="status-item">
+                            <span class="label">Sync Error:</span>
+                            <span id="netSyncError" class="value">0 ms</span>
+                        </div>
+                    </div>
+                </section>
+            </div>
         </main>
 
         <footer class="footer">
-            <p>Audio Ninja v0.1.0 • <a href="https://github.com/your-repo/audio-ninja">GitHub</a></p>
+            <p>Audio Ninja v0.1.0 &bull; <a href="https://github.com/mr-u0b0dy/audio-ninja">GitHub</a></p>
         </footer>
     </div>
 
