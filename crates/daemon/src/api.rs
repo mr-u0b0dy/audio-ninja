@@ -314,17 +314,65 @@ pub async fn stats_daemon(State(state): State<AppState>) -> Json<serde_json::Val
 fn read_proc_stats() -> (f64, f64) {
     #[cfg(target_os = "linux")]
     {
-        if let Ok(statm) = std::fs::read_to_string("/proc/self/statm") {
-            let parts: Vec<&str> = statm.split_whitespace().collect();
-            if let Some(rss_pages) = parts.get(1).and_then(|s| s.parse::<f64>().ok()) {
-                let page_size = 4096.0; // typical Linux page size
-                let memory_mb = rss_pages * page_size / (1024.0 * 1024.0);
-                // CPU usage is harder without tracking over time; return a snapshot estimate
-                return (0.0, memory_mb);
-            }
-        }
+        use std::sync::Mutex;
+
+        // Track previous CPU tick values to compute delta-based CPU usage
+        static PREV: Mutex<Option<(u64, std::time::Instant)>> = Mutex::new(None);
+
+        let memory_mb = std::fs::read_to_string("/proc/self/statm")
+            .ok()
+            .and_then(|s| {
+                s.split_whitespace()
+                    .nth(1)
+                    .and_then(|r| r.parse::<f64>().ok())
+            })
+            .map(|rss_pages| rss_pages * 4096.0 / (1024.0 * 1024.0))
+            .unwrap_or(0.0);
+
+        // CPU: read total process ticks from /proc/self/stat (fields 14+15 = utime+stime)
+        let cpu_percent = std::fs::read_to_string("/proc/self/stat")
+            .ok()
+            .and_then(|stat| {
+                // Fields after the (comm) block are space-separated; utime=field[13], stime=field[14]
+                let after_paren = stat.rfind(')')?.checked_add(2)?;
+                let fields: Vec<&str> = stat[after_paren..].split_whitespace().collect();
+                let utime: u64 = fields.get(11)?.parse().ok()?;
+                let stime: u64 = fields.get(12)?.parse().ok()?;
+                let total_ticks = utime + stime;
+
+                let mut prev = PREV.lock().ok()?;
+                let ticks_per_sec = 100.0; // sysconf(_SC_CLK_TCK) is usually 100 on Linux
+
+                let pct = if let Some((prev_ticks, prev_time)) = prev.as_ref() {
+                    let dt = prev_time.elapsed().as_secs_f64();
+                    if dt > 0.01 {
+                        let dticks = total_ticks.saturating_sub(*prev_ticks) as f64;
+                        (dticks / ticks_per_sec / dt * 100.0).min(100.0 * num_cpus())
+                    } else {
+                        0.0
+                    }
+                } else {
+                    0.0
+                };
+
+                *prev = Some((total_ticks, std::time::Instant::now()));
+                Some(pct)
+            })
+            .unwrap_or(0.0);
+
+        (cpu_percent, memory_mb)
     }
-    (0.0, 0.0)
+    #[cfg(not(target_os = "linux"))]
+    {
+        (0.0, 0.0)
+    }
+}
+
+/// Return number of logical CPUs (for CPU% normalization)
+fn num_cpus() -> f64 {
+    std::thread::available_parallelism()
+        .map(|n| n.get() as f64)
+        .unwrap_or(1.0)
 }
 
 /// GET /api/v1/stats/sync - Speaker synchronization statistics
@@ -363,9 +411,19 @@ pub async fn stats_audio_levels(State(state): State<AppState>) -> Json<serde_jso
     let engine = state.engine.read().await;
     let is_playing = matches!(engine.transport_state, crate::engine::TransportState::Playing);
 
-    // Return simulated levels until real audio pipeline is connected
+    // Simulate dynamic levels with slight per-call jitter (will be replaced by
+    // real metering once the cpal pipeline feeds peak values into shared state).
+    let jitter = || -> f64 {
+        // Simple pseudo-random based on nanosecond timestamp
+        let ns = std::time::SystemTime::now()
+            .duration_since(std::time::UNIX_EPOCH)
+            .unwrap_or_default()
+            .subsec_nanos() as f64;
+        (ns % 6.0) - 3.0 // ±3 dB jitter
+    };
+
     let (input_db, output_db) = if is_playing {
-        (-12.0, -14.0)
+        (-12.0 + jitter() * 0.5, -14.0 + jitter() * 0.5)
     } else {
         (-60.0, -60.0)
     };
@@ -373,7 +431,13 @@ pub async fn stats_audio_levels(State(state): State<AppState>) -> Json<serde_jso
     let per_speaker: Vec<f64> = engine
         .speakers
         .values()
-        .map(|s| if s.online && is_playing { -14.0 } else { -60.0 })
+        .map(|s| {
+            if s.online && is_playing {
+                -14.0 + jitter() * 0.4
+            } else {
+                -60.0
+            }
+        })
         .collect();
 
     Json(serde_json::json!({
@@ -382,7 +446,7 @@ pub async fn stats_audio_levels(State(state): State<AppState>) -> Json<serde_jso
         "output_db_left": output_db,
         "output_db_right": output_db + 0.3,
         "per_speaker_db": per_speaker,
-        "clipping": false,
+        "clipping": input_db > -1.0 || output_db > -1.0,
     }))
 }
 
