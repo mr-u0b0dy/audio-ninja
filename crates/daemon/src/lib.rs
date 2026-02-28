@@ -9,10 +9,11 @@ pub mod engine;
 
 pub use engine::EngineState;
 
-use std::sync::Arc;
+use std::{sync::Arc, time::Instant};
 use tokio::sync::RwLock;
 
 #[derive(Clone)]
 pub struct AppState {
     pub engine: Arc<RwLock<EngineState>>,
+    pub started_at: Instant,
 }

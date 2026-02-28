@@ -198,6 +198,191 @@ pub fn layout_from_name(name: &str) -> Option<SpeakerLayout> {
                 latency: Duration::ZERO,
             },
         ],
+        "2.1" => vec![
+            SpeakerDescriptor {
+                id: "FL".into(),
+                role: FrontLeft,
+                position: Position3 { x: -0.5, y: 1.0, z: 0.0 },
+                max_spl_db: 110.0,
+                latency: Duration::ZERO,
+            },
+            SpeakerDescriptor {
+                id: "FR".into(),
+                role: FrontRight,
+                position: Position3 { x: 0.5, y: 1.0, z: 0.0 },
+                max_spl_db: 110.0,
+                latency: Duration::ZERO,
+            },
+            SpeakerDescriptor {
+                id: "LFE".into(),
+                role: Subwoofer,
+                position: Position3 { x: 0.0, y: 0.0, z: -0.5 },
+                max_spl_db: 120.0,
+                latency: Duration::ZERO,
+            },
+        ],
+        "3.1" => vec![
+            SpeakerDescriptor {
+                id: "FL".into(),
+                role: FrontLeft,
+                position: Position3 { x: -0.5, y: 1.0, z: 0.0 },
+                max_spl_db: 110.0,
+                latency: Duration::ZERO,
+            },
+            SpeakerDescriptor {
+                id: "FR".into(),
+                role: FrontRight,
+                position: Position3 { x: 0.5, y: 1.0, z: 0.0 },
+                max_spl_db: 110.0,
+                latency: Duration::ZERO,
+            },
+            SpeakerDescriptor {
+                id: "C".into(),
+                role: Center,
+                position: Position3 { x: 0.0, y: 1.0, z: 0.0 },
+                max_spl_db: 110.0,
+                latency: Duration::ZERO,
+            },
+            SpeakerDescriptor {
+                id: "LFE".into(),
+                role: Subwoofer,
+                position: Position3 { x: 0.0, y: 0.0, z: -0.5 },
+                max_spl_db: 120.0,
+                latency: Duration::ZERO,
+            },
+        ],
+        "4.0" | "quad" => vec![
+            SpeakerDescriptor {
+                id: "FL".into(),
+                role: FrontLeft,
+                position: Position3 { x: -0.707, y: 0.707, z: 0.0 },
+                max_spl_db: 110.0,
+                latency: Duration::ZERO,
+            },
+            SpeakerDescriptor {
+                id: "FR".into(),
+                role: FrontRight,
+                position: Position3 { x: 0.707, y: 0.707, z: 0.0 },
+                max_spl_db: 110.0,
+                latency: Duration::ZERO,
+            },
+            SpeakerDescriptor {
+                id: "RL".into(),
+                role: RearLeft,
+                position: Position3 { x: -0.707, y: -0.707, z: 0.0 },
+                max_spl_db: 110.0,
+                latency: Duration::ZERO,
+            },
+            SpeakerDescriptor {
+                id: "RR".into(),
+                role: RearRight,
+                position: Position3 { x: 0.707, y: -0.707, z: 0.0 },
+                max_spl_db: 110.0,
+                latency: Duration::ZERO,
+            },
+        ],
+        "5.1.2" => {
+            let mut spk = layout_from_name("5.1").unwrap().speakers;
+            spk.push(SpeakerDescriptor {
+                id: "TFL".into(),
+                role: TopFrontLeft,
+                position: Position3 { x: -0.5, y: 0.5, z: 1.0 },
+                max_spl_db: 110.0,
+                latency: Duration::ZERO,
+            });
+            spk.push(SpeakerDescriptor {
+                id: "TFR".into(),
+                role: TopFrontRight,
+                position: Position3 { x: 0.5, y: 0.5, z: 1.0 },
+                max_spl_db: 110.0,
+                latency: Duration::ZERO,
+            });
+            spk
+        }
+        "7.1" => {
+            let mut spk = layout_from_name("5.1").unwrap().speakers;
+            spk.push(SpeakerDescriptor {
+                id: "RL".into(),
+                role: RearLeft,
+                position: Position3 { x: -0.707, y: -0.707, z: 0.0 },
+                max_spl_db: 110.0,
+                latency: Duration::ZERO,
+            });
+            spk.push(SpeakerDescriptor {
+                id: "RR".into(),
+                role: RearRight,
+                position: Position3 { x: 0.707, y: -0.707, z: 0.0 },
+                max_spl_db: 110.0,
+                latency: Duration::ZERO,
+            });
+            spk
+        }
+        "7.1.4" => {
+            let mut spk = layout_from_name("7.1").unwrap().speakers;
+            spk.push(SpeakerDescriptor {
+                id: "TFL".into(),
+                role: TopFrontLeft,
+                position: Position3 { x: -0.5, y: 0.5, z: 1.0 },
+                max_spl_db: 110.0,
+                latency: Duration::ZERO,
+            });
+            spk.push(SpeakerDescriptor {
+                id: "TFR".into(),
+                role: TopFrontRight,
+                position: Position3 { x: 0.5, y: 0.5, z: 1.0 },
+                max_spl_db: 110.0,
+                latency: Duration::ZERO,
+            });
+            spk.push(SpeakerDescriptor {
+                id: "TRL".into(),
+                role: TopRearLeft,
+                position: Position3 { x: -0.5, y: -0.5, z: 1.0 },
+                max_spl_db: 110.0,
+                latency: Duration::ZERO,
+            });
+            spk.push(SpeakerDescriptor {
+                id: "TRR".into(),
+                role: TopRearRight,
+                position: Position3 { x: 0.5, y: -0.5, z: 1.0 },
+                max_spl_db: 110.0,
+                latency: Duration::ZERO,
+            });
+            spk
+        }
+        "9.1.6" => {
+            let mut spk = layout_from_name("7.1.4").unwrap().speakers;
+            // Add wide left/right at ±60 degrees
+            spk.push(SpeakerDescriptor {
+                id: "WL".into(),
+                role: Custom("WideLeft".to_string()),
+                position: Position3 { x: -0.866, y: 0.5, z: 0.0 },
+                max_spl_db: 110.0,
+                latency: Duration::ZERO,
+            });
+            spk.push(SpeakerDescriptor {
+                id: "WR".into(),
+                role: Custom("WideRight".to_string()),
+                position: Position3 { x: 0.866, y: 0.5, z: 0.0 },
+                max_spl_db: 110.0,
+                latency: Duration::ZERO,
+            });
+            // Add top side left/right
+            spk.push(SpeakerDescriptor {
+                id: "TSL".into(),
+                role: Custom("TopSideLeft".to_string()),
+                position: Position3 { x: -1.0, y: 0.0, z: 1.0 },
+                max_spl_db: 110.0,
+                latency: Duration::ZERO,
+            });
+            spk.push(SpeakerDescriptor {
+                id: "TSR".into(),
+                role: Custom("TopSideRight".to_string()),
+                position: Position3 { x: 1.0, y: 0.0, z: 1.0 },
+                max_spl_db: 110.0,
+                latency: Duration::ZERO,
+            });
+            spk
+        }
         _ => return None,
     };
 

@@ -9,8 +9,11 @@
 <body>
     <div class="container">
         <header class="header">
-            <h1>🥷 Audio Ninja</h1>
-            <p class="subtitle">Professional Audio Processing</p>
+            <img src="../icons/audio-ninja-logo.png" alt="Audio Ninja Logo" class="logo">
+            <div>
+                <h1>Audio Ninja</h1>
+                <p class="subtitle">Professional Immersive Audio Processing</p>
+            </div>
         </header>
 
         <main class="main-content">
@@ -145,7 +148,85 @@
                         </div>
                     </div>
                 </section>
+
+                <!-- Input/Output Panel -->
+                <section class="panel config-panel">
+                    <h2>🎙️ Audio I/O</h2>
+                    <div class="control-group">
+                        <label for="inputDevice">Input Device:</label>
+                        <select id="inputDevice">
+                            <option value="">Loading devices...</option>
+                        </select>
+                        <div class="help-text">Select audio input source</div>
+                    </div>
+
+                    <div class="control-group">
+                        <label for="inputSource">Input Source Type:</label>
+                        <select id="inputSource">
+                            <option value="SystemAudio">System Audio (Loopback)</option>
+                            <option value="ExternalDevice">External Device</option>
+                        </select>
+                        <div class="help-text">Choose between system audio capture or external device</div>
+                    </div>
+
+                    <div class="control-group">
+                        <label for="outputDevice">Output Device:</label>
+                        <select id="outputDevice">
+                            <option value="">Loading devices...</option>
+                        </select>
+                        <div class="help-text">Select audio output device</div>
+                    </div>
+
+                    <div class="button-group">
+                        <button id="refreshDevicesBtn" class="btn btn-secondary">🔄 Refresh Devices</button>
+                    </div>
+                </section>
             </div>
+
+            <!-- Transport Control Panel -->
+            <section class="panel control-panel">
+                <h2>🎵 Transport & Playback</h2>
+                <div class="control-group">
+                    <label for="audioFile">Audio File:</label>
+                    <div style="display: flex; gap: 10px;">
+                        <input type="text" id="audioFile" placeholder="/path/to/audio.wav" readonly style="flex: 1;">
+                        <button id="selectFileBtn" class="btn btn-secondary">Browse...</button>
+                    </div>
+                    <div class="help-text">Currently loaded: <span id="currentFile">None</span></div>
+                </div>
+
+                <div class="control-group">
+                    <label for="transportMode">Transport Mode:</label>
+                    <select id="transportMode">
+                        <option value="FileOnly">File Playback Only</option>
+                        <option value="StreamOnly">Live Stream Only</option>
+                        <option value="Mixed">Mixed (File + Stream)</option>
+                    </select>
+                    <div class="help-text">Choose playback mode</div>
+                </div>
+
+                <div class="button-group">
+                    <button id="playBtn" class="btn btn-success">▶️ Play</button>
+                    <button id="pauseBtn" class="btn btn-secondary">⏸️ Pause</button>
+                    <button id="stopBtn" class="btn btn-secondary">⏹️ Stop</button>
+                </div>
+
+                <div class="control-group" style="margin-top: 20px;">
+                    <label>Playback Status:</label>
+                    <div class="status-item">
+                        <span class="label">State:</span>
+                        <span id="playbackState" class="value">Idle</span>
+                    </div>
+                    <div class="status-item" style="margin-top: 10px;">
+                        <span class="label">Sample Rate:</span>
+                        <span id="playbackSampleRate" class="value">-</span>
+                    </div>
+                    <div class="status-item" style="margin-top: 10px;">
+                        <span class="label">Duration:</span>
+                        <span id="playbackDuration" class="value">-</span>
+                    </div>
+                </div>
+            </section>
 
             <!-- Control Panel -->
             <section class="panel control-panel">

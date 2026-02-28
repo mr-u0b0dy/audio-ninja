@@ -11,7 +11,7 @@ use axum::{
     Router,
 };
 use clap::Parser;
-use std::{net::SocketAddr, sync::Arc};
+use std::{net::SocketAddr, sync::Arc, time::Instant};
 use tokio::sync::RwLock;
 use tower_http::cors::{Any, CorsLayer};
 use tracing::info;
@@ -54,6 +54,7 @@ async fn main() -> Result<()> {
     let engine_state = EngineState::new();
     let app_state = AppState {
         engine: Arc::new(RwLock::new(engine_state)),
+        started_at: Instant::now(),
     };
 
     // Build REST API routes

@@ -102,6 +102,23 @@ impl SpeakerLayout {
     pub fn surround_5_1() -> Self {
         crate::mapping::layout_from_name("5.1").expect("5.1 layout")
     }
+
+    pub fn surround_7_1() -> Self {
+        crate::mapping::layout_from_name("7.1").expect("7.1 layout")
+    }
+
+    pub fn atmos_7_1_4() -> Self {
+        crate::mapping::layout_from_name("7.1.4").expect("7.1.4 layout")
+    }
+
+    pub fn immersive_9_1_6() -> Self {
+        crate::mapping::layout_from_name("9.1.6").expect("9.1.6 layout")
+    }
+
+    /// Create layout from a preset name string.
+    pub fn from_preset(name: &str) -> Option<Self> {
+        crate::mapping::layout_from_name(name)
+    }
 }
 
 #[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]

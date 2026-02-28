@@ -12,6 +12,7 @@ use tower::util::ServiceExt; // for `oneshot`
 use uuid::Uuid;
 
 use audio_ninja_daemon::AppState;
+use std::time::Instant;
 
 /// Helper to create app with test state
 fn create_test_app() -> Router {
@@ -23,6 +24,7 @@ fn create_test_app() -> Router {
     let engine_state = EngineState::new();
     let app_state = AppState {
         engine: Arc::new(RwLock::new(engine_state)),
+        started_at: Instant::now(),
     };
 
     Router::new()
@@ -61,6 +63,14 @@ fn create_test_app() -> Router {
         .route(
             "/api/v1/transport/status",
             get(audio_ninja_daemon::api::transport_status),
+        )
+        .route(
+            "/api/v1/transport/load-file",
+            post(audio_ninja_daemon::api::load_audio_file),
+        )
+        .route(
+            "/api/v1/transport/playback-status",
+            get(audio_ninja_daemon::api::playback_status),
         )
         .route(
             "/api/v1/calibration/start",
@@ -265,6 +275,46 @@ async fn test_set_layout_invalid_preset() {
 }
 
 #[tokio::test]
+async fn test_set_layout_custom() {
+    let app = create_test_app();
+
+    let speaker_id = Uuid::new_v4();
+    let layout_request = json!({
+        "speakers": [
+            {
+                "speaker_id": speaker_id,
+                "azimuth": 0.0,
+                "elevation": 0.0,
+                "distance": 1.0
+            }
+        ]
+    });
+
+    let request = Request::builder()
+        .method("POST")
+        .uri("/api/v1/layout")
+        .header("content-type", "application/json")
+        .body(Body::from(serde_json::to_vec(&layout_request).unwrap()))
+        .unwrap();
+
+    let response = app.clone().oneshot(request).await.unwrap();
+    assert_eq!(response.status(), StatusCode::OK);
+
+    // Fetch and verify layout exists
+    let request = Request::builder()
+        .uri("/api/v1/layout")
+        .body(Body::empty())
+        .unwrap();
+
+    let response = app.oneshot(request).await.unwrap();
+    assert_eq!(response.status(), StatusCode::OK);
+
+    let body = json_body(response.into_body()).await;
+    assert_eq!(body["name"], "custom");
+    assert_eq!(body["speakers"].as_array().unwrap().len(), 1);
+}
+
+#[tokio::test]
 async fn test_transport_play() {
     let app = create_test_app();
 
@@ -361,7 +411,46 @@ async fn test_calibration_status() {
 }
 
 #[tokio::test]
-async fn test_calibration_apply_not_implemented() {
+async fn test_calibration_apply_flow() {
+    let app = create_test_app();
+
+    // Begin calibration session
+    let request = Request::builder()
+        .method("POST")
+        .uri("/api/v1/calibration/start")
+        .body(Body::empty())
+        .unwrap();
+
+    let response = app.clone().oneshot(request).await.unwrap();
+    assert_eq!(response.status(), StatusCode::ACCEPTED);
+
+    // Apply calibration
+    let request = Request::builder()
+        .method("POST")
+        .uri("/api/v1/calibration/apply")
+        .body(Body::empty())
+        .unwrap();
+
+    let response = app.clone().oneshot(request).await.unwrap();
+    assert_eq!(response.status(), StatusCode::OK);
+
+    // Verify status reflects completion
+    let request = Request::builder()
+        .uri("/api/v1/calibration/status")
+        .body(Body::empty())
+        .unwrap();
+
+    let response = app.oneshot(request).await.unwrap();
+    assert_eq!(response.status(), StatusCode::OK);
+
+    let body = json_body(response.into_body()).await;
+    assert!(!body["running"].as_bool().unwrap());
+    assert!((body["progress"].as_f64().unwrap() - 1.0).abs() < f64::EPSILON);
+    assert!(body["measurements"].as_u64().unwrap() >= 1);
+}
+
+#[tokio::test]
+async fn test_calibration_apply_without_session() {
     let app = create_test_app();
 
     let request = Request::builder()
@@ -372,7 +461,7 @@ async fn test_calibration_apply_not_implemented() {
 
     let response = app.oneshot(request).await.unwrap();
 
-    assert_eq!(response.status(), StatusCode::NOT_IMPLEMENTED);
+    assert_eq!(response.status(), StatusCode::BAD_REQUEST);
 }
 
 #[tokio::test]
@@ -494,5 +583,231 @@ async fn test_transport_state_workflow() {
         .unwrap();
 
     let response = app.oneshot(request).await.unwrap();
+    assert_eq!(response.status(), StatusCode::OK);
+}
+
+#[tokio::test]
+async fn test_load_file_not_found() {
+    let app = create_test_app();
+
+    let load_request = json!({
+        "file_path": "/nonexistent/file.wav"
+    });
+
+    let request = Request::builder()
+        .method("POST")
+        .uri("/api/v1/transport/load-file")
+        .header("content-type", "application/json")
+        .body(Body::from(serde_json::to_vec(&load_request).unwrap()))
+        .unwrap();
+
+    let response = app.oneshot(request).await.unwrap();
+    assert_eq!(response.status(), StatusCode::BAD_REQUEST);
+}
+
+#[tokio::test]
+async fn test_load_file_success() {
+    use std::io::Write;
+    use tempfile::NamedTempFile;
+
+    // Create minimal WAV file (44 bytes header)
+    let mut temp = NamedTempFile::new().unwrap();
+    // RIFF header
+    temp.write_all(b"RIFF").unwrap();
+    temp.write_all(&(36u32).to_le_bytes()).unwrap(); // file size - 8
+    // WAVE header
+    temp.write_all(b"WAVE").unwrap();
+    // fmt subchunk
+    temp.write_all(b"fmt ").unwrap();
+    temp.write_all(&(16u32).to_le_bytes()).unwrap(); // subchunk1 size
+    temp.write_all(&(1u16).to_le_bytes()).unwrap(); // audio format (PCM)
+    temp.write_all(&(2u16).to_le_bytes()).unwrap(); // channels (stereo)
+    temp.write_all(&(48000u32).to_le_bytes()).unwrap(); // sample rate
+    temp.write_all(&(192000u32).to_le_bytes()).unwrap(); // byte rate
+    temp.write_all(&(4u16).to_le_bytes()).unwrap(); // block align
+    temp.write_all(&(16u16).to_le_bytes()).unwrap(); // bits per sample
+    // data chunk
+    temp.write_all(b"data").unwrap();
+    temp.write_all(&(0u32).to_le_bytes()).unwrap(); // data size
+    temp.flush().unwrap();
+
+    let app = create_test_app();
+    let load_request = json!({
+        "file_path": temp.path().to_string_lossy().to_string()
+    });
+
+    let request = Request::builder()
+        .method("POST")
+        .uri("/api/v1/transport/load-file")
+        .header("content-type", "application/json")
+        .body(Body::from(serde_json::to_vec(&load_request).unwrap()))
+        .unwrap();
+
+    let response = app.clone().oneshot(request).await.unwrap();
+    assert_eq!(response.status(), StatusCode::OK);
+
+    let body = json_body(response.into_body()).await;
+    assert_eq!(body["success"], true);
+    assert!(body["file"].is_string());
+    assert_eq!(body["status"], "loaded");
+}
+
+#[tokio::test]
+async fn test_playback_status_after_load() {
+    use std::io::Write;
+    use tempfile::NamedTempFile;
+
+    // Create minimal WAV file
+    let mut temp = NamedTempFile::new().unwrap();
+    temp.write_all(b"RIFF").unwrap();
+    temp.write_all(&(36u32).to_le_bytes()).unwrap();
+    temp.write_all(b"WAVE").unwrap();
+    temp.write_all(b"fmt ").unwrap();
+    temp.write_all(&(16u32).to_le_bytes()).unwrap();
+    temp.write_all(&(1u16).to_le_bytes()).unwrap(); // PCM
+    temp.write_all(&(2u16).to_le_bytes()).unwrap(); // stereo
+    temp.write_all(&(48000u32).to_le_bytes()).unwrap(); // 48kHz
+    temp.write_all(&(192000u32).to_le_bytes()).unwrap();
+    temp.write_all(&(4u16).to_le_bytes()).unwrap();
+    temp.write_all(&(16u16).to_le_bytes()).unwrap();
+    // data chunk
+    temp.write_all(b"data").unwrap();
+    temp.write_all(&(0u32).to_le_bytes()).unwrap();
+    temp.flush().unwrap();
+
+    let app = create_test_app();
+
+    // Load file
+    let load_request = json!({
+        "file_path": temp.path().to_string_lossy().to_string()
+    });
+
+    let request = Request::builder()
+        .method("POST")
+        .uri("/api/v1/transport/load-file")
+        .header("content-type", "application/json")
+        .body(Body::from(serde_json::to_vec(&load_request).unwrap()))
+        .unwrap();
+
+    let _response = app.clone().oneshot(request).await.unwrap();
+
+    // Get playback status
+    let request = Request::builder()
+        .uri("/api/v1/transport/playback-status")
+        .body(Body::empty())
+        .unwrap();
+
+    let response = app.oneshot(request).await.unwrap();
+    assert_eq!(response.status(), StatusCode::OK);
+
+    let body = json_body(response.into_body()).await;
+    assert!(body["file"].is_string());
+    assert_eq!(body["sample_rate"], 48000);
+    assert!(body["total_samples"].is_number());
+}
+
+#[tokio::test]
+async fn test_load_wav_file() {
+    use std::io::Write;
+
+    let app = create_test_app();
+
+    // Create a minimal valid WAV file
+    let mut temp_file = tempfile::NamedTempFile::new().unwrap();
+    let wav_header = [
+        // RIFF header
+        b'R', b'I', b'F', b'F',
+        0x24, 0x00, 0x00, 0x00, // file size - 8
+        b'W', b'A', b'V', b'E',
+        // fmt chunk
+        b'f', b'm', b't', b' ',
+        0x10, 0x00, 0x00, 0x00, // fmt chunk size
+        0x01, 0x00,             // audio format (PCM)
+        0x02, 0x00,             // channels (2)
+        0x80, 0xBB, 0x00, 0x00, // sample rate (48000)
+        0x00, 0xEE, 0x02, 0x00, // byte rate
+        0x04, 0x00,             // block align
+        0x10, 0x00,             // bits per sample (16)
+        // data chunk
+        b'd', b'a', b't', b'a',
+        0x00, 0x00, 0x00, 0x00, // data size
+    ];
+    temp_file.write_all(&wav_header).unwrap();
+    temp_file.flush().unwrap();
+
+    let file_path = temp_file.path().to_str().unwrap();
+
+    let load_request = json!({
+        "file_path": file_path
+    });
+
+    let request = Request::builder()
+        .method("POST")
+        .uri("/api/v1/transport/load-file")
+        .header("content-type", "application/json")
+        .body(Body::from(serde_json::to_vec(&load_request).unwrap()))
+        .unwrap();
+
+    let response = app.clone().oneshot(request).await.unwrap();
+    assert_eq!(response.status(), StatusCode::OK);
+
+    // Verify playback status reflects parsed metadata
+    let request = Request::builder()
+        .uri("/api/v1/transport/playback-status")
+        .body(Body::empty())
+        .unwrap();
+
+    let response = app.oneshot(request).await.unwrap();
+    let body = json_body(response.into_body()).await;
+    assert_eq!(body["sample_rate"], 48000);
+    assert!(body["total_samples"].is_number());
+}
+
+#[tokio::test]
+async fn test_load_invalid_file() {
+    let app = create_test_app();
+
+    let load_request = json!({
+        "file_path": "/nonexistent/file.wav"
+    });
+
+    let request = Request::builder()
+        .method("POST")
+        .uri("/api/v1/transport/load-file")
+        .header("content-type", "application/json")
+        .body(Body::from(serde_json::to_vec(&load_request).unwrap()))
+        .unwrap();
+
+    let response = app.oneshot(request).await.unwrap();
+    assert_eq!(response.status(), StatusCode::BAD_REQUEST);
+}
+
+#[tokio::test]
+async fn test_load_unsupported_format() {
+    use std::io::Write;
+
+    let app = create_test_app();
+
+    // Create a file with unknown format
+    let mut temp_file = tempfile::NamedTempFile::new().unwrap();
+    temp_file.write_all(b"JUNKDATAINVALIDFORMAT").unwrap();
+    temp_file.flush().unwrap();
+
+    let file_path = temp_file.path().to_str().unwrap();
+
+    let load_request = json!({
+        "file_path": file_path
+    });
+
+    let request = Request::builder()
+        .method("POST")
+        .uri("/api/v1/transport/load-file")
+        .header("content-type", "application/json")
+        .body(Body::from(serde_json::to_vec(&load_request).unwrap()))
+        .unwrap();
+
+    let response = app.oneshot(request).await.unwrap();
+    // For unrecognized formats, the daemon falls back to heuristic estimation
+    // so it returns OK with estimated metadata
     assert_eq!(response.status(), StatusCode::OK);
 }

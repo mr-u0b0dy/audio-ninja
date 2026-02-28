@@ -14,7 +14,7 @@ use crate::{
     engine::{SpeakerInfo, SpeakerStats},
     AppState,
 };
-use audio_ninja::SpeakerLayout;
+use audio_ninja::{Position3, SpeakerDescriptor, SpeakerLayout, SpeakerRole};
 
 #[derive(Serialize)]
 pub struct StatusResponse {
@@ -33,12 +33,10 @@ pub struct InfoResponse {
 #[derive(Deserialize)]
 pub struct LayoutRequest {
     preset: Option<String>,
-    #[allow(dead_code)]
     speakers: Option<Vec<SpeakerPositionRequest>>,
 }
 
 #[derive(Deserialize)]
-#[allow(dead_code)]
 pub struct SpeakerPositionRequest {
     speaker_id: Uuid,
     azimuth: f32,
@@ -52,11 +50,11 @@ pub struct ErrorResponse {
 }
 
 /// GET /api/v1/status
-pub async fn status(State(_state): State<AppState>) -> Json<StatusResponse> {
+pub async fn status(State(state): State<AppState>) -> Json<StatusResponse> {
     Json(StatusResponse {
         status: "running".to_string(),
         version: env!("CARGO_PKG_VERSION").to_string(),
-        uptime_secs: 0, // TODO: track actual uptime
+        uptime_secs: state.started_at.elapsed().as_secs(),
     })
 }
 
@@ -133,9 +131,45 @@ pub async fn set_layout(
             "5.1" => SpeakerLayout::surround_5_1(),
             _ => return StatusCode::BAD_REQUEST,
         }
+    } else if let Some(speakers) = request.speakers {
+        if speakers.is_empty() {
+            return StatusCode::BAD_REQUEST;
+        }
+
+        let descriptors: Vec<SpeakerDescriptor> = speakers
+            .into_iter()
+            .filter(|sp| sp.distance.is_finite() && sp.distance > 0.0)
+            .map(|sp| {
+                let az = sp.azimuth.to_radians();
+                let el = sp.elevation.to_radians();
+                let r = sp.distance;
+
+                // Convert spherical (azimuth, elevation, radius) to Cartesian (x, y, z)
+                // Azimuth rotates around Z with 0 at +Y (front), elevation from X-Y plane.
+                let x = r * az.sin() * el.cos();
+                let y = r * az.cos() * el.cos();
+                let z = r * el.sin();
+
+                SpeakerDescriptor {
+                    id: sp.speaker_id.to_string(),
+                    role: SpeakerRole::Custom("custom".to_string()),
+                    position: Position3 { x, y, z },
+                    max_spl_db: 110.0,
+                    latency: std::time::Duration::ZERO,
+                }
+            })
+            .collect();
+
+        if descriptors.is_empty() {
+            return StatusCode::BAD_REQUEST;
+        }
+
+        SpeakerLayout {
+            name: "custom".to_string(),
+            speakers: descriptors,
+        }
     } else {
-        // Custom layout from speaker positions
-        return StatusCode::NOT_IMPLEMENTED;
+        return StatusCode::BAD_REQUEST;
     };
 
     engine.set_layout(layout);
@@ -189,9 +223,12 @@ pub async fn calibration_status(State(state): State<AppState>) -> Json<serde_jso
 }
 
 /// POST /api/v1/calibration/apply
-pub async fn calibration_apply(State(_state): State<AppState>) -> StatusCode {
-    // TODO: Apply calibration results
-    StatusCode::NOT_IMPLEMENTED
+pub async fn calibration_apply(State(state): State<AppState>) -> StatusCode {
+    let mut engine = state.engine.write().await;
+    match engine.apply_calibration() {
+        Ok(_) => StatusCode::OK,
+        Err(_) => StatusCode::BAD_REQUEST,
+    }
 }
 
 /// GET /api/v1/stats

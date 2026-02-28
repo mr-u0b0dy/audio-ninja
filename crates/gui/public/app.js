@@ -1,6 +1,9 @@
 // Audio Ninja GUI - Frontend Application
 const { invoke } = window.__TAURI__.tauri;
 
+// Daemon API base URL
+const DAEMON_API = 'http://127.0.0.1:8080/api/v1';
+
 // Application state
 let appState = {
     config: {
@@ -14,7 +17,12 @@ let appState = {
         binaural_azimuth: 0.0,
         binaural_elevation: 0.0,
         binaural_distance: 1.0,
-    }
+    },
+    input_devices: [],
+    output_devices: [],
+    current_input: null,
+    current_output: null,
+    playback_state: 'idle',
 };
 
 // DRC preset info
@@ -39,6 +47,8 @@ document.addEventListener('DOMContentLoaded', () => {
     setupEventListeners();
     initializeRenderer();
     updateUIFromState();
+    loadDevices();
+    startStatusPolling();
 });
 
 // Setup event listeners
@@ -102,6 +112,19 @@ function setupEventListeners() {
     document.getElementById('applyConfigBtn').addEventListener('click', applyConfiguration);
     document.getElementById('processAudioBtn').addEventListener('click', processAudio);
     document.getElementById('resetBtn').addEventListener('click', resetToDefaults);
+
+    // I/O Controls
+    document.getElementById('refreshDevicesBtn').addEventListener('click', loadDevices);
+    document.getElementById('inputDevice').addEventListener('change', selectInputDevice);
+    document.getElementById('inputSource').addEventListener('change', selectInputSource);
+    document.getElementById('outputDevice').addEventListener('change', selectOutputDevice);
+
+    // Transport Controls
+    document.getElementById('playBtn').addEventListener('click', transportPlay);
+    document.getElementById('pauseBtn').addEventListener('click', transportPause);
+    document.getElementById('stopBtn').addEventListener('click', transportStop);
+    document.getElementById('selectFileBtn').addEventListener('click', selectAudioFile);
+    document.getElementById('transportMode').addEventListener('change', setTransportMode);
 }
 
 // Initialize renderer
@@ -298,4 +321,260 @@ async function getAvailableOptions() {
     } catch (error) {
         console.error('Failed to get options:', error);
     }
+}
+
+// ===== I/O Device Management =====
+
+// Load input/output devices from daemon
+async function loadDevices() {
+    try {
+        // Load input devices
+        const inputResp = await fetch(`${DAEMON_API}/input/devices`);
+        if (inputResp.ok) {
+            const data = await inputResp.json();
+            appState.input_devices = data.devices || [];
+            updateInputDeviceList();
+        }
+
+        // Load output devices
+        const outputResp = await fetch(`${DAEMON_API}/output/devices`);
+        if (outputResp.ok) {
+            const data = await outputResp.json();
+            appState.output_devices = data.devices || [];
+            updateOutputDeviceList();
+        }
+
+        showResult('Devices loaded successfully', 'success');
+    } catch (error) {
+        showResult('Failed to load devices: ' + error.message, 'error');
+    }
+}
+
+// Update input device dropdown
+function updateInputDeviceList() {
+    const select = document.getElementById('inputDevice');
+    select.innerHTML = '';
+
+    if (appState.input_devices.length === 0) {
+        select.innerHTML = '<option value="">No devices available</option>';
+        return;
+    }
+
+    appState.input_devices.forEach(device => {
+        const option = document.createElement('option');
+        option.value = device.id;
+        option.textContent = `${device.name} (${device.channels}ch @ ${device.sample_rates[0]}Hz)`;
+        select.appendChild(option);
+    });
+}
+
+// Update output device dropdown
+function updateOutputDeviceList() {
+    const select = document.getElementById('outputDevice');
+    select.innerHTML = '';
+
+    if (appState.output_devices.length === 0) {
+        select.innerHTML = '<option value="">No devices available</option>';
+        return;
+    }
+
+    appState.output_devices.forEach(device => {
+        const option = document.createElement('option');
+        option.value = device.id;
+        option.textContent = `${device.name} (${device.type}, ${device.channels}ch)`;
+        select.appendChild(option);
+    });
+}
+
+// Select input device
+async function selectInputDevice() {
+    const deviceId = document.getElementById('inputDevice').value;
+    const sourceType = document.getElementById('inputSource').value;
+
+    try {
+        const response = await fetch(`${DAEMON_API}/input/select`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                source: sourceType,
+                device_id: deviceId || null,
+            }),
+        });
+
+        if (response.ok) {
+            appState.current_input = deviceId;
+            showResult(`Input device selected: ${deviceId}`, 'success');
+        } else {
+            throw new Error('Failed to select input device');
+        }
+    } catch (error) {
+        showResult('Failed to select input: ' + error.message, 'error');
+    }
+}
+
+// Select input source type
+async function selectInputSource() {
+    await selectInputDevice(); // Reapply with new source type
+}
+
+// Select output device
+async function selectOutputDevice() {
+    const deviceId = document.getElementById('outputDevice').value;
+
+    try {
+        const response = await fetch(`${DAEMON_API}/output/select`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ device_id: deviceId }),
+        });
+
+        if (response.ok) {
+            appState.current_output = deviceId;
+            showResult(`Output device selected: ${deviceId}`, 'success');
+        } else {
+            throw new Error('Failed to select output device');
+        }
+    } catch (error) {
+        showResult('Failed to select output: ' + error.message, 'error');
+    }
+}
+
+// ===== Transport Controls =====
+
+// Select audio file (placeholder for Tauri file dialog)
+async function selectAudioFile() {
+    try {
+        const filePath = await invoke('select_file');
+        if (filePath) {
+            document.getElementById('audioFile').value = filePath;
+            await loadAudioFile(filePath);
+        }
+    } catch (error) {
+        // Fallback: prompt for manual path entry
+        const path = prompt('Enter audio file path:');
+        if (path) {
+            document.getElementById('audioFile').value = path;
+            await loadAudioFile(path);
+        }
+    }
+}
+
+// Load audio file
+async function loadAudioFile(filePath) {
+    try {
+        const response = await fetch(`${DAEMON_API}/transport/load-file`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ file_path: filePath }),
+        });
+
+        if (response.ok) {
+            const data = await response.json();
+            document.getElementById('currentFile').textContent = filePath;
+            showResult(`File loaded: ${filePath}`, 'success');
+            await updatePlaybackStatus();
+        } else {
+            throw new Error('Failed to load file');
+        }
+    } catch (error) {
+        showResult('Failed to load file: ' + error.message, 'error');
+    }
+}
+
+// Set transport mode
+async function setTransportMode() {
+    const mode = document.getElementById('transportMode').value;
+
+    try {
+        const response = await fetch(`${DAEMON_API}/transport/mode`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ mode }),
+        });
+
+        if (response.ok) {
+            showResult(`Transport mode set to: ${mode}`, 'success');
+        } else {
+            throw new Error('Failed to set transport mode');
+        }
+    } catch (error) {
+        showResult('Failed to set mode: ' + error.message, 'error');
+    }
+}
+
+// Transport: Play
+async function transportPlay() {
+    try {
+        const response = await fetch(`${DAEMON_API}/transport/play`, { method: 'POST' });
+        if (response.ok) {
+            showResult('Playback started', 'success');
+            await updatePlaybackStatus();
+        } else {
+            throw new Error('Failed to start playback');
+        }
+    } catch (error) {
+        showResult('Failed to play: ' + error.message, 'error');
+    }
+}
+
+// Transport: Pause
+async function transportPause() {
+    try {
+        const response = await fetch(`${DAEMON_API}/transport/pause`, { method: 'POST' });
+        if (response.ok) {
+            showResult('Playback paused', 'success');
+            await updatePlaybackStatus();
+        } else {
+            throw new Error('Failed to pause playback');
+        }
+    } catch (error) {
+        showResult('Failed to pause: ' + error.message, 'error');
+    }
+}
+
+// Transport: Stop
+async function transportStop() {
+    try {
+        const response = await fetch(`${DAEMON_API}/transport/stop`, { method: 'POST' });
+        if (response.ok) {
+            showResult('Playback stopped', 'success');
+            await updatePlaybackStatus();
+        } else {
+            throw new Error('Failed to stop playback');
+        }
+    } catch (error) {
+        showResult('Failed to stop: ' + error.message, 'error');
+    }
+}
+
+// Update playback status display
+async function updatePlaybackStatus() {
+    try {
+        const response = await fetch(`${DAEMON_API}/transport/playback-status`);
+        if (response.ok) {
+            const data = await response.json();
+            document.getElementById('playbackState').textContent = data.state || 'Idle';
+            document.getElementById('playbackSampleRate').textContent = data.sample_rate ? `${data.sample_rate} Hz` : '-';
+            
+            if (data.total_samples && data.sample_rate) {
+                const durationSecs = data.total_samples / data.sample_rate;
+                const minutes = Math.floor(durationSecs / 60);
+                const seconds = Math.floor(durationSecs % 60);
+                document.getElementById('playbackDuration').textContent = `${minutes}:${seconds.toString().padStart(2, '0')}`;
+            } else {
+                document.getElementById('playbackDuration').textContent = '-';
+            }
+        }
+    } catch (error) {
+        console.error('Failed to update playback status:', error);
+    }
+}
+
+// Poll status every 500ms
+function startStatusPolling() {
+    setInterval(async () => {
+        if (appState.playback_state !== 'idle') {
+            await updatePlaybackStatus();
+        }
+    }, 500);
 }
