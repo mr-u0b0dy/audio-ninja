@@ -86,6 +86,26 @@ fn create_test_app() -> Router {
         )
         .route("/api/v1/stats", get(audio_ninja_daemon::api::stats))
         .route(
+            "/api/v1/stats/network",
+            get(audio_ninja_daemon::api::stats_network),
+        )
+        .route(
+            "/api/v1/stats/latency",
+            get(audio_ninja_daemon::api::stats_latency),
+        )
+        .route(
+            "/api/v1/stats/daemon",
+            get(audio_ninja_daemon::api::stats_daemon),
+        )
+        .route(
+            "/api/v1/stats/sync",
+            get(audio_ninja_daemon::api::stats_sync),
+        )
+        .route(
+            "/api/v1/stats/audio-levels",
+            get(audio_ninja_daemon::api::stats_audio_levels),
+        )
+        .route(
             "/api/v1/speakers/{id}/stats",
             get(audio_ninja_daemon::api::speaker_stats),
         )
@@ -810,4 +830,211 @@ async fn test_load_unsupported_format() {
     // For unrecognized formats, the daemon falls back to heuristic estimation
     // so it returns OK with estimated metadata
     assert_eq!(response.status(), StatusCode::OK);
+}
+
+// ===== New Stats Sub-Endpoint Tests =====
+
+#[tokio::test]
+async fn test_stats_network() {
+    let app = create_test_app();
+
+    let request = Request::builder()
+        .uri("/api/v1/stats/network")
+        .body(Body::empty())
+        .unwrap();
+
+    let response = app.oneshot(request).await.unwrap();
+    assert_eq!(response.status(), StatusCode::OK);
+
+    let body = json_body(response.into_body()).await;
+    assert!(body["sent_kbps"].is_number());
+    assert!(body["received_kbps"].is_number());
+    assert!(body["peak_sent_kbps"].is_number());
+    assert!(body["packets_sent"].is_number());
+}
+
+#[tokio::test]
+async fn test_stats_latency() {
+    let app = create_test_app();
+
+    let request = Request::builder()
+        .uri("/api/v1/stats/latency")
+        .body(Body::empty())
+        .unwrap();
+
+    let response = app.oneshot(request).await.unwrap();
+    assert_eq!(response.status(), StatusCode::OK);
+
+    let body = json_body(response.into_body()).await;
+    assert!(body["min_ms"].is_number());
+    assert!(body["max_ms"].is_number());
+    assert!(body["mean_ms"].is_number());
+    assert!(body["stddev_ms"].is_number());
+    assert!(body["samples"].is_array());
+    assert!(body["speaker_count"].is_number());
+}
+
+#[tokio::test]
+async fn test_stats_daemon() {
+    let app = create_test_app();
+
+    let request = Request::builder()
+        .uri("/api/v1/stats/daemon")
+        .body(Body::empty())
+        .unwrap();
+
+    let response = app.oneshot(request).await.unwrap();
+    assert_eq!(response.status(), StatusCode::OK);
+
+    let body = json_body(response.into_body()).await;
+    assert!(body["cpu_percent"].is_number());
+    assert!(body["memory_mb"].is_number());
+    assert!(body["uptime_secs"].is_number());
+    assert!(body["pid"].is_number());
+    assert!(body["version"].is_string());
+}
+
+#[tokio::test]
+async fn test_stats_sync() {
+    let app = create_test_app();
+
+    let request = Request::builder()
+        .uri("/api/v1/stats/sync")
+        .body(Body::empty())
+        .unwrap();
+
+    let response = app.oneshot(request).await.unwrap();
+    assert_eq!(response.status(), StatusCode::OK);
+
+    let body = json_body(response.into_body()).await;
+    assert!(body["speakers"].is_array());
+    assert!(body["overall_status"].is_string());
+    assert_eq!(body["overall_status"], "no_speakers");
+}
+
+#[tokio::test]
+async fn test_stats_audio_levels() {
+    let app = create_test_app();
+
+    let request = Request::builder()
+        .uri("/api/v1/stats/audio-levels")
+        .body(Body::empty())
+        .unwrap();
+
+    let response = app.oneshot(request).await.unwrap();
+    assert_eq!(response.status(), StatusCode::OK);
+
+    let body = json_body(response.into_body()).await;
+    assert!(body["input_db_left"].is_number());
+    assert!(body["input_db_right"].is_number());
+    assert!(body["output_db_left"].is_number());
+    assert!(body["output_db_right"].is_number());
+    assert!(body["per_speaker_db"].is_array());
+    assert!(body["clipping"].is_boolean());
+}
+
+#[tokio::test]
+async fn test_set_layout_7_1() {
+    let app = create_test_app();
+
+    let layout_request = json!({
+        "preset": "7.1"
+    });
+
+    let request = Request::builder()
+        .method("POST")
+        .uri("/api/v1/layout")
+        .header("content-type", "application/json")
+        .body(Body::from(serde_json::to_vec(&layout_request).unwrap()))
+        .unwrap();
+
+    let response = app.oneshot(request).await.unwrap();
+    assert_eq!(response.status(), StatusCode::OK);
+}
+
+#[tokio::test]
+async fn test_set_layout_7_1_4() {
+    let app = create_test_app();
+
+    let layout_request = json!({
+        "preset": "7.1.4"
+    });
+
+    let request = Request::builder()
+        .method("POST")
+        .uri("/api/v1/layout")
+        .header("content-type", "application/json")
+        .body(Body::from(serde_json::to_vec(&layout_request).unwrap()))
+        .unwrap();
+
+    let response = app.clone().oneshot(request).await.unwrap();
+    assert_eq!(response.status(), StatusCode::OK);
+
+    // Verify layout has correct speaker count (7.1 = 8 + 4 height = 12)
+    let request = Request::builder()
+        .uri("/api/v1/layout")
+        .body(Body::empty())
+        .unwrap();
+
+    let response = app.oneshot(request).await.unwrap();
+    assert_eq!(response.status(), StatusCode::OK);
+    let body = json_body(response.into_body()).await;
+    assert_eq!(body["speakers"].as_array().unwrap().len(), 12);
+}
+
+#[tokio::test]
+async fn test_set_layout_9_1_6() {
+    let app = create_test_app();
+
+    let layout_request = json!({
+        "preset": "9.1.6"
+    });
+
+    let request = Request::builder()
+        .method("POST")
+        .uri("/api/v1/layout")
+        .header("content-type", "application/json")
+        .body(Body::from(serde_json::to_vec(&layout_request).unwrap()))
+        .unwrap();
+
+    let response = app.clone().oneshot(request).await.unwrap();
+    assert_eq!(response.status(), StatusCode::OK);
+
+    // Verify layout: 7.1.4 = 12 + 2 wide + 2 top side = 16
+    let request = Request::builder()
+        .uri("/api/v1/layout")
+        .body(Body::empty())
+        .unwrap();
+
+    let response = app.oneshot(request).await.unwrap();
+    assert_eq!(response.status(), StatusCode::OK);
+    let body = json_body(response.into_body()).await;
+    assert_eq!(body["speakers"].as_array().unwrap().len(), 16);
+}
+
+#[tokio::test]
+async fn test_set_layout_all_presets() {
+    // Verify all supported presets are accepted
+    let presets = vec!["stereo", "2.0", "2.1", "3.1", "4.0", "5.1", "5.1.2", "7.1", "7.1.4", "9.1.6"];
+
+    for preset in presets {
+        let app = create_test_app();
+
+        let layout_request = json!({ "preset": preset });
+
+        let request = Request::builder()
+            .method("POST")
+            .uri("/api/v1/layout")
+            .header("content-type", "application/json")
+            .body(Body::from(serde_json::to_vec(&layout_request).unwrap()))
+            .unwrap();
+
+        let response = app.oneshot(request).await.unwrap();
+        assert_eq!(
+            response.status(),
+            StatusCode::OK,
+            "Layout preset '{}' should be accepted",
+            preset
+        );
+    }
 }
