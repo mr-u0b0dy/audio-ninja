@@ -73,6 +73,7 @@ document.addEventListener('DOMContentLoaded', () => {
     drawFilterCanvas();
     drawLatencyCanvas();
     drawBandwidthCanvas();
+    setupLayoutCanvasDrag();
     startStatusPolling();
     checkDaemonConnection();
 });
@@ -291,8 +292,43 @@ function setupEventListeners() {
     document.getElementById('selectFileBtn').addEventListener('click', selectAudioFile);
     document.getElementById('transportMode').addEventListener('change', setTransportMode);
 
+    // Seek Slider
+    const seekSlider = document.getElementById('seekSlider');
+    seekSlider.addEventListener('mousedown', () => { isSeeking = true; });
+    seekSlider.addEventListener('touchstart', () => { isSeeking = true; });
+    seekSlider.addEventListener('input', () => {
+        if (appState.playback_total_duration) {
+            const pos = (seekSlider.value / 1000) * appState.playback_total_duration;
+            document.getElementById('playbackPosition').textContent = formatTime(pos);
+        }
+    });
+    seekSlider.addEventListener('change', () => {
+        isSeeking = false;
+        if (appState.playback_total_samples) {
+            const seekSample = Math.round((seekSlider.value / 1000) * appState.playback_total_samples);
+            seekToPosition(seekSample);
+        }
+    });
+
+    // Transport mode help text
+    const modeHelp = { 'FileOnly': 'Play audio from a loaded file', 'StreamOnly': 'Capture live audio from input devices', 'Mixed': 'Play file and capture live input simultaneously' };
+    document.getElementById('transportMode').addEventListener('change', (e) => {
+        document.getElementById('transportModeHelp').textContent = modeHelp[e.target.value] || '';
+    });
+
+    // Input device change updates info card
+    document.getElementById('inputDevice').addEventListener('change', () => {
+        const device = appState.input_devices.find(d => d.id === document.getElementById('inputDevice').value);
+        updateDeviceInfoCard('input', device);
+    });
+    document.getElementById('outputDevice').addEventListener('change', () => {
+        const device = appState.output_devices.find(d => d.id === document.getElementById('outputDevice').value);
+        updateDeviceInfoCard('output', device);
+    });
+
     // Layout Controls
     document.getElementById('layoutPreset').addEventListener('change', (e) => {
+        layoutDragState.presetKey = e.target.value;
         drawLayoutCanvas(e.target.value);
     });
     document.getElementById('applyLayoutBtn').addEventListener('click', applyLayout);
@@ -312,18 +348,27 @@ function setupEventListeners() {
     document.getElementById('exportFilterBtn').addEventListener('click', exportFilter);
 }
 
-// ===== Daemon Connection =====
+// ===== Daemon Connection with Retry =====
+let connectionRetryDelay = 1000;
+const MAX_RETRY_DELAY = 30000;
+
 async function checkDaemonConnection() {
+    const dot = document.getElementById('connDot');
+    const text = document.getElementById('connText');
     try {
-        const response = await fetch(`${DAEMON_API}/status`);
+        const response = await fetch(`${DAEMON_API}/status`, { signal: AbortSignal.timeout(3000) });
         if (response.ok) {
             const data = await response.json();
             appState.daemon_connected = true;
+            connectionRetryDelay = 1000; // reset retry
             const el = document.getElementById('statusDaemon');
             el.textContent = 'Connected (v' + data.version + ')';
             el.classList.remove('status-off');
             el.classList.add('status-on');
             document.getElementById('statusUptime').textContent = formatUptime(data.uptime_secs);
+            // Connection indicator
+            dot.className = 'conn-dot conn-online';
+            text.textContent = 'Online';
         }
     } catch {
         appState.daemon_connected = false;
@@ -331,6 +376,16 @@ async function checkDaemonConnection() {
         el.textContent = 'Disconnected';
         el.classList.remove('status-on');
         el.classList.add('status-off');
+        // Connection indicator with retry
+        dot.className = 'conn-dot conn-offline';
+        text.textContent = 'Offline';
+        // Exponential backoff retry
+        setTimeout(async () => {
+            dot.className = 'conn-dot conn-retry';
+            text.textContent = 'Retrying...';
+            await checkDaemonConnection();
+        }, connectionRetryDelay);
+        connectionRetryDelay = Math.min(connectionRetryDelay * 2, MAX_RETRY_DELAY);
     }
 }
 
@@ -541,14 +596,22 @@ function updateInputDeviceList() {
     select.innerHTML = '';
     if (appState.input_devices.length === 0) {
         select.innerHTML = '<option value="">No devices available</option>';
+        updateDeviceInfoCard('input', null);
         return;
+    }
+    if (appState.input_devices.length === 1) {
+        // Auto-select single device
+        appState.current_input = appState.input_devices[0].id;
     }
     appState.input_devices.forEach(device => {
         const option = document.createElement('option');
         option.value = device.id;
         option.textContent = device.name + ' (' + (device.device_type || device.type || 'unknown') + ')';
+        if (!device.available) option.textContent += ' [Unavailable]';
+        option.disabled = !device.available;
         select.appendChild(option);
     });
+    updateDeviceInfoCard('input', appState.input_devices[0]);
 }
 
 function updateOutputDeviceList() {
@@ -556,15 +619,52 @@ function updateOutputDeviceList() {
     select.innerHTML = '';
     if (appState.output_devices.length === 0) {
         select.innerHTML = '<option value="">No devices available</option>';
+        updateDeviceInfoCard('output', null);
         return;
+    }
+    if (appState.output_devices.length === 1) {
+        appState.current_output = appState.output_devices[0].id;
     }
     appState.output_devices.forEach(device => {
         const option = document.createElement('option');
         option.value = device.id;
         option.textContent = device.name + ' (' + (device.device_type || 'unknown') + ', ' + (device.max_channels || 2) + 'ch)';
         if (device.is_default) option.textContent += ' [Default]';
+        if (!device.available) option.textContent += ' [Unavailable]';
+        option.disabled = !device.available;
         select.appendChild(option);
     });
+    // Auto-select default
+    const defaultDev = appState.output_devices.find(d => d.is_default) || appState.output_devices[0];
+    if (defaultDev) {
+        select.value = defaultDev.id;
+        updateDeviceInfoCard('output', defaultDev);
+    }
+}
+
+function updateDeviceInfoCard(type, device) {
+    if (type === 'input') {
+        document.getElementById('inputChannels').textContent = device ? (device.max_channels || 2) : '-';
+        document.getElementById('inputSampleRate').textContent = device ? (device.default_sample_rate || '48000') + ' Hz' : '-';
+        document.getElementById('inputType').textContent = device ? (device.device_type || 'unknown') : '-';
+        const avail = document.getElementById('inputAvailability');
+        if (device) {
+            avail.className = 'io-availability ' + (device.available !== false ? 'available' : 'unavailable');
+        } else {
+            avail.className = 'io-availability';
+        }
+    } else {
+        document.getElementById('outputChannels').textContent = device ? (device.max_channels || 2) : '-';
+        document.getElementById('outputSampleRate').textContent = device ? (device.default_sample_rate || '48000') + ' Hz' : '-';
+        document.getElementById('outputType').textContent = device ? (device.device_type || 'unknown') : '-';
+        document.getElementById('outputIsDefault').textContent = device ? (device.is_default ? 'Yes' : 'No') : '-';
+        const avail = document.getElementById('outputAvailability');
+        if (device) {
+            avail.className = 'io-availability ' + (device.available !== false ? 'available' : 'unavailable');
+        } else {
+            avail.className = 'io-availability';
+        }
+    }
 }
 
 function populateCalMicDevices() {
@@ -581,6 +681,8 @@ function populateCalMicDevices() {
 async function selectInputDevice() {
     const deviceId = document.getElementById('inputDevice').value;
     const sourceType = document.getElementById('inputSource').value;
+    const device = appState.input_devices.find(d => d.id === deviceId);
+    updateDeviceInfoCard('input', device);
     try {
         const response = await fetch(`${DAEMON_API}/input/select`, {
             method: 'POST',
@@ -589,8 +691,9 @@ async function selectInputDevice() {
         });
         if (response.ok) {
             appState.current_input = deviceId;
-            setStatusIndicator('inputStatus', true, 'Active: ' + deviceId, 'No input selected');
-            showResult('Input device selected: ' + deviceId, 'success');
+            const name = device ? device.name : deviceId;
+            setStatusIndicator('inputStatus', true, 'Active: ' + name, 'No input selected');
+            showResult('Input device selected: ' + name, 'success');
             saveState();
         }
     } catch (error) {
@@ -602,6 +705,8 @@ async function selectInputSource() { await selectInputDevice(); }
 
 async function selectOutputDevice() {
     const deviceId = document.getElementById('outputDevice').value;
+    const device = appState.output_devices.find(d => d.id === deviceId);
+    updateDeviceInfoCard('output', device);
     try {
         const response = await fetch(`${DAEMON_API}/output/select`, {
             method: 'POST',
@@ -610,8 +715,9 @@ async function selectOutputDevice() {
         });
         if (response.ok) {
             appState.current_output = deviceId;
-            setStatusIndicator('outputStatus', true, 'Active: ' + deviceId, 'No output selected');
-            showResult('Output device selected: ' + deviceId, 'success');
+            const name = device ? device.name : deviceId;
+            setStatusIndicator('outputStatus', true, 'Active: ' + name, 'No output selected');
+            showResult('Output device selected: ' + name, 'success');
             saveState();
         }
     } catch (error) {
@@ -704,6 +810,7 @@ async function transportStop() {
     }
 }
 
+let isSeeking = false;
 async function updatePlaybackStatus() {
     try {
         const response = await fetch(`${DAEMON_API}/transport/playback-status`);
@@ -719,10 +826,17 @@ async function updatePlaybackStatus() {
             if (data.total_samples && data.sample_rate && data.total_samples > 0) {
                 const totalDuration = data.total_samples / data.sample_rate;
                 const position = (data.position || 0) / data.sample_rate;
-                const progress = (position / totalDuration) * 100;
-                document.getElementById('playbackProgress').style.width = Math.min(progress, 100) + '%';
                 document.getElementById('playbackPosition').textContent = formatTime(position);
                 document.getElementById('playbackDuration').textContent = formatTime(totalDuration);
+                // Update seek slider unless user is dragging
+                if (!isSeeking) {
+                    const slider = document.getElementById('seekSlider');
+                    slider.value = Math.round((position / totalDuration) * 1000);
+                }
+                // Store for seek calculation
+                appState.playback_total_duration = totalDuration;
+                appState.playback_sample_rate = data.sample_rate;
+                appState.playback_total_samples = data.total_samples;
             }
         }
     } catch { /* daemon offline */ }
@@ -732,6 +846,17 @@ function formatTime(secs) {
     const m = Math.floor(secs / 60);
     const s = Math.floor(secs % 60);
     return m + ':' + s.toString().padStart(2, '0');
+}
+
+// ===== Seek to Position =====
+async function seekToPosition(samplePosition) {
+    try {
+        await fetch(`${DAEMON_API}/transport/seek`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ position: samplePosition }),
+        });
+    } catch { /* seek not supported yet, silently ignore */ }
 }
 
 // ===== Speaker Layout Visualization =====
@@ -866,6 +991,260 @@ async function applyLayout() {
 
 async function testVBAPSignal() {
     showResult('VBAP test signal routing... (requires running daemon with real audio output)', 'success');
+}
+
+// ===== Layout Canvas Drag Interactivity =====
+let layoutDragState = { dragging: false, speakerIdx: -1, speakers: null, presetKey: '5.1' };
+
+function setupLayoutCanvasDrag() {
+    const canvas = document.getElementById('layoutCanvas');
+    if (!canvas) return;
+
+    canvas.addEventListener('mousedown', (e) => {
+        const rect = canvas.getBoundingClientRect();
+        const mx = (e.clientX - rect.left) * (canvas.width / rect.width);
+        const my = (e.clientY - rect.top) * (canvas.height / rect.height);
+        const preset = LAYOUT_PRESETS[layoutDragState.presetKey];
+        if (!preset) return;
+
+        const cx = canvas.width / 2;
+        const cy = canvas.height / 2;
+        const radius = Math.min(canvas.width, canvas.height) * 0.38;
+
+        // Find the closest speaker within 15px
+        let closest = -1, closestDist = 20;
+        preset.speakers.forEach((sp, i) => {
+            const azRad = (sp.az - 90) * Math.PI / 180;
+            const dist = sp.n === 'LFE' ? radius * 0.3 : radius * 0.85;
+            const sx = cx + dist * Math.cos(azRad);
+            const sy = cy + dist * Math.sin(azRad);
+            const d = Math.hypot(mx - sx, my - sy);
+            if (d < closestDist) { closestDist = d; closest = i; }
+        });
+
+        if (closest >= 0) {
+            layoutDragState.dragging = true;
+            layoutDragState.speakerIdx = closest;
+            layoutDragState.speakers = preset.speakers.map(s => ({...s}));
+            canvas.style.cursor = 'grabbing';
+        }
+    });
+
+    canvas.addEventListener('mousemove', (e) => {
+        if (!layoutDragState.dragging) {
+            // Hover cursor hint
+            const rect = canvas.getBoundingClientRect();
+            const mx = (e.clientX - rect.left) * (canvas.width / rect.width);
+            const my = (e.clientY - rect.top) * (canvas.height / rect.height);
+            const preset = LAYOUT_PRESETS[layoutDragState.presetKey];
+            if (!preset) return;
+            const cx = canvas.width / 2;
+            const cy = canvas.height / 2;
+            const radius = Math.min(canvas.width, canvas.height) * 0.38;
+            let near = false;
+            preset.speakers.forEach(sp => {
+                const azRad = (sp.az - 90) * Math.PI / 180;
+                const dist = sp.n === 'LFE' ? radius * 0.3 : radius * 0.85;
+                const sx = cx + dist * Math.cos(azRad);
+                const sy = cy + dist * Math.sin(azRad);
+                if (Math.hypot(mx - sx, my - sy) < 15) near = true;
+            });
+            canvas.style.cursor = near ? 'grab' : 'default';
+            return;
+        }
+
+        const rect = canvas.getBoundingClientRect();
+        const mx = (e.clientX - rect.left) * (canvas.width / rect.width);
+        const my = (e.clientY - rect.top) * (canvas.height / rect.height);
+        const cx = canvas.width / 2;
+        const cy = canvas.height / 2;
+
+        // Convert mouse position back to azimuth
+        const dx = mx - cx;
+        const dy = my - cy;
+        const az = Math.atan2(dy, dx) * 180 / Math.PI + 90;
+        const normalizedAz = ((az % 360) + 360) % 360;
+        const finalAz = normalizedAz > 180 ? normalizedAz - 360 : normalizedAz;
+
+        layoutDragState.speakers[layoutDragState.speakerIdx].az = Math.round(finalAz);
+
+        // Redraw with modified positions
+        drawLayoutCanvasCustom(layoutDragState.speakers, layoutDragState.presetKey);
+    });
+
+    canvas.addEventListener('mouseup', () => {
+        if (layoutDragState.dragging) {
+            layoutDragState.dragging = false;
+            canvas.style.cursor = 'default';
+            // Persist modified positions to preset
+            const preset = LAYOUT_PRESETS[layoutDragState.presetKey];
+            if (preset && layoutDragState.speakers) {
+                preset.speakers = layoutDragState.speakers;
+            }
+            // Save to localStorage
+            saveState();
+        }
+    });
+
+    canvas.addEventListener('mouseleave', () => {
+        if (layoutDragState.dragging) {
+            layoutDragState.dragging = false;
+            canvas.style.cursor = 'default';
+        }
+    });
+}
+
+function drawLayoutCanvasCustom(speakers, presetKey) {
+    const canvas = document.getElementById('layoutCanvas');
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+    const w = canvas.width;
+    const h = canvas.height;
+    const cx = w / 2;
+    const cy = h / 2;
+    const radius = Math.min(w, h) * 0.38;
+
+    ctx.clearRect(0, 0, w, h);
+
+    // Room circle + grid
+    ctx.beginPath(); ctx.arc(cx, cy, radius, 0, Math.PI * 2);
+    ctx.strokeStyle = 'rgba(230, 81, 0, 0.3)'; ctx.lineWidth = 1; ctx.stroke();
+    ctx.beginPath(); ctx.arc(cx, cy, radius * 0.5, 0, Math.PI * 2);
+    ctx.strokeStyle = 'rgba(230, 81, 0, 0.15)'; ctx.stroke();
+    ctx.strokeStyle = 'rgba(255, 140, 0, 0.15)';
+    ctx.beginPath(); ctx.moveTo(cx, cy - radius - 10); ctx.lineTo(cx, cy + radius + 10); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(cx - radius - 10, cy); ctx.lineTo(cx + radius + 10, cy); ctx.stroke();
+
+    // Listener
+    ctx.beginPath(); ctx.arc(cx, cy, 12, 0, Math.PI * 2);
+    ctx.fillStyle = 'rgba(255, 213, 128, 0.5)'; ctx.fill();
+    ctx.beginPath(); ctx.arc(cx, cy, 5, 0, Math.PI * 2);
+    ctx.fillStyle = '#FFD580'; ctx.fill();
+
+    // Direction labels
+    ctx.fillStyle = 'rgba(255, 213, 128, 0.5)';
+    ctx.font = '11px sans-serif'; ctx.textAlign = 'center';
+    ctx.fillText('Front', cx, cy - radius - 15);
+    ctx.fillText('Rear', cx, cy + radius + 22);
+    ctx.fillText('L', cx - radius - 18, cy + 4);
+    ctx.fillText('R', cx + radius + 18, cy + 4);
+
+    // Update info
+    const preset = LAYOUT_PRESETS[presetKey];
+    const hasLFE = speakers.some(s => s.n === 'LFE');
+    const hasHeight = speakers.some(s => s.el > 0);
+    document.getElementById('layoutSpeakerCount').textContent = speakers.length;
+    document.getElementById('layoutName').textContent = preset ? preset.name : 'Custom';
+    setStatusIndicator('layoutLFE', hasLFE, 'Yes', 'No');
+    setStatusIndicator('layoutHeight', hasHeight, 'Yes', 'No');
+
+    const tbody = document.getElementById('speakerTableBody');
+    tbody.innerHTML = '';
+
+    speakers.forEach((sp, idx) => {
+        const azRad = (sp.az - 90) * Math.PI / 180;
+        const dist = sp.n === 'LFE' ? radius * 0.3 : radius * 0.85;
+        const sx = cx + dist * Math.cos(azRad);
+        const sy = cy + dist * Math.sin(azRad);
+
+        const isHeight = sp.el > 0;
+        const isLFE = sp.n === 'LFE';
+        const isDragged = layoutDragState.dragging && layoutDragState.speakerIdx === idx;
+
+        ctx.beginPath();
+        ctx.arc(sx, sy, isLFE ? 10 : (isHeight ? 8 : 10), 0, Math.PI * 2);
+        ctx.fillStyle = isDragged ? '#FFD580' : (isLFE ? '#FF8C00' : (isHeight ? '#2196F3' : '#E65100'));
+        ctx.fill();
+        ctx.strokeStyle = isDragged ? '#FFF' : 'rgba(255, 213, 128, 0.6)';
+        ctx.lineWidth = isDragged ? 3 : 2;
+        ctx.stroke();
+
+        if (isHeight) {
+            ctx.beginPath();
+            ctx.moveTo(sx, sy - 13); ctx.lineTo(sx + 5, sy - 8);
+            ctx.lineTo(sx, sy - 3); ctx.lineTo(sx - 5, sy - 8);
+            ctx.closePath();
+            ctx.fillStyle = 'rgba(33, 150, 243, 0.7)'; ctx.fill();
+        }
+
+        ctx.fillStyle = '#F5F5F5'; ctx.font = 'bold 11px sans-serif'; ctx.textAlign = 'center';
+        ctx.fillText(sp.n, sx, sy + (isHeight ? 22 : 20));
+
+        const tr = document.createElement('tr');
+        tr.innerHTML = '<td>' + sp.n + '</td><td>' + sp.az + '&deg;</td><td>' + sp.el + '&deg;</td><td>1.0m</td><td>' + (isLFE ? 'LFE' : (isHeight ? 'Height' : 'Ear Level')) + '</td>';
+        tbody.appendChild(tr);
+    });
+}
+
+// ===== Sync Error Visualization =====
+async function updateSyncViz() {
+    try {
+        const resp = await fetch(`${DAEMON_API}/stats/sync`);
+        if (!resp.ok) return;
+        const data = await resp.json();
+        drawSyncCanvas(data);
+        document.getElementById('syncOverall').textContent = data.overall_status || 'No speakers';
+        const maxDrift = data.speakers && data.speakers.length > 0
+            ? Math.max(...data.speakers.map(s => Math.abs(s.sync_error_ms || 0))).toFixed(1) + ' ms'
+            : '- ms';
+        document.getElementById('syncMaxDrift').textContent = maxDrift;
+    } catch {}
+}
+
+function drawSyncCanvas(data) {
+    const canvas = document.getElementById('syncCanvas');
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+    const w = canvas.width;
+    const h = canvas.height;
+    const cx = w / 2;
+    const cy = h / 2;
+    const radius = Math.min(w, h) * 0.38;
+
+    ctx.clearRect(0, 0, w, h);
+
+    // Concentric rings for severity
+    [1.0, 0.66, 0.33].forEach((scale, i) => {
+        ctx.beginPath(); ctx.arc(cx, cy, radius * scale, 0, Math.PI * 2);
+        const colors = ['rgba(244, 67, 54, 0.15)', 'rgba(255, 193, 7, 0.15)', 'rgba(76, 175, 80, 0.15)'];
+        ctx.fillStyle = colors[i]; ctx.fill();
+        ctx.strokeStyle = colors[i].replace('0.15', '0.4'); ctx.lineWidth = 1; ctx.stroke();
+    });
+
+    // Labels
+    ctx.fillStyle = 'rgba(255, 213, 128, 0.4)'; ctx.font = '10px sans-serif'; ctx.textAlign = 'center';
+    ctx.fillText('<5ms', cx, cy - radius * 0.33 + 12);
+    ctx.fillText('<20ms', cx, cy - radius * 0.66 + 12);
+    ctx.fillText('>20ms', cx, cy - radius + 12);
+
+    // Center dot
+    ctx.beginPath(); ctx.arc(cx, cy, 4, 0, Math.PI * 2);
+    ctx.fillStyle = '#FFD580'; ctx.fill();
+
+    if (!data.speakers || data.speakers.length === 0) {
+        ctx.fillStyle = 'rgba(255, 213, 128, 0.3)'; ctx.font = '14px sans-serif';
+        ctx.fillText('No speakers connected', cx, cy + radius + 30);
+        return;
+    }
+
+    // Plot speakers
+    const angleStep = (2 * Math.PI) / data.speakers.length;
+    data.speakers.forEach((sp, i) => {
+        const angle = -Math.PI / 2 + i * angleStep;
+        const err = Math.abs(sp.sync_error_ms || 0);
+        const dist = Math.min(err / 30, 1.0) * radius; // 30ms = edge
+        const sx = cx + dist * Math.cos(angle);
+        const sy = cy + dist * Math.sin(angle);
+
+        const color = err < 5 ? '#4CAF50' : (err < 20 ? '#FFC107' : '#F44336');
+        ctx.beginPath(); ctx.arc(sx, sy, 8, 0, Math.PI * 2);
+        ctx.fillStyle = color; ctx.fill();
+        ctx.strokeStyle = 'rgba(255, 255, 255, 0.5)'; ctx.lineWidth = 1.5; ctx.stroke();
+
+        ctx.fillStyle = '#F5F5F5'; ctx.font = 'bold 10px sans-serif'; ctx.textAlign = 'center';
+        ctx.fillText(sp.name || ('S' + (i + 1)), sx, sy + 20);
+        ctx.fillText(err.toFixed(1) + 'ms', sx, sy + 32);
+    });
 }
 
 // ===== Calibration =====
@@ -1124,6 +1503,7 @@ async function updateStats() {
             updateLatencyStats(),
             updateDaemonStats(),
             updateAudioLevels(),
+            updateSyncViz(),
         ]);
     } catch { /* daemon offline */ }
 }
@@ -1227,12 +1607,19 @@ function startStatusPolling() {
         updateMeters();
     }, 100);
 
-    // Medium poll (500ms) for playback status
+    // Medium poll (100ms) for playback status during playback
     setInterval(async () => {
-        if (appState.playback_state !== 'idle') {
+        if (appState.playback_state === 'playing') {
             await updatePlaybackStatus();
         }
-    }, 500);
+    }, 100);
+
+    // Slower poll (1s) for playback status when paused
+    setInterval(async () => {
+        if (appState.playback_state === 'paused') {
+            await updatePlaybackStatus();
+        }
+    }, 1000);
 
     // Slow poll (3s) for daemon status and stats
     setInterval(async () => {

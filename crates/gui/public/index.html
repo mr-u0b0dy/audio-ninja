@@ -14,6 +14,10 @@
                 <h1>Audio Ninja</h1>
                 <p class="subtitle">Professional Immersive Audio Processing</p>
             </div>
+            <div class="connection-status" id="connectionStatus" title="Daemon connection status">
+                <span class="conn-dot conn-offline" id="connDot"></span>
+                <span class="conn-text" id="connText">Offline</span>
+            </div>
         </header>
 
         <!-- Tab Navigation -->
@@ -243,8 +247,23 @@
                             </select>
                             <div class="help-text">System audio capture or external device</div>
                         </div>
+                        <div class="device-info-card" id="inputDeviceInfo">
+                            <div class="device-info-row">
+                                <span class="device-info-label">Channels:</span>
+                                <span class="device-info-value" id="inputChannels">-</span>
+                            </div>
+                            <div class="device-info-row">
+                                <span class="device-info-label">Sample Rate:</span>
+                                <span class="device-info-value" id="inputSampleRate">-</span>
+                            </div>
+                            <div class="device-info-row">
+                                <span class="device-info-label">Type:</span>
+                                <span class="device-info-value" id="inputType">-</span>
+                            </div>
+                        </div>
                         <div class="io-status">
                             <span class="label">Status:</span>
+                            <span class="io-availability" id="inputAvailability"></span>
                             <span id="inputStatus" class="value status-off">No input selected</span>
                         </div>
                     </section>
@@ -258,8 +277,27 @@
                             </select>
                             <div class="help-text">Select audio output device</div>
                         </div>
+                        <div class="device-info-card" id="outputDeviceInfo">
+                            <div class="device-info-row">
+                                <span class="device-info-label">Channels:</span>
+                                <span class="device-info-value" id="outputChannels">-</span>
+                            </div>
+                            <div class="device-info-row">
+                                <span class="device-info-label">Sample Rate:</span>
+                                <span class="device-info-value" id="outputSampleRate">-</span>
+                            </div>
+                            <div class="device-info-row">
+                                <span class="device-info-label">Type:</span>
+                                <span class="device-info-value" id="outputType">-</span>
+                            </div>
+                            <div class="device-info-row">
+                                <span class="device-info-label">Default:</span>
+                                <span class="device-info-value" id="outputIsDefault">-</span>
+                            </div>
+                        </div>
                         <div class="io-status">
                             <span class="label">Status:</span>
+                            <span class="io-availability" id="outputAvailability"></span>
                             <span id="outputStatus" class="value status-off">No output selected</span>
                         </div>
                     </section>
@@ -287,11 +325,12 @@
 
                     <div class="control-group">
                         <label for="transportMode">Transport Mode:</label>
-                        <select id="transportMode">
-                            <option value="FileOnly">File Playback Only</option>
-                            <option value="StreamOnly">Live Stream Only</option>
-                            <option value="Mixed">Mixed (File + Stream)</option>
+                        <select id="transportMode" title="Select how audio is routed">
+                            <option value="FileOnly" title="Play audio from a loaded file">File Playback Only</option>
+                            <option value="StreamOnly" title="Capture live audio from input devices">Live Stream Only</option>
+                            <option value="Mixed" title="Play file and capture live input simultaneously">Mixed (File + Stream)</option>
                         </select>
+                        <div class="help-text" id="transportModeHelp">Play audio from a loaded file</div>
                     </div>
                 </section>
 
@@ -304,9 +343,7 @@
                     </div>
 
                     <div class="progress-bar-container">
-                        <div class="progress-bar">
-                            <div class="progress-fill" id="playbackProgress" style="width: 0%"></div>
-                        </div>
+                        <input type="range" class="seek-slider" id="seekSlider" min="0" max="1000" value="0" step="1" aria-label="Seek position">
                         <div class="progress-labels">
                             <span id="playbackPosition">0:00</span>
                             <span id="playbackDuration">0:00</span>
@@ -592,6 +629,24 @@
                                 </tr>
                             </tbody>
                         </table>
+                    </div>
+                </section>
+
+                <!-- Sync Error Visualization -->
+                <section class="panel">
+                    <h2>Speaker Synchronization</h2>
+                    <div class="sync-viz-container">
+                        <canvas id="syncCanvas" width="400" height="400" aria-label="Speaker sync error visualization"></canvas>
+                    </div>
+                    <div class="status-grid" style="margin-top: 10px;">
+                        <div class="status-item">
+                            <span class="label">Overall:</span>
+                            <span id="syncOverall" class="value status-off">No speakers</span>
+                        </div>
+                        <div class="status-item">
+                            <span class="label">Max Drift:</span>
+                            <span id="syncMaxDrift" class="value">- ms</span>
+                        </div>
                     </div>
                 </section>
 
