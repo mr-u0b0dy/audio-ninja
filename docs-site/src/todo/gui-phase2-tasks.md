@@ -22,29 +22,29 @@
 - [ ] Save PNG fallbacks to `/crates/gui/icons/`
 
 ### Task 3: Update CSS with Magma Theme Variables
-- [ ] Define `:root` CSS variables:
+- [x] Define `:root` CSS variables:
   - `--magma-orange: #E65100`
   - `--neon-amber: #FF8C00`
   - `--void-black: #050203`
   - `--deep-bronze: #26140D`
   - `--mist-white: #F5F5F5`
   - `--blade-glow: #FFD580`
-- [ ] File: `/crates/gui/public/style.css`
-- [ ] Verify contrast ratios (WCAG AA: 4.5:1 minimum)
+- [x] File: `/crates/gui/public/style.css`
+- [x] Verify contrast ratios (WCAG AA: 4.5:1 minimum)
 
 ### Task 4: Refactor Existing Panel Styling
-- [ ] Update button backgrounds to Magma Orange
-- [ ] Update button hover to Neon Amber
-- [ ] Update panel backgrounds to Deep Bronze
-- [ ] Update text colors to Mist White
-- [ ] Add Blade Glow highlights for active states
-- [ ] Test on all existing panels (DRC, Loudness, Headroom, Binaural)
+- [x] Update button backgrounds to Magma Orange
+- [x] Update button hover to Neon Amber
+- [x] Update panel backgrounds to Deep Bronze
+- [x] Update text colors to Mist White
+- [x] Add Blade Glow highlights for active states
+- [x] Test on all existing panels (DRC, Loudness, Headroom, Binaural)
 
 ### Task 5: Add Smooth Transitions & Effects
-- [ ] Apply 200ms ease-in-out transitions to all state changes
-- [ ] Add glow effects to active buttons/tabs
-- [ ] Update gradients: Orange-to-bronze progression
-- [ ] Test performance impact (target <5% CPU)
+- [x] Apply 200ms ease-in-out transitions to all state changes
+- [x] Add glow effects to active buttons/tabs
+- [x] Update gradients: Orange-to-bronze progression
+- [x] Test performance impact (target <5% CPU)
 
 ### Task 6: Update Logo Integration
 - [ ] Add logo to header in `/crates/gui/public/index.html`
@@ -86,11 +86,11 @@
 - [ ] Add error handling and fallback
 
 ### Task 11: Implement Device Selection Handlers
-- [ ] POST `/api/v1/input/select` with device ID
-- [ ] POST `/api/v1/output/select` with device ID
-- [ ] Update UI after selection (highlight active device)
-- [ ] Add success/error feedback (toast notification)
-- [ ] Test switching devices during playback
+- [x] POST `/api/v1/input/select` with device ID
+- [x] POST `/api/v1/output/select` with device ID
+- [x] Update UI after selection (highlight active device)
+- [x] Add success/error feedback (toast notification)
+- [x] Test switching devices during playback
 
 ### Task 12: Add Transport Panel HTML
 - [ ] Create transport panel in index.html:
@@ -102,18 +102,18 @@
   - Playback duration
 
 ### Task 13: Implement File Loading
-- [ ] File picker UI with drag-drop support
-- [ ] POST `/api/v1/transport/load-file` with file path
-- [ ] Display selected file name in UI
-- [ ] Add error handling for invalid files
+- [x] File picker UI with drag-drop support
+- [x] POST `/api/v1/transport/load-file` with file path
+- [x] Display selected file name in UI
+- [x] Add error handling for invalid files
 - [ ] Test with .wav, .mp3, .flac, .opus
 
 ### Task 14: Implement Playback Controls
-- [ ] POST `/api/v1/transport/play` on Play button
-- [ ] POST `/api/v1/transport/pause` on Pause button
-- [ ] POST `/api/v1/transport/stop` on Stop button
-- [ ] Update button states (Play → Pause when playing)
-- [ ] Add keyboard shortcuts (Space for play/pause)
+- [x] POST `/api/v1/transport/play` on Play button
+- [x] POST `/api/v1/transport/pause` on Pause button
+- [x] POST `/api/v1/transport/stop` on Stop button
+- [x] Update button states (Play → Pause when playing)
+- [x] Add keyboard shortcuts (Space for play/pause)
 
 ### Task 15: Add Progress Tracking
 - [ ] GET `/api/v1/transport/playback-status` every 100ms
@@ -123,11 +123,11 @@
 - [ ] Handle slider drag events for seeking
 
 ### Task 16: Implement Transport Mode Selector
-- [ ] POST `/api/v1/transport/mode` with selected mode
-- [ ] UI dropdown: File-only | Stream-only | Mixed
+- [x] POST `/api/v1/transport/mode` with selected mode
+- [x] UI dropdown: File-only | Stream-only | Mixed
 - [ ] Add mode descriptions/tooltips
 - [ ] Test mode switching during playback
-- [ ] Save user preference (localStorage)
+- [x] Save user preference (localStorage)
 
 ### Task 17: I/O & Transport Testing
 - [ ] Test device enumeration with multiple configurations
@@ -245,12 +245,12 @@
 - [ ] Show sync status indicator (locked/drift/unlocked)
 
 ### Task 32: Implement Audio Level Meters
-- [ ] GET `/api/v1/stats/audio-levels` every 50ms
-- [ ] Display input level meter (dBFS from -60 to 0)
-- [ ] Display output level meter (dBFS per speaker)
-- [ ] Use gradient colors: green (-60 to -12), yellow (-12 to -3), red (-3 to 0)
-- [ ] Show peak hold with 3-second decay
-- [ ] Add clipping indicator (red flash on overload)
+- [x] GET `/api/v1/stats/audio-levels` every 50ms
+- [x] Display input level meter (dBFS from -60 to 0)
+- [x] Display output level meter (dBFS per speaker)
+- [x] Use gradient colors: green (-60 to -12), yellow (-12 to -3), red (-3 to 0)
+- [x] Show peak hold with 3-second decay
+- [x] Add clipping indicator (red flash on overload)
 
 ### Task 33: Polish Transitions & Animations
 - [ ] Add smooth fade-in animations for panels
@@ -267,11 +267,11 @@
 - [ ] Test on landscape/portrait tablet orientation
 
 ### Task 35: Accessibility Improvements
-- [ ] Add ARIA labels to all interactive elements
-- [ ] Implement keyboard navigation (Tab through controls)
+- [x] Add ARIA labels to all interactive elements
+- [x] Implement keyboard navigation (Tab through controls)
 - [ ] Test with screen reader (NVDA on Linux)
-- [ ] Ensure color contrast WCAG AA (4.5:1 minimum)
-- [ ] Add focus indicators for keyboard navigation
+- [x] Ensure color contrast WCAG AA (4.5:1 minimum)
+- [x] Add focus indicators for keyboard navigation
 
 ### Task 36: Dashboard Testing
 - [ ] Test stats updates with 0, 2, 4, 8 speakers
@@ -285,18 +285,18 @@
 ## Cross-Cutting Tasks
 
 ### Task 37: Error Handling & User Feedback
-- [ ] Implement toast notification system
+- [x] Implement toast notification system
 - [ ] Show connection status indicator (green/yellow/red)
 - [ ] Add retry logic for failed API calls
-- [ ] Display meaningful error messages to user
-- [ ] Log errors to console with timestamps
+- [x] Display meaningful error messages to user
+- [x] Log errors to console with timestamps
 
 ### Task 38: State Persistence
-- [ ] Save selected input/output devices to localStorage
-- [ ] Save transport mode preference
-- [ ] Save custom speaker layouts
+- [x] Save selected input/output devices to localStorage
+- [x] Save transport mode preference
+- [x] Save custom speaker layouts
 - [ ] Save theme preference (if implementing light/dark toggle)
-- [ ] Clear stale state on app restart
+- [x] Clear stale state on app restart
 
 ### Task 39: REST API Integration Testing
 - [ ] Create integration test suite for all endpoints
@@ -382,7 +382,7 @@
 ### Final Release Checklist
 - [ ] All 43 tasks completed ✅
 - [ ] 100% feature coverage (0 TODOs in code)
-- [ ] All tests passing (276+ tests)
+- [ ] All tests passing (293+ tests)
 - [ ] Zero console warnings/errors (Tauri DevTools clean)
 - [ ] Cross-platform testing complete (Linux, macOS, Windows)
 - [ ] Release binaries under 10MB (with all features)

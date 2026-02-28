@@ -211,6 +211,210 @@ paths:
               schema:
                 $ref: '#/components/schemas/SystemStats'
 
+  /stats/network:
+    get:
+      summary: Get network bandwidth statistics
+      tags: [Statistics]
+      responses:
+        '200':
+          description: Network bandwidth metrics
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NetworkStats'
+
+  /stats/latency:
+    get:
+      summary: Get latency statistics across speakers
+      tags: [Statistics]
+      responses:
+        '200':
+          description: Latency distribution metrics
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LatencyStats'
+
+  /stats/daemon:
+    get:
+      summary: Get daemon process statistics
+      tags: [Statistics]
+      responses:
+        '200':
+          description: Daemon CPU, memory, and uptime
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DaemonStats'
+
+  /stats/sync:
+    get:
+      summary: Get speaker synchronization statistics
+      tags: [Statistics]
+      responses:
+        '200':
+          description: Per-speaker sync error and phase status
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SyncStats'
+
+  /stats/audio-levels:
+    get:
+      summary: Get real-time audio levels
+      tags: [Statistics]
+      responses:
+        '200':
+          description: Input/output audio levels in dBFS
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AudioLevels'
+
+  /input/devices:
+    get:
+      summary: List all input devices
+      tags: [Audio I/O]
+      responses:
+        '200':
+          description: List of available input devices
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/InputDeviceInfo'
+
+  /input/select:
+    post:
+      summary: Select input source
+      tags: [Audio I/O]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SelectInputRequest'
+      responses:
+        '200':
+          description: Input source selected
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SelectInputResponse'
+        '404':
+          description: Input source not found
+
+  /input/status:
+    get:
+      summary: Get current input status
+      tags: [Audio I/O]
+      responses:
+        '200':
+          description: Active input source information
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InputStatus'
+
+  /output/devices:
+    get:
+      summary: List all output devices
+      tags: [Audio I/O]
+      responses:
+        '200':
+          description: List of available output devices
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/OutputDeviceInfo'
+
+  /output/select:
+    post:
+      summary: Select output device
+      tags: [Audio I/O]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SelectOutputRequest'
+      responses:
+        '200':
+          description: Output device selected
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SelectOutputResponse'
+        '404':
+          description: Output device not found
+
+  /output/status:
+    get:
+      summary: Get current output status
+      tags: [Audio I/O]
+      responses:
+        '200':
+          description: Active output device information
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OutputStatus'
+
+  /transport/load-file:
+    post:
+      summary: Load audio file for playback
+      tags: [Transport]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LoadFileRequest'
+      responses:
+        '200':
+          description: File loaded successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LoadFileResponse'
+        '400':
+          description: Invalid file or load error
+
+  /transport/mode:
+    post:
+      summary: Set transport mode
+      tags: [Transport]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SetTransportModeRequest'
+      responses:
+        '200':
+          description: Transport mode set
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SetTransportModeResponse'
+        '400':
+          description: Invalid mode
+
+  /transport/playback-status:
+    get:
+      summary: Get playback status
+      tags: [Transport]
+      responses:
+        '200':
+          description: Current playback state and position
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PlaybackStatus'
+
 components:
   parameters:
     SpeakerId:
@@ -336,7 +540,7 @@ components:
           properties:
             preset:
               type: string
-              enum: [stereo, 5.1, 7.1, 7.1.4, 9.1.6]
+              enum: [stereo, "2.1", "3.1", quad, "5.1", "5.1.2", "7.1", "7.1.4", "9.1.6"]
               example: stereo
         - required: [speakers]
           properties:
@@ -410,6 +614,345 @@ components:
           type: string
           example: Speaker not found
 
+    NetworkStats:
+      type: object
+      required: [sent_kbps, received_kbps, peak_sent_kbps, peak_received_kbps, packets_sent, packets_received]
+      properties:
+        sent_kbps:
+          type: number
+          format: double
+          example: 1536.0
+        received_kbps:
+          type: number
+          format: double
+          example: 15.36
+        peak_sent_kbps:
+          type: number
+          format: double
+          example: 1843.2
+        peak_received_kbps:
+          type: number
+          format: double
+          example: 23.04
+        packets_sent:
+          type: integer
+          format: int64
+          example: 0
+        packets_received:
+          type: integer
+          format: int64
+          example: 0
+
+    LatencyStats:
+      type: object
+      required: [min_ms, max_ms, mean_ms, stddev_ms, samples, speaker_count]
+      properties:
+        min_ms:
+          type: number
+          format: double
+          example: 8.5
+        max_ms:
+          type: number
+          format: double
+          example: 22.3
+        mean_ms:
+          type: number
+          format: double
+          example: 14.1
+        stddev_ms:
+          type: number
+          format: double
+          example: 3.7
+        samples:
+          type: array
+          items:
+            type: number
+            format: double
+          example: [8.5, 12.0, 14.1, 16.8, 22.3]
+        speaker_count:
+          type: integer
+          example: 5
+
+    DaemonStats:
+      type: object
+      required: [cpu_percent, memory_mb, uptime_secs, pid, version]
+      properties:
+        cpu_percent:
+          type: number
+          format: double
+          example: 2.5
+        memory_mb:
+          type: number
+          format: double
+          example: 45.2
+        uptime_secs:
+          type: integer
+          format: int64
+          example: 3600
+        pid:
+          type: integer
+          example: 12345
+        version:
+          type: string
+          example: 0.1.0
+
+    SyncStats:
+      type: object
+      required: [speakers, overall_status]
+      properties:
+        speakers:
+          type: array
+          items:
+            type: object
+            required: [id, name, sync_error_ms, status]
+            properties:
+              id:
+                type: string
+                format: uuid
+              name:
+                type: string
+                example: Left Speaker
+              sync_error_ms:
+                type: number
+                format: float
+                example: 1.2
+              status:
+                type: string
+                enum: [locked, drift, unlocked]
+                example: locked
+        overall_status:
+          type: string
+          enum: [no_speakers, locked, drift]
+          example: locked
+
+    AudioLevels:
+      type: object
+      required: [input_db_left, input_db_right, output_db_left, output_db_right, per_speaker_db, clipping]
+      properties:
+        input_db_left:
+          type: number
+          format: double
+          description: Input left channel level in dBFS
+          example: -12.0
+        input_db_right:
+          type: number
+          format: double
+          description: Input right channel level in dBFS
+          example: -11.5
+        output_db_left:
+          type: number
+          format: double
+          description: Output left channel level in dBFS
+          example: -14.0
+        output_db_right:
+          type: number
+          format: double
+          description: Output right channel level in dBFS
+          example: -13.7
+        per_speaker_db:
+          type: array
+          items:
+            type: number
+            format: double
+          description: Per-speaker output levels in dBFS
+          example: [-14.0, -14.0, -60.0]
+        clipping:
+          type: boolean
+          description: True if clipping detected on any channel
+          example: false
+
+    InputDeviceInfo:
+      type: object
+      required: [id, name, device_type, max_channels, available]
+      properties:
+        id:
+          type: string
+          example: PulseAudio Default (System)
+        name:
+          type: string
+          example: PulseAudio Default
+        device_type:
+          type: string
+          example: System
+        max_channels:
+          type: integer
+          example: 2
+        available:
+          type: boolean
+          example: true
+
+    OutputDeviceInfo:
+      type: object
+      required: [id, name, device_type, max_channels, available, is_default]
+      properties:
+        id:
+          type: string
+          example: output_0
+        name:
+          type: string
+          example: Default Speaker
+        device_type:
+          type: string
+          example: Speaker
+        max_channels:
+          type: integer
+          example: 2
+        available:
+          type: boolean
+          example: true
+        is_default:
+          type: boolean
+          example: true
+
+    SelectInputRequest:
+      type: object
+      required: [source_id]
+      properties:
+        source_id:
+          type: string
+          example: PulseAudio Default (System)
+
+    SelectInputResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: true
+        source:
+          type: string
+          example: System
+        device:
+          type: string
+          example: PulseAudio Default
+
+    SelectOutputRequest:
+      type: object
+      required: [device_id]
+      properties:
+        device_id:
+          type: string
+          example: output_0
+
+    SelectOutputResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: true
+        device:
+          type: string
+          example: Default Speaker
+        device_type:
+          type: string
+          example: Speaker
+        channels:
+          type: integer
+          example: 2
+
+    InputStatus:
+      type: object
+      required: [active]
+      properties:
+        active:
+          type: boolean
+          example: true
+        source_type:
+          type: string
+          nullable: true
+          example: System
+        device:
+          type: string
+          nullable: true
+          example: PulseAudio Default
+
+    OutputStatus:
+      type: object
+      required: [active]
+      properties:
+        active:
+          type: boolean
+          example: true
+        device:
+          type: string
+          nullable: true
+          example: Default Speaker
+        device_type:
+          type: string
+          nullable: true
+          example: Speaker
+        channels:
+          type: integer
+          example: 2
+
+    LoadFileRequest:
+      type: object
+      required: [file_path]
+      properties:
+        file_path:
+          type: string
+          example: /home/user/music/song.wav
+
+    LoadFileResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: true
+        file:
+          type: string
+          example: /home/user/music/song.wav
+        status:
+          type: string
+          example: loaded
+
+    SetTransportModeRequest:
+      type: object
+      required: [mode]
+      properties:
+        mode:
+          type: string
+          enum: [file, stream, mixed]
+          example: file
+
+    SetTransportModeResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: true
+        mode:
+          type: string
+          example: FilePlayback
+
+    PlaybackStatus:
+      type: object
+      required: [mode, transport_state, sample_rate]
+      properties:
+        mode:
+          type: string
+          example: FilePlayback
+        file:
+          type: string
+          nullable: true
+          example: /home/user/music/song.wav
+        position:
+          type: integer
+          format: int64
+          description: Current position in samples
+          example: 44100
+        total_samples:
+          type: integer
+          format: int64
+          description: Total samples in loaded file
+          example: 441000
+        sample_rate:
+          type: integer
+          example: 44100
+        transport_state:
+          type: string
+          enum: [Stopped, Playing, Paused]
+          example: Playing
+
 tags:
   - name: Status
     description: Daemon status and information
@@ -418,8 +961,10 @@ tags:
   - name: Layout
     description: Speaker layout configuration
   - name: Transport
-    description: Playback transport control
+    description: Playback transport control and file loading
   - name: Calibration
     description: Room calibration
   - name: Statistics
-    description: System statistics
+    description: System, network, latency, sync, and audio level statistics
+  - name: Audio I/O
+    description: Input source and output device management

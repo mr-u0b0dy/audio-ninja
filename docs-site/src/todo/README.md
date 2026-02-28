@@ -1,6 +1,6 @@
 # Project Roadmap
 
-**Last Updated**: January 1, 2026
+**Last Updated**: January 2, 2026
 
 Audio Ninja is a wireless immersive audio platform with IAMF support. This roadmap tracks development progress across three major phases.
 
@@ -22,14 +22,20 @@ Audio Ninja is a wireless immersive audio platform with IAMF support. This roadm
 | **Core Architecture** | ✅ Complete | 100% | Phase 2 GUI |
 | **REST API** | ✅ Complete | 100% | Integration |
 | **CLI/TUI** | ✅ Complete | 100% | Maintenance |
-| **GUI** | 🚧 In Progress | 30% | Phase 2a |
+| **GUI** | 🚧 In Progress | 60% | Phase 2c |
 | **Audio Backends** | ⏳ Planned | 0% | Phase 3 |
 
 **Recent Achievements**:
 - ✅ Fixed all CI/CD pipeline issues
 - ✅ Documentation site deployed
 - ✅ GUI Phase 2 planning complete
-- ✅ 276 tests passing, 80%+ coverage
+- ✅ 293 tests passing, 80%+ coverage
+- ✅ 10 layout presets (2.0 through 9.1.6)
+- ✅ 5 stats sub-endpoints (network, latency, daemon, sync, audio-levels)
+- ✅ GUI toast notifications, keyboard shortcuts, drag-drop, localStorage
+- ✅ WCAG accessibility pass (ARIA roles, focus-visible)
+- ✅ CI code coverage job enabled
+- ✅ OpenAPI spec updated with all I/O and stats endpoints
 
 ---
 
@@ -58,7 +64,7 @@ Audio Ninja is a wireless immersive audio platform with IAMF support. This roadm
 <details>
 <summary><strong>Quality Metrics</strong></summary>
 
-- ✅ 276 tests passing
+- ✅ 293 tests passing
 - ✅ 80%+ code coverage
 - ✅ Clippy: 0 warnings
 - ✅ Rustdoc: 0 errors
@@ -72,7 +78,7 @@ Audio Ninja is a wireless immersive audio platform with IAMF support. This roadm
 
 ## Phase 2: GUI Refactoring & Branding 🚧 IN PROGRESS
 
-**Duration**: 5 weeks | **Effort**: 40-50 hours | **Status**: Ready to Start
+**Duration**: 5 weeks | **Effort**: 40-50 hours | **Status**: In Progress (~60%)
 
 ### Overview
 
@@ -84,14 +90,15 @@ Transform the GUI from functional prototype to professional audio workstation wi
 
 ### Sub-Phases
 
-#### Phase 2a: Logo & Color Scheme 
+#### Phase 2a: Logo & Color Scheme ✅ MOSTLY COMPLETE
 **Priority**: 🔴 HIGH | **Effort**: 5-7 hours | **Week**: 1
 
 - ✅ Logo design complete (assets/logo.png)
 - ✅ Magma Orange theme designed (WCAG AA verified)
 - ✅ CSS component templates created
-- 🚧 Implement CSS theme variables
-- 🚧 Update all UI components
+- ✅ CSS theme variables implemented
+- ✅ Toast notifications, transitions, hover effects
+- ✅ WCAG accessibility (ARIA roles, focus-visible)
 - 🚧 Logo integration in header
 
 **Details**: [GUI Phase 2 Tasks - Section 2a](gui-phase2-tasks.md#phase-2a-logo--color-scheme-priority-1)
@@ -100,11 +107,12 @@ Transform the GUI from functional prototype to professional audio workstation wi
 **Priority**: 🔴 HIGH | **Effort**: 8-10 hours | **Week**: 2
 
 - ✅ REST API endpoints ready
-- 🚧 Device selection dropdowns
-- 🚧 Audio source routing interface
-- 🚧 File loader and playback controls
-- 🚧 Transport mode selector
-- 🚧 Error handling & feedback
+- ✅ Device selection dropdowns (wired to API)
+- ✅ Audio source routing interface
+- ✅ File loader with drag-drop support
+- ✅ Transport mode selector with localStorage
+- ✅ Error handling & toast feedback
+- ✅ Keyboard shortcuts (Space, Escape, 1-7, Ctrl+O)
 
 **Details**: [GUI Phase 2 Tasks - Section 2b](gui-phase2-tasks.md#phase-2b-io--transport-panel-priority-1)
 
@@ -122,10 +130,13 @@ Transform the GUI from functional prototype to professional audio workstation wi
 #### Phase 2d: Stats Dashboard & Polish
 **Priority**: 🟡 MEDIUM | **Effort**: 10-12 hours | **Week**: 4-5
 
-- 🚧 Real-time metrics dashboard
+- ✅ Real-time metrics dashboard (wired to 5 stats endpoints)
+- ✅ Audio level meters with peak hold
+- ✅ Network bandwidth display
+- ✅ Latency statistics display
+- ✅ Daemon CPU/memory monitoring
 - 🚧 Speaker status monitoring
-- 🚧 Network bandwidth graphs
-- 🚧 Performance profiling
+- 🚧 Network bandwidth graphs (Chart.js)
 - 🚧 Cross-platform testing
 - 🚧 Responsive design optimization
 
@@ -300,5 +311,5 @@ See [CONTRIBUTING.md](../../CONTRIBUTING.md) for detailed guidelines.
 
 ---
 
-**Last Updated**: January 1, 2026  
-**Next Review**: After Phase 2a completion
+**Last Updated**: January 2, 2026  
+**Next Review**: After Phase 2c completion
