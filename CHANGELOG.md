@@ -8,13 +8,36 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
-- Nothing yet
+- **GUI Phase 2**: 7-tab desktop interface (Status, Config, I/O, Transport, Layout, Calibration, Stats)
+  - Magma/dark orange theme with CSS custom properties and smooth transitions
+  - Audio level meters (input L/R, output L/R) with dBFS display
+  - Canvas-based speaker layout visualization with drag-to-reposition
+  - Latency history, bandwidth, and sync error canvas graphs
+  - Speaker stats table with per-speaker metrics
+  - Calibration panel with sweep settings, IR visualization, and filter design
+  - Transport controls: file loading, play/pause/stop, seek slider, mode selector (File/Stream/Mixed)
+  - I/O device management: input/output device dropdowns with real-time status
+  - Toast notification system for user feedback
+  - Keyboard shortcuts (1-7 for tabs, Space play/pause, Ctrl+O file picker)
+  - Drag-and-drop file loading on transport panel
+  - Responsive CSS with breakpoints at 640px, 768px, 1024px
+  - Daemon connection status indicator with exponential backoff retry
+  - localStorage persistence for user preferences (tab, devices, mode, layout)
+  - ARIA attributes and focus-visible styles for accessibility
+- **Daemon**: `POST /api/v1/transport/seek` endpoint for sample-accurate seeking
+- **Daemon**: Real CPU/memory monitoring from `/proc/self` on Linux
+- **Daemon**: Per-speaker sync status classification (locked/drift/unlocked)
+- **Logo**: Professional Audio Ninja logo integrated in GUI header
 
 ### Changed
-- Nothing yet
+- Stats tab element IDs normalized to camelCase (`statCpu`, `statMemory`, etc.)
+- Logo path uses `public/` directory for correct Tauri production builds
 
 ### Fixed
-- Nothing yet
+- Stats dashboard not updating: HTML element IDs mismatched JS queries (e.g. `statsCPU` vs `statCpu`)
+- Logo not loading in production Tauri builds due to `../icons/` path escaping distDir
+- Release workflow: removed orphaned `upload_url` output referencing nonexistent step
+- Release workflow: checksum job now uses `v`-prefixed tag for `gh release download`
 
 ## [0.1.0] - 2025-12-28
 

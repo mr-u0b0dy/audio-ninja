@@ -41,5 +41,12 @@
     "serayuzgur.crates",
     "vadimcn.vscode-lldb"
   ],
-  "makefile.configureOnOpen": false
+  "makefile.configureOnOpen": false,
+  "chat.tools.terminal.autoApprove": {
+    "cargo test": true,
+    "cargo clippy": true,
+    "cargo update": true,
+    "cargo check": true,
+    "awk": true
+  }
 }

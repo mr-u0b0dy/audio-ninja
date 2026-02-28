@@ -504,6 +504,11 @@ pub struct SetTransportModeRequest {
     pub mode: String, // "file", "stream", or "mixed"
 }
 
+#[derive(Deserialize)]
+pub struct SeekRequest {
+    pub position: u64,
+}
+
 /// GET /api/v1/input/devices - List all input devices
 pub async fn list_input_devices(State(state): State<AppState>) -> Json<Vec<InputDeviceInfo>> {
     let mut engine = state.engine.write().await;
@@ -669,6 +674,19 @@ pub async fn output_status(State(state): State<AppState>) -> Json<serde_json::Va
             "channels": 0,
         }))
     }
+}
+
+/// POST /api/v1/transport/seek - Seek to position in loaded file
+pub async fn transport_seek(
+    State(state): State<AppState>,
+    Json(req): Json<SeekRequest>,
+) -> StatusCode {
+    let mut engine = state.engine.write().await;
+    if engine.playback.file_path.is_none() {
+        return StatusCode::BAD_REQUEST;
+    }
+    engine.seek(req.position);
+    StatusCode::OK
 }
 
 /// GET /api/v1/transport/playback-status - Get playback status

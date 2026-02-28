@@ -168,6 +168,11 @@ impl EngineState {
         self.transport_state = TransportState::Stopped;
     }
 
+    /// Seek to a specific sample position in the loaded file
+    pub fn seek(&mut self, position: u64) {
+        self.playback.playback_position = position.min(self.playback.total_samples);
+    }
+
     pub fn start_calibration(&mut self) {
         self.calibration.running = true;
         self.calibration.progress = 0.0;

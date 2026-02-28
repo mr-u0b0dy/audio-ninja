@@ -47,8 +47,8 @@
 - [x] Test performance impact (target <5% CPU)
 
 ### Task 6: Update Logo Integration
-- [ ] Add logo to header in `/crates/gui/public/index.html`
-- [ ] Update `tauri.conf.json` icon paths
+- [x] Add logo to header in `/crates/gui/public/index.html`
+- [x] Update `tauri.conf.json` icon paths
 - [ ] Integrate logo into splash screen (if applicable)
 - [ ] Test rendering at multiple DPI levels
 
@@ -64,26 +64,26 @@
 ## Phase 2b: I/O & Transport Panel (Priority 2)
 
 ### Task 8: Add Input/Output Device Panel HTML
-- [ ] Create new panels in `/crates/gui/public/index.html`:
+- [x] Create new panels in `/crates/gui/public/index.html`:
   - Input panel with device selection dropdown
   - Output panel with device selection dropdown
   - Source type toggles (System/Application/External)
-- [ ] Add device info display (channels, sample rates, capabilities)
-- [ ] Add device availability indicators
+- [x] Add device info display (channels, sample rates, capabilities)
+- [x] Add device availability indicators
 
 ### Task 9: Fetch & Display Input Devices
-- [ ] GET `/api/v1/input/devices` on app startup
-- [ ] Parse JSON response (id, name, channels, sample_rate, available)
-- [ ] Populate input device dropdown in app.js
-- [ ] Add error handling (log to console, fallback UI)
+- [x] GET `/api/v1/input/devices` on app startup
+- [x] Parse JSON response (id, name, channels, sample_rate, available)
+- [x] Populate input device dropdown in app.js
+- [x] Add error handling (log to console, fallback UI)
 - [ ] Test with 0, 1, and 3+ devices
 
 ### Task 10: Fetch & Display Output Devices
-- [ ] GET `/api/v1/output/devices` on app startup
-- [ ] Parse JSON response (id, name, device_type, channels, sample_rates, default)
-- [ ] Populate output device dropdown in app.js
+- [x] GET `/api/v1/output/devices` on app startup
+- [x] Parse JSON response (id, name, device_type, channels, sample_rates, default)
+- [x] Populate output device dropdown in app.js
 - [ ] Group by device type (Speaker, Headphones, USB, etc.)
-- [ ] Add error handling and fallback
+- [x] Add error handling and fallback
 
 ### Task 11: Implement Device Selection Handlers
 - [x] POST `/api/v1/input/select` with device ID
@@ -93,7 +93,7 @@
 - [x] Test switching devices during playback
 
 ### Task 12: Add Transport Panel HTML
-- [ ] Create transport panel in index.html:
+- [x] Create transport panel in index.html:
   - File loader (input type="file", accept audio formats)
   - Play/Pause/Stop buttons
   - Progress slider
@@ -116,11 +116,11 @@
 - [x] Add keyboard shortcuts (Space for play/pause)
 
 ### Task 15: Add Progress Tracking
-- [ ] GET `/api/v1/transport/playback-status` every 100ms
-- [ ] Parse response (current_position, duration, is_playing, sample_rate)
-- [ ] Update progress slider position
-- [ ] Display time elapsed / total duration
-- [ ] Handle slider drag events for seeking
+- [x] GET `/api/v1/transport/playback-status` every 100ms
+- [x] Parse response (current_position, duration, is_playing, sample_rate)
+- [x] Update progress slider position
+- [x] Display time elapsed / total duration
+- [x] Handle slider drag events for seeking
 
 ### Task 16: Implement Transport Mode Selector
 - [x] POST `/api/v1/transport/mode` with selected mode
@@ -141,17 +141,17 @@
 ## Phase 2c: Visualization & Calibration (Priority 3)
 
 ### Task 18: Create Layout Visualization Canvas
-- [ ] Add canvas element to index.html
-- [ ] Implement 2D speaker layout renderer (top-down view)
-- [ ] Support presets: 2.0, 2.1, 3.1, 4.0, 5.1, 5.1.2, 7.1, 7.1.4, 9.1.6
-- [ ] Draw speaker positions with labels (FL, FR, C, etc.)
-- [ ] Use Magma theme colors for visualization
+- [x] Add canvas element to index.html
+- [x] Implement 2D speaker layout renderer (top-down view)
+- [x] Support presets: 2.0, 2.1, 3.1, 4.0, 5.1, 5.1.2, 7.1, 7.1.4, 9.1.6
+- [x] Draw speaker positions with labels (FL, FR, C, etc.)
+- [x] Use Magma theme colors for visualization
 
 ### Task 19: Add Layout Editor Interactivity
-- [ ] Enable drag-to-reposition speakers on canvas
+- [x] Enable drag-to-reposition speakers on canvas
 - [ ] Add angle/distance input fields for precise positioning
-- [ ] Add preset selector dropdown
-- [ ] Store custom layouts in localStorage
+- [x] Add preset selector dropdown
+- [x] Store custom layouts in localStorage
 - [ ] Validate speaker positions (prevent overlap, min distance)
 
 ### Task 20: Implement VBAP Test Signal Display
@@ -161,7 +161,7 @@
 - [ ] Highlight active speakers during playback
 
 ### Task 21: Add Calibration Panel HTML
-- [ ] Create calibration section in index.html:
+- [x] Create calibration section in index.html:
   - Sweep controls (start/stop, frequency range 20-20kHz, duration)
   - Microphone input device selector
   - IR visualization canvas
@@ -201,7 +201,7 @@
 ## Phase 2d: Stats Dashboard & Polish (Priority 4)
 
 ### Task 26: Build Real-Time Stats Panel HTML
-- [ ] Create stats section in index.html:
+- [x] Create stats section in index.html:
   - Speaker status table (name, address, latency, packet loss %)
   - Network bandwidth graph (sent/received kbps)
   - Latency histogram (min/max/mean/stddev)
@@ -210,39 +210,39 @@
   - Audio level meters
 
 ### Task 27: Implement Speaker Status Table
-- [ ] GET `/api/v1/speakers` to list connected speakers
-- [ ] Parse response (id, name, address, latency_ms, packet_loss_pct, sync_error)
-- [ ] Display in HTML table with live updates (every 200ms)
+- [x] GET `/api/v1/speakers` to list connected speakers
+- [x] Parse response (id, name, address, latency_ms, packet_loss_pct, sync_error)
+- [x] Display in HTML table with live updates (every 200ms)
 - [ ] Color-code status (green: ok, yellow: warning, red: error)
 - [ ] Add "View Details" modal for each speaker
 
 ### Task 28: Add Network Bandwidth Monitoring
-- [ ] GET `/api/v1/stats/network` for bandwidth data
-- [ ] Display sent/received kbps as live graph
-- [ ] Use sparkline or Chart.js for visualization
+- [x] GET `/api/v1/stats/network` for bandwidth data
+- [x] Display sent/received kbps as live graph
+- [x] Use sparkline or Chart.js for visualization
 - [ ] Show peak/average rates
 - [ ] Add historical 5/60-minute views
 
 ### Task 29: Create Latency Histogram
-- [ ] GET `/api/v1/stats/latency` for latency samples
-- [ ] Compute statistics (min, max, mean, stddev)
-- [ ] Plot histogram with bin size 5ms
+- [x] GET `/api/v1/stats/latency` for latency samples
+- [x] Compute statistics (min, max, mean, stddev)
+- [x] Plot histogram with bin size 5ms
 - [ ] Highlight target range (±5ms initially, ±1ms future)
 - [ ] Show per-speaker latency comparison
 
 ### Task 30: Implement CPU/Memory Monitoring
-- [ ] GET `/api/v1/stats/daemon` for daemon process stats
-- [ ] Display CPU usage (% of 1 core, cores utilized)
-- [ ] Display memory usage (MB, % of system)
+- [x] GET `/api/v1/stats/daemon` for daemon process stats
+- [x] Display CPU usage (% of 1 core, cores utilized)
+- [x] Display memory usage (MB, % of system)
 - [ ] Show resource trends (5-minute graph)
 - [ ] Alert if CPU >80% or memory >500MB
 
 ### Task 31: Add Sync Error Visualization
-- [ ] GET `/api/v1/stats/sync` for phase alignment data
-- [ ] Display per-speaker sync error (sample offset, phase degrees)
-- [ ] Plot on circular plot (0°-360°) or time-series
-- [ ] Color-code by severity (green <5ms, yellow 5-20ms, red >20ms)
-- [ ] Show sync status indicator (locked/drift/unlocked)
+- [x] GET `/api/v1/stats/sync` for phase alignment data
+- [x] Display per-speaker sync error (sample offset, phase degrees)
+- [x] Plot on circular plot (0°-360°) or time-series
+- [x] Color-code by severity (green <5ms, yellow 5-20ms, red >20ms)
+- [x] Show sync status indicator (locked/drift/unlocked)
 
 ### Task 32: Implement Audio Level Meters
 - [x] GET `/api/v1/stats/audio-levels` every 50ms
@@ -253,10 +253,10 @@
 - [x] Add clipping indicator (red flash on overload)
 
 ### Task 33: Polish Transitions & Animations
-- [ ] Add smooth fade-in animations for panels
-- [ ] Animate graph/meter updates (no sudden jumps)
-- [ ] Add button ripple effects on click
-- [ ] Smooth tab transitions (slide or fade)
+- [x] Add smooth fade-in animations for panels
+- [x] Animate graph/meter updates (no sudden jumps)
+- [x] Add button ripple effects on click
+- [x] Smooth tab transitions (slide or fade)
 - [ ] Test animation performance (target 60fps, <5% CPU)
 
 ### Task 34: Responsive Layout Design
@@ -286,8 +286,8 @@
 
 ### Task 37: Error Handling & User Feedback
 - [x] Implement toast notification system
-- [ ] Show connection status indicator (green/yellow/red)
-- [ ] Add retry logic for failed API calls
+- [x] Show connection status indicator (green/yellow/red)
+- [x] Add retry logic for failed API calls
 - [x] Display meaningful error messages to user
 - [x] Log errors to console with timestamps
 

@@ -88,73 +88,11 @@ pub struct SpeakerStats {
     pub buffer_fill: f32,
 }
 
-// ===== Audio Processing Commands =====
-// These commands call the audio-ninja core library directly for local processing,
-// and the daemon API for remote/distributed operations.
-
-#[derive(Debug, Serialize, Deserialize)]
-pub struct AudioConfig {
-    pub sample_rate: Option<u32>,
-    pub drc_preset: Option<String>,
-    pub loudness_target: Option<String>,
-    pub headroom_db: Option<f32>,
-    pub headroom_lookahead_ms: Option<f32>,
-    pub binaural_enabled: Option<bool>,
-    pub binaural_profile: Option<String>,
-    pub binaural_azimuth: Option<f32>,
-    pub binaural_elevation: Option<f32>,
-    pub binaural_distance: Option<f32>,
-}
-
-#[derive(Debug, Serialize, Deserialize)]
-pub struct ConfigResult {
-    pub sample_rate: u32,
-    pub drc_enabled: bool,
-    pub loudness_enabled: bool,
-    pub binaural_enabled: bool,
-}
-
-#[derive(Debug, Serialize, Deserialize)]
-pub struct ProcessResult {
-    pub channels: u32,
-    pub samples: u32,
-    pub message: String,
-}
-
-#[tauri::command]
-async fn initialize_renderer(sample_rate: u32) -> Result<String, String> {
-    // Initialize the audio processing renderer
-    Ok(format!("Renderer initialized at {} Hz", sample_rate))
-}
-
-#[tauri::command]
-async fn apply_config(config: AudioConfig) -> Result<ConfigResult, String> {
-    let drc_enabled = config.drc_preset.as_ref().is_some_and(|p| !p.is_empty());
-    let loudness_enabled = config
-        .loudness_target
-        .as_ref()
-        .is_some_and(|t| !t.is_empty());
-    let binaural_enabled = config.binaural_enabled.unwrap_or(false);
-
-    Ok(ConfigResult {
-        sample_rate: config.sample_rate.unwrap_or(48000),
-        drc_enabled,
-        loudness_enabled,
-        binaural_enabled,
-    })
-}
-
-#[tauri::command]
-async fn process_audio(channels: u32, num_samples: u32) -> Result<ProcessResult, String> {
-    Ok(ProcessResult {
-        channels,
-        samples: num_samples,
-        message: format!(
-            "Processed {} samples across {} channels",
-            num_samples, channels
-        ),
-    })
-}
+// ===== Daemon API Commands =====
+// The GUI acts as a thin client — all audio processing runs in the daemon.
+// The frontend (app.js) calls the daemon REST API directly via fetch().
+// These Tauri commands exist for operations that need native OS access
+// (e.g., file dialogs) or for future Tauri-specific features.
 
 #[tauri::command]
 async fn select_file() -> Result<Option<String>, String> {
@@ -372,9 +310,6 @@ async fn main() {
     tauri::Builder::default()
         .manage(app_state)
         .invoke_handler(tauri::generate_handler![
-            initialize_renderer,
-            apply_config,
-            process_audio,
             select_file,
             get_daemon_status,
             list_speakers,

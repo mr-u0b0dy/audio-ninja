@@ -17,7 +17,6 @@ jobs:
     name: Create Release
     runs-on: ubuntu-latest
     outputs:
-      upload_url: ${{ steps.create_release.outputs.upload_url }}
       version: ${{ steps.get_version.outputs.version }}
     steps:
       - name: Get version from tag
@@ -165,7 +164,7 @@ jobs:
 
       - name: Generate checksums from release
         run: |
-          gh release download ${{ needs.create-release.outputs.version }} -D artifacts --pattern '*'
+          gh release download v${{ needs.create-release.outputs.version }} -D artifacts --pattern '*'
           cd artifacts
           sha256sum * > checksums.txt
         env:

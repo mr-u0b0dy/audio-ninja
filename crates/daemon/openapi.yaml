@@ -157,6 +157,28 @@ paths:
         '200':
           description: Playback stopped
 
+  /transport/seek:
+    post:
+      summary: Seek to position in loaded file
+      tags: [Transport]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [position]
+              properties:
+                position:
+                  type: integer
+                  format: uint64
+                  description: Target position in samples
+      responses:
+        '200':
+          description: Seek successful
+        '400':
+          description: No file loaded or invalid position
+
   /transport/status:
     get:
       summary: Get transport status
