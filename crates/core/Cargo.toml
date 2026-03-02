@@ -30,4 +30,4 @@ rand = "0.9"
 tokio = { version = "1.42", features = ["net", "sync", "time", "rt", "macros"] }
 mdns-sd = "0.11"
 uuid = { version = "1.11", features = ["v4", "serde"] }
-cpal = { version = "0.15", optional = true }
+cpal = { version = "0.17", optional = true }
