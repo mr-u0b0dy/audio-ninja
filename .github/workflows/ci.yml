@@ -143,7 +143,7 @@ jobs:
         run: cargo build --workspace --exclude audio-ninja-gui --all-features --release
 
       - name: Upload build artifacts
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         if: matrix.profile == 'release'
         with:
           name: binaries-${{ matrix.os }}-${{ matrix.target }}
@@ -200,7 +200,7 @@ jobs:
         run: cargo test --workspace --exclude audio-ninja-gui --all-features --doc
 
       - name: Upload test results (JUnit only)
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         if: always()
         with:
           name: test-results-${{ matrix.os }}
@@ -345,7 +345,7 @@ jobs:
           token: ${{ secrets.CODECOV_TOKEN }}
 
       - name: Upload coverage artifacts
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         if: always()
         with:
           name: coverage-report
